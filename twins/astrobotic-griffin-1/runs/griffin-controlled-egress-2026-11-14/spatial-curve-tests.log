@@ -1,0 +1,268 @@
+   Compiling rustix v1.1.4
+   Compiling tracing v0.1.44
+   Compiling bevy_ecs v0.20.0
+   Compiling regex-automata v0.4.15
+   Compiling ron v0.12.2
+   Compiling png v0.18.1
+   Compiling polling v3.11.0
+   Compiling matchers v0.2.0
+   Compiling image v0.25.10
+   Compiling async-io v2.6.0
+   Compiling tracing-log v0.2.0
+   Compiling read-fonts v0.41.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling bevy_app v0.20.0
+   Compiling parking_lot_core v0.9.12
+   Compiling parking_lot v0.12.5
+   Compiling naga v30.0.0
+   Compiling bevy_time v0.20.0
+   Compiling bevy_transform v0.20.0
+   Compiling bevy_diagnostic v0.20.0
+   Compiling bevy_input v0.20.0
+   Compiling bevy_asset v0.20.0
+   Compiling bevy_log v0.20.0
+   Compiling harfrust v0.12.0
+   Compiling bevy_window v0.20.0
+   Compiling bevy_mesh v0.20.0
+   Compiling bevy_image v0.20.0
+   Compiling skrifa v0.44.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling lalrpop-util v0.23.2
+   Compiling fontique v0.11.1
+   Compiling wgpu-hal v30.0.0
+   Compiling wgsl-parse v0.6.0
+   Compiling parley v0.11.1
+   Compiling bevy_camera v0.20.0
+   Compiling bevy_clipboard v0.20.0
+   Compiling bevy_text v0.20.0
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling bevy_picking v0.20.0
+   Compiling wgpu-core v30.0.0
+   Compiling bevy_sprite v0.20.0
+   Compiling bevy_input_focus v0.20.0
+   Compiling wesl v0.6.0
+   Compiling bevy_gizmos v0.20.0
+   Compiling bevy_extract v0.20.0
+   Compiling wgpu v30.0.0
+   Compiling bevy_a11y v0.20.0
+   Compiling bevy_shader v0.20.0 (https://github.com/LunCoSim/bevy?rev=8671dfe743d284f074587862e03bcd3e0b79ecc6#8671dfe7)
+   Compiling bevy_light v0.20.0 (https://github.com/LunCoSim/bevy?rev=8671dfe743d284f074587862e03bcd3e0b79ecc6#8671dfe7)
+   Compiling bevy_ui v0.20.0
+   Compiling bevy_material v0.20.0
+   Compiling bevy_state v0.20.0
+   Compiling bevy_render v0.20.0 (https://github.com/LunCoSim/bevy?rev=8671dfe743d284f074587862e03bcd3e0b79ecc6#8671dfe7)
+   Compiling bevy_gilrs v0.20.0
+   Compiling wayland-sys v0.31.11
+   Compiling wayland-backend v0.3.15
+   Compiling ahash v0.8.12
+   Compiling epaint v0.36.2
+   Compiling wayland-client v0.31.14
+   Compiling wayland-protocols v0.32.13
+   Compiling bevy_ui_widgets v0.20.0
+   Compiling gethostname v1.1.0
+   Compiling x11rb v0.13.2
+   Compiling bevy_core_pipeline v0.20.0
+   Compiling egui v0.36.2
+   Compiling regex v1.13.0
+   Compiling celestial-core v0.1.1-alpha.2 (https://github.com/LunCoSim/celestial?rev=3ceda3bbc8770023e0ab527e826828b7e9bf5aec#3ceda3bb)
+   Compiling bevy_sprite_render v0.20.0
+   Compiling bevy_pbr v0.20.0 (https://github.com/LunCoSim/bevy?rev=8671dfe743d284f074587862e03bcd3e0b79ecc6#8671dfe7)
+   Compiling bevy_post_process v0.20.0
+   Compiling bevy_anti_alias v0.20.0
+   Compiling calloop v0.13.0
+   Compiling bevy_ui_render v0.20.0
+   Compiling xkbcommon-dl v0.4.2
+   Compiling calloop v0.14.4
+   Compiling wayland-cursor v0.31.14
+   Compiling calloop-wayland-source v0.4.1
+   Compiling winit v0.30.13
+   Compiling celestial-time v0.1.1-alpha.2 (https://github.com/LunCoSim/celestial?rev=3ceda3bbc8770023e0ab527e826828b7e9bf5aec#3ceda3bb)
+   Compiling wayland-protocols-wlr v0.3.12
+   Compiling wayland-protocols-experimental v20250721.0.1
+   Compiling wayland-protocols-misc v0.3.12
+   Compiling wayland-csd-frame v0.3.0
+   Compiling accesskit_winit v0.33.2
+   Compiling arboard v3.6.1
+   Compiling smithay-client-toolkit v0.20.0
+   Compiling bevy_winit v0.20.0
+   Compiling terminal_size v0.4.4
+   Compiling bevy_internal v0.20.0
+   Compiling smithay-clipboard v0.7.3
+   Compiling miette v7.6.0
+   Compiling zip v9.0.5
+   Compiling bevy v0.20.0
+   Compiling bevy_egui v0.43.1
+   Compiling rumoca-core v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling lunco-core v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-core)
+   Compiling lunco-settings v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-settings)
+   Compiling lunco-twin v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-twin)
+   Compiling openusd v0.8.0 (https://github.com/LunCoSim/openusd?rev=38fd797eadfdb5e8759cb060b7733b7fc962747e#38fd797e)
+   Compiling gemm-common v0.19.0
+   Compiling lunco-core-runtime v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-core-runtime)
+   Compiling lunco-doc-bevy v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-doc-bevy)
+   Compiling lunco-assets-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-assets-core)
+   Compiling lunco-time v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-time)
+   Compiling rumoca-ir-ast v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling env_filter v2.0.0
+   Compiling lunco-telemetry-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-telemetry-core)
+   Compiling env_logger v0.11.11
+   Compiling lunco-workspace v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workspace)
+   Compiling parol v4.7.0
+   Compiling gemm-f64 v0.19.0
+   Compiling openusd-build v0.8.0 (https://github.com/LunCoSim/openusd?rev=38fd797eadfdb5e8759cb060b7733b7fc962747e#38fd797e)
+   Compiling lunco-usd-data v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-data)
+   Compiling gemm-c64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling openusd-schemas v0.8.0 (https://github.com/LunCoSim/openusd?rev=38fd797eadfdb5e8759cb060b7733b7fc962747e#38fd797e)
+   Compiling gemm-c32 v0.19.0
+   Compiling rumoca-ir-flat v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-ir-dae v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling gemm v0.19.0
+   Compiling lunco-usd-authoring v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-authoring)
+   Compiling rumoca-phase-parse v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-eval-ast v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling petgraph v0.8.3
+   Compiling leafwing-input-manager v0.22.0
+   Compiling parol_runtime v4.5.0
+   Compiling rumoca-ir-solve v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling faer v0.24.4
+   Compiling lunco-usd-compose v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-compose)
+   Compiling rumoca-eval-dae v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-eval-flat v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-resolve v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling lunco-port-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-port-core)
+   Compiling lunco-embodiment-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-embodiment-core)
+   Compiling rumoca-eval-solve v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling lunco-control-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-control-core)
+   Compiling rumoca-ir-galec v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-codegen v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-instantiate v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-typecheck v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-dae v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-flatten v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-phase-structural v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling lunco-exposure-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-exposure-core)
+   Compiling lunco-celestial v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-celestial)
+   Compiling lunco-core-session v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-core-session)
+   Compiling lunco-signal v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-signal)
+   Compiling lunco-api-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-api-core)
+   Compiling lunco-readiness v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-readiness)
+   Compiling lunco-lint v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-lint)
+   Compiling big_space v0.14.0-rc.0 (https://github.com/LunCoSim/big_space?rev=581295f909ddddad138a876b497dbc1fdff389b6#581295f9)
+   Compiling bevy_transform_interpolation v0.6.0
+   Compiling lunco-usd-bevy-stage v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-stage)
+   Compiling lunco-spatial v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-spatial)
+   Compiling avian3d v0.8.0 (https://github.com/LunCoSim/avian?rev=b8d1f5a3d5aeeb61220813e82607ca6a74e7057a#b8d1f5a3)
+   Compiling lunco-usd-document v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-document)
+   Compiling lunco-render v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-render)
+   Compiling lunco-viewport-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-viewport-core)
+   Compiling lunco-usd-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-core)
+   Compiling egui_extras v0.36.2
+   Compiling lunco-assets-datasets v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-assets-datasets)
+   Compiling lunco-interaction-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-interaction-core)
+   Compiling lunco-workbench-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-core)
+   Compiling lunco-assets-runtime v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-assets-runtime)
+   Compiling lunco-cosim-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-cosim-core)
+   Compiling lunco-usd-geometry v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-geometry)
+   Compiling lunco-usd-bevy-twin v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-twin)
+   Compiling lunco-theme v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-theme)
+   Compiling rhai v1.25.1
+   Compiling lunco-usd-bevy-lathe v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-lathe)
+   Compiling lunco-camera-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-camera-core)
+   Compiling lunco-obstacle-field v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-obstacle-field)
+   Compiling lunco-workbench-widgets v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-widgets)
+   Compiling lunco-materials v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-materials)
+   Compiling lunco-usd-bevy-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-core)
+   Compiling lunco-terrain-bake v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-terrain-bake)
+   Compiling lunco-sysml-ast v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-sysml-ast)
+   Compiling lunco-workbench-state v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-state)
+   Compiling lunco-hooks-rhai v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-hooks-rhai)
+   Compiling rfd v0.17.2
+   Compiling bevy_flair_core v0.9.0
+   Compiling lunco-celestial-spatial-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-celestial-spatial-core)
+   Compiling lunco-input-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-input-core)
+   Compiling lunco-status-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-status-core)
+   Compiling bevy_flair_style v0.9.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/third_party/bevy_flair_style)
+   Compiling lunco-workbench-file-dialog v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-file-dialog)
+   Compiling egui_dock v0.21.1
+   Compiling lunco-scene-command-contracts v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-command-contracts)
+   Compiling lunco-scripting-rhai-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-rhai-core)
+   Compiling transform-gizmo v0.9.0 (https://github.com/LunCoSim/mitchty-transform-gizmo?rev=01302a171ac3db662c0c322ef9e98fe7d5f33a6a#01302a17)
+   Compiling bevy_flair_css_parser v0.9.0
+   Compiling lunco-workbench-layout v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-layout)
+   Compiling lunco-tools-rhai v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-tools-rhai)
+   Compiling lunco-canvas v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-canvas)
+   Compiling egui_plot v0.37.0
+   Compiling bevy_flair v0.9.0
+   Compiling lunco-workbench-help-ui v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-help-ui)
+   Compiling transform-gizmo-bevy v0.9.0 (https://github.com/LunCoSim/mitchty-transform-gizmo?rev=01302a171ac3db662c0c322ef9e98fe7d5f33a6a#01302a17)
+   Compiling bevy_hui v0.8.0
+   Compiling lunco-workbench-file-ops v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-file-ops)
+   Compiling lunco-render-recovery v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-render-recovery)
+   Compiling lunco-input-ui v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-input-ui)
+   Compiling lunco-workbench-browser v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-browser)
+   Compiling lunco-workbench-text-editor v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-text-editor)
+   Compiling lunco-workbench-perf-ui v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-perf-ui)
+   Compiling lunco-workbench-window v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-window)
+   Compiling lunco-workbench-runtime-ui v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench-runtime-ui)
+   Compiling lunco-modelica-ui-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-modelica-ui-core)
+   Compiling rumoca-phase-autodiff v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling rumoca-compile v0.10.2 (https://github.com/LunCoSim/rumoca?rev=e325c2c12d2115e78f481f40701784b510dcca3c#e325c2c1)
+   Compiling lunco-modelica-ast v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-modelica-ast)
+   Compiling lunco-modelica-runtime v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-modelica-runtime)
+   Compiling lunco-api v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-api)
+   Compiling lunco-physics v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-physics)
+   Compiling lunco-scripting-bridge-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-bridge-core)
+   Compiling lunco-scene-selection v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-selection)
+   Compiling lunco-telemetry v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-telemetry)
+   Compiling lunco-scripting v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting)
+   Compiling lunco-usd-avian-contracts v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian-contracts)
+   Compiling lunco-environment v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-environment)
+   Compiling lunco-cosim v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-cosim)
+   Compiling lunco-scripting-bridge-time v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-bridge-time)
+   Compiling lunco-usd-bevy-scene v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-scene)
+   Compiling lunco-mobility v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-mobility)
+   Compiling lunco-scripting-bridge-spatial v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-bridge-spatial)
+   Compiling lunco-usd-bevy-mesh v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-mesh)
+   Compiling lunco-usd-avian-filters v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian-filters)
+   Compiling lunco-usd-avian-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian-core)
+   Compiling lunco-usd-sim-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-sim-core)
+   Compiling lunco-usd-avian-joints v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian-joints)
+   Compiling lunco-usd-avian-reader v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian-reader)
+   Compiling lunco-usd-viewport-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-viewport-core)
+   Compiling lunco-terrain-surface v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-terrain-surface)
+   Compiling lunco-usd-sim-authoring v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-sim-authoring)
+   Compiling lunco-usd-avian v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian)
+   Compiling lunco-usd-avian-lint v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-avian-lint)
+   Compiling lunco-scene-authoring v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-authoring)
+   Compiling lunco-usd-bevy-light v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-light)
+   Compiling lunco-scripting-bridge-usd v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-bridge-usd)
+   Compiling lunco-usd-viewport-runtime v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-viewport-runtime)
+   Compiling lunco-viz v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-viz)
+   Compiling lunco-scripting-rhai-world v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-rhai-world)
+   Compiling lunco-scene-validation v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-validation)
+   Compiling lunco-scene-camera v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-camera)
+   Compiling lunco-scene-catalog v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-catalog)
+   Compiling lunco-workbench v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workbench)
+   Compiling lunco-luncosim-edit-gizmo-ui v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-luncosim-edit-gizmo-ui)
+   Compiling lunco-scripting-rhai-runtime v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scripting-rhai-runtime)
+   Compiling lunco-scene-queries v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-queries)
+   Compiling lunco-usd-ui v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-ui)
+   Compiling lunco-usd-bevy-camera v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-usd-bevy-camera)
+   Compiling lunco-scene-commands v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-scene-commands)
+   Compiling lunco-luncosim-edit-core v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-luncosim-edit-core)
+   Compiling lunco-luncosim-edit-ui v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-luncosim-edit-ui)
+    Finished `test` profile [optimized + debuginfo] target(s) in 54.74s
+     Running unittests src/lib.rs (target/debug/deps/lunco_luncosim_edit_ui-c7bbe83603c6106f)
+
+running 7 tests
+test script_tools::usd_curve_view_tests::curve_view_mesh_uses_parent_local_route_frame_and_preserves_endpoints ... ok
+test script_tools::usd_curve_view_tests::authored_curve_has_only_endpoint_vertices_regardless_of_length ... ok
+test script_tools::usd_curve_view_tests::failed_current_curve_view_completes_with_its_terminal_error ... ok
+test script_tools::usd_curve_view_tests::scene_click_target_uses_depth_and_button_policy_not_event_order ... ok
+test script_tools::usd_curve_view_tests::short_curve_views_have_no_mesh_to_render ... ok
+test script_tools::usd_curve_view_tests::spatial_vertical_ribbon_preserves_local_height_and_anchor_pose ... ok
+test script_tools::usd_curve_view_tests::stale_curve_view_completion_cannot_replace_newer_status ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 71 filtered out; finished in 0.00s
+

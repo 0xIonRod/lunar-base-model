@@ -1,0 +1,3 @@
+PARKED waiting for user disconnect {'elastic_energy': 0.0, 'tension0': 0.0, 'tension1': 0.0, 'enabled': 1.0}
+CUT manual control
+PASS manual distance 0.1069539339101055 braked speed 0.002893322300743375

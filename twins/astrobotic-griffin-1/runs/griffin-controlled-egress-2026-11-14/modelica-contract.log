@@ -1,0 +1,21 @@
+true
+true
+""
+"Check of GriffinTetherPairContract completed successfully.
+Class GriffinTetherPairContract has 5036 equation(s) and 5036 variable(s).
+2529 of these are trivial equation(s)."
+record SimulationResult
+    resultFile = "/tmp/griffin-tether-contract-1xlof6v1/GriffinTetherPairContract_res.mat",
+    simulationOptions = "startTime = 0.0, stopTime = 3.0, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'GriffinTetherPairContract', options = '', outputFormat = 'mat', variableFilter = '.*', cflags = '', simflags = ''",
+    messages = "LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.
+LOG_SUCCESS       | info    | The simulation finished successfully.
+",
+    timeFrontend = 0.44290965000000004,
+    timeBackend = 1.827077641,
+    timeSimCode = 0.48991528300000003,
+    timeTemplates = 0.493039931,
+    timeCompile = 5.785027827,
+    timeSimulation = 0.191702382,
+    timeTotal = 9.230240873
+end SimulationResult;
+""

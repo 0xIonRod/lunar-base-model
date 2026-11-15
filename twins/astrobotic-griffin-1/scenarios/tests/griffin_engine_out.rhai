@@ -1,5 +1,5 @@
-// Engine-out stimulus/verdict. Each main engine is its own PressureFedEngine
-// member fed by the shared tanks; `engineNN_enabled` is its health input.
+// Engine-out stimulus/verdict for USD valve/chamber assemblies.
+// Both valves consume the shared engine health input in one coupled network.
 // With full command held, failing one engine must extinguish exactly that
 // engine and its plume while the other six keep their thrust, so the cluster
 // delivers six sevenths of its nominal thrust.
@@ -15,7 +15,7 @@ const EXTINGUISHED_PLUME_FRACTION = 1.0e-9;
 
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion")],
-      entity_reads:[],entity_writes:[],query_reads:[],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
+      entity_reads:[],entity_writes:[],query_reads:["QueryUsdPrim","QueryUsdPrims"],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
 }
 
 fn _threshold() {
@@ -31,10 +31,49 @@ fn _engine_thrusts(main) {
     thrusts
 }
 
+fn topology_checks(main) {
+    let checks=[];
+    let network=query("QueryUsdPrim",#{path:main,attrs:[],rels:["collection:components:includes"]});
+    let members=network.relationships["collection:components:includes"];
+    for name in griffin_spec::main_engine_names() {
+        let root=main+"/"+name;
+        let fuel=root+"/FuelValve";let oxidizer=root+"/OxidizerValve";let chamber=root+"/Chamber";
+        let snapshot=query("QueryUsdPrims",#{paths:[root,fuel,oxidizer,chamber],
+            attrs:["info:sourceAsset","connectors:inlet","connectors:fuel_in","connectors:oxidizer_in",
+                "inputs:flow_fraction_command","inputs:enabled","inputs:available_mass_kg"],
+            connections:true,schemas:true});
+        let records=#{};for record in snapshot.records {records[record.path]=record;}
+        let f=records[fuel];let o=records[oxidizer];let c=records[chamber];let assembly=records[root];
+        checks.push(t_true(f.attrs["info:sourceAsset"].ends_with("/PressureFedValve.mo")
+            && o.attrs["info:sourceAsset"].ends_with("/PressureFedValve.mo")
+            && c.attrs["info:sourceAsset"].ends_with("/PressureFedCombustionChamber.mo"),
+            name+" must expose both valve models and its chamber in USD"));
+        checks.push(t_true(f.connections["connectors:inlet"]==[main+"/FuelTank.connectors:outlet"]
+            && o.connections["connectors:inlet"]==[main+"/OxidizerTank.connectors:outlet"]
+            && c.connections["connectors:fuel_in"]==[fuel+".connectors:outlet"]
+            && c.connections["connectors:oxidizer_in"]==[oxidizer+".connectors:outlet"],
+            name+" must preserve the complete tank-valve-chamber fluid path"));
+        let enabled=main+".inputs:"+griffin_spec::main_engine_port(name,"enabled");
+        checks.push(t_true(f.connections["inputs:enabled"]==[enabled] && o.connections["inputs:enabled"]==[enabled]
+            && f.connections["inputs:flow_fraction_command"]==[main+".inputs:flow_fraction_command"]
+            && o.connections["inputs:flow_fraction_command"]==[main+".inputs:flow_fraction_command"]
+            && f.connections["inputs:available_mass_kg"]==[main+"/FuelTank.outputs:mass_kg"]
+            && o.connections["inputs:available_mass_kg"]==[main+"/OxidizerTank.outputs:mass_kg"],
+            name+" must wire command, health and reservoir availability to both valves"));
+        checks.push(t_true(members.contains(fuel) && members.contains(oxidizer) && members.contains(chamber)
+            && !members.contains(root) && !assembly.api_schemas.contains("LunCoProgramAPI")
+            && !assembly.api_schemas.contains("CollectionAPI:components")
+            && assembly.attrs["info:sourceAsset"]==(),
+            name+" must be an assembly whose parts share the parent solver"));
+    }
+    checks
+}
+
 fn on_start(me,ctx) {
     this.griffin=find_path("/World/Griffin1");
     this.main=find_path("/World/Griffin1/MainPropulsion");
     this.elapsed=0.0;this.phase="nominal";this.done=false;
+    this.topology=topology_checks("/World/Griffin1/MainPropulsion");
     // This static propulsion bench is an authored command producer. Program
     // holds command guidance; selection alone does not take manual authority.
     let command=cmd("SetPorts",#{target:this.griffin,writes:[["guidance_throttle",1.0]]});
@@ -59,7 +98,7 @@ fn on_tick(me,ctx) {
     let after=_engine_thrusts(this.main);
     let total=griffin_spec::main_engine_total(this.main,"thrust_n");
     let count=griffin_spec::main_engine_names().len();
-    let failures=[];
+    let failures=this.topology;
     failures.push(t_true(this.command_ok,"full main-engine command was rejected"));
     failures.push(t_true(this.failure_ok,"engine failure input was rejected"));
     for name in griffin_spec::main_engine_names() {

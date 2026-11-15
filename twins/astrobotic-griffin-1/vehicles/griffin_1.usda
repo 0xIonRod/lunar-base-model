@@ -158,7 +158,7 @@ def Xform "Griffin1" (
         int lunco:ui:schemaRow = 1
         string lunco:ui:schemaRole = "Throttle in · downward braking"
         uniform token collection:components:expansionRule = "explicitOnly"
-        custom rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PropellantStatus>, </Griffin1/MainPropulsion/Engine01>, </Griffin1/MainPropulsion/Engine01Plume>, </Griffin1/MainPropulsion/Engine02>, </Griffin1/MainPropulsion/Engine02Plume>, </Griffin1/MainPropulsion/Engine03>, </Griffin1/MainPropulsion/Engine03Plume>, </Griffin1/MainPropulsion/Engine04>, </Griffin1/MainPropulsion/Engine04Plume>, </Griffin1/MainPropulsion/Engine05>, </Griffin1/MainPropulsion/Engine05Plume>, </Griffin1/MainPropulsion/Engine06>, </Griffin1/MainPropulsion/Engine06Plume>, </Griffin1/MainPropulsion/Engine07>, </Griffin1/MainPropulsion/Engine07Plume>, </Griffin1/MainPropulsion/Engine01Wall>, </Griffin1/MainPropulsion/Engine02Wall>, </Griffin1/MainPropulsion/Engine03Wall>, </Griffin1/MainPropulsion/Engine04Wall>, </Griffin1/MainPropulsion/Engine05Wall>, </Griffin1/MainPropulsion/Engine06Wall>, </Griffin1/MainPropulsion/Engine07Wall>]
+        custom rel collection:components:includes = [</Griffin1/MainPropulsion/FuelTank>, </Griffin1/MainPropulsion/OxidizerTank>, </Griffin1/MainPropulsion/NozzleDesign>, </Griffin1/MainPropulsion/PropellantStatus>, </Griffin1/MainPropulsion/Engine01Plume>, </Griffin1/MainPropulsion/Engine02Plume>, </Griffin1/MainPropulsion/Engine03Plume>, </Griffin1/MainPropulsion/Engine04Plume>, </Griffin1/MainPropulsion/Engine05Plume>, </Griffin1/MainPropulsion/Engine06Plume>, </Griffin1/MainPropulsion/Engine07Plume>, </Griffin1/MainPropulsion/Engine01Wall>, </Griffin1/MainPropulsion/Engine02Wall>, </Griffin1/MainPropulsion/Engine03Wall>, </Griffin1/MainPropulsion/Engine04Wall>, </Griffin1/MainPropulsion/Engine05Wall>, </Griffin1/MainPropulsion/Engine06Wall>, </Griffin1/MainPropulsion/Engine07Wall>, </Griffin1/MainPropulsion/Engine01/FuelValve>, </Griffin1/MainPropulsion/Engine01/OxidizerValve>, </Griffin1/MainPropulsion/Engine01/Chamber>, </Griffin1/MainPropulsion/Engine02/FuelValve>, </Griffin1/MainPropulsion/Engine02/OxidizerValve>, </Griffin1/MainPropulsion/Engine02/Chamber>, </Griffin1/MainPropulsion/Engine03/FuelValve>, </Griffin1/MainPropulsion/Engine03/OxidizerValve>, </Griffin1/MainPropulsion/Engine03/Chamber>, </Griffin1/MainPropulsion/Engine04/FuelValve>, </Griffin1/MainPropulsion/Engine04/OxidizerValve>, </Griffin1/MainPropulsion/Engine04/Chamber>, </Griffin1/MainPropulsion/Engine05/FuelValve>, </Griffin1/MainPropulsion/Engine05/OxidizerValve>, </Griffin1/MainPropulsion/Engine05/Chamber>, </Griffin1/MainPropulsion/Engine06/FuelValve>, </Griffin1/MainPropulsion/Engine06/OxidizerValve>, </Griffin1/MainPropulsion/Engine06/Chamber>, </Griffin1/MainPropulsion/Engine07/FuelValve>, </Griffin1/MainPropulsion/Engine07/OxidizerValve>, </Griffin1/MainPropulsion/Engine07/Chamber>]
         float inputs:rcs_fuel_mass_flow_kgs
         float inputs:rcs_fuel_mass_flow_kgs.connect = </Griffin1/AttitudePropulsion.outputs:fuel_mass_flow_kgs>
         float inputs:rcs_oxidizer_mass_flow_kgs
@@ -189,123 +189,123 @@ def Xform "Griffin1" (
         float inputs:flow_fraction_command.connect = </Griffin1.outputs:throttle>
         float inputs:engine01_enabled = 1.0
         custom double outputs:engine01_thrust_n
-        double outputs:engine01_thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:thrust_n>
+        double outputs:engine01_thrust_n.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:thrust_n>
         custom double outputs:engine01_maximum_thrust_n
-        double outputs:engine01_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:maximum_thrust_n>
+        double outputs:engine01_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine01_activity
-        double outputs:engine01_activity.connect = </Griffin1/MainPropulsion/Engine01.outputs:activity>
+        double outputs:engine01_activity.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:activity>
         custom double outputs:engine01_chamber_pressure_pa
-        double outputs:engine01_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine01.outputs:chamber_pressure_pa>
+        double outputs:engine01_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine01_propellant_flow
-        double outputs:engine01_propellant_flow.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
+        double outputs:engine01_propellant_flow.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:propellant_flow>
         custom double outputs:engine01_fuel_flow_kgs
-        double outputs:engine01_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:fuel_flow_kgs>
+        double outputs:engine01_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine01_oxidizer_flow_kgs
-        double outputs:engine01_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:oxidizer_flow_kgs>
+        double outputs:engine01_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine01_mixture_efficiency
-        double outputs:engine01_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine01.outputs:mixture_efficiency>
+        double outputs:engine01_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:mixture_efficiency>
         float inputs:engine02_enabled = 1.0
         custom double outputs:engine02_thrust_n
-        double outputs:engine02_thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:thrust_n>
+        double outputs:engine02_thrust_n.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:thrust_n>
         custom double outputs:engine02_maximum_thrust_n
-        double outputs:engine02_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:maximum_thrust_n>
+        double outputs:engine02_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine02_activity
-        double outputs:engine02_activity.connect = </Griffin1/MainPropulsion/Engine02.outputs:activity>
+        double outputs:engine02_activity.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:activity>
         custom double outputs:engine02_chamber_pressure_pa
-        double outputs:engine02_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine02.outputs:chamber_pressure_pa>
+        double outputs:engine02_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine02_propellant_flow
-        double outputs:engine02_propellant_flow.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
+        double outputs:engine02_propellant_flow.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:propellant_flow>
         custom double outputs:engine02_fuel_flow_kgs
-        double outputs:engine02_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:fuel_flow_kgs>
+        double outputs:engine02_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine02_oxidizer_flow_kgs
-        double outputs:engine02_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:oxidizer_flow_kgs>
+        double outputs:engine02_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine02_mixture_efficiency
-        double outputs:engine02_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine02.outputs:mixture_efficiency>
+        double outputs:engine02_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:mixture_efficiency>
         float inputs:engine03_enabled = 1.0
         custom double outputs:engine03_thrust_n
-        double outputs:engine03_thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:thrust_n>
+        double outputs:engine03_thrust_n.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:thrust_n>
         custom double outputs:engine03_maximum_thrust_n
-        double outputs:engine03_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:maximum_thrust_n>
+        double outputs:engine03_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine03_activity
-        double outputs:engine03_activity.connect = </Griffin1/MainPropulsion/Engine03.outputs:activity>
+        double outputs:engine03_activity.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:activity>
         custom double outputs:engine03_chamber_pressure_pa
-        double outputs:engine03_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine03.outputs:chamber_pressure_pa>
+        double outputs:engine03_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine03_propellant_flow
-        double outputs:engine03_propellant_flow.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
+        double outputs:engine03_propellant_flow.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:propellant_flow>
         custom double outputs:engine03_fuel_flow_kgs
-        double outputs:engine03_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:fuel_flow_kgs>
+        double outputs:engine03_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine03_oxidizer_flow_kgs
-        double outputs:engine03_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:oxidizer_flow_kgs>
+        double outputs:engine03_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine03_mixture_efficiency
-        double outputs:engine03_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine03.outputs:mixture_efficiency>
+        double outputs:engine03_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:mixture_efficiency>
         float inputs:engine04_enabled = 1.0
         custom double outputs:engine04_thrust_n
-        double outputs:engine04_thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:thrust_n>
+        double outputs:engine04_thrust_n.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:thrust_n>
         custom double outputs:engine04_maximum_thrust_n
-        double outputs:engine04_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:maximum_thrust_n>
+        double outputs:engine04_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine04_activity
-        double outputs:engine04_activity.connect = </Griffin1/MainPropulsion/Engine04.outputs:activity>
+        double outputs:engine04_activity.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:activity>
         custom double outputs:engine04_chamber_pressure_pa
-        double outputs:engine04_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine04.outputs:chamber_pressure_pa>
+        double outputs:engine04_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine04_propellant_flow
-        double outputs:engine04_propellant_flow.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
+        double outputs:engine04_propellant_flow.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:propellant_flow>
         custom double outputs:engine04_fuel_flow_kgs
-        double outputs:engine04_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:fuel_flow_kgs>
+        double outputs:engine04_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine04_oxidizer_flow_kgs
-        double outputs:engine04_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:oxidizer_flow_kgs>
+        double outputs:engine04_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine04_mixture_efficiency
-        double outputs:engine04_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine04.outputs:mixture_efficiency>
+        double outputs:engine04_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:mixture_efficiency>
         float inputs:engine05_enabled = 1.0
         custom double outputs:engine05_thrust_n
-        double outputs:engine05_thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:thrust_n>
+        double outputs:engine05_thrust_n.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:thrust_n>
         custom double outputs:engine05_maximum_thrust_n
-        double outputs:engine05_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:maximum_thrust_n>
+        double outputs:engine05_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine05_activity
-        double outputs:engine05_activity.connect = </Griffin1/MainPropulsion/Engine05.outputs:activity>
+        double outputs:engine05_activity.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:activity>
         custom double outputs:engine05_chamber_pressure_pa
-        double outputs:engine05_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine05.outputs:chamber_pressure_pa>
+        double outputs:engine05_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine05_propellant_flow
-        double outputs:engine05_propellant_flow.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
+        double outputs:engine05_propellant_flow.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:propellant_flow>
         custom double outputs:engine05_fuel_flow_kgs
-        double outputs:engine05_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:fuel_flow_kgs>
+        double outputs:engine05_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine05_oxidizer_flow_kgs
-        double outputs:engine05_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:oxidizer_flow_kgs>
+        double outputs:engine05_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine05_mixture_efficiency
-        double outputs:engine05_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine05.outputs:mixture_efficiency>
+        double outputs:engine05_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:mixture_efficiency>
         float inputs:engine06_enabled = 1.0
         custom double outputs:engine06_thrust_n
-        double outputs:engine06_thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:thrust_n>
+        double outputs:engine06_thrust_n.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:thrust_n>
         custom double outputs:engine06_maximum_thrust_n
-        double outputs:engine06_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:maximum_thrust_n>
+        double outputs:engine06_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine06_activity
-        double outputs:engine06_activity.connect = </Griffin1/MainPropulsion/Engine06.outputs:activity>
+        double outputs:engine06_activity.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:activity>
         custom double outputs:engine06_chamber_pressure_pa
-        double outputs:engine06_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine06.outputs:chamber_pressure_pa>
+        double outputs:engine06_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine06_propellant_flow
-        double outputs:engine06_propellant_flow.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
+        double outputs:engine06_propellant_flow.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:propellant_flow>
         custom double outputs:engine06_fuel_flow_kgs
-        double outputs:engine06_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:fuel_flow_kgs>
+        double outputs:engine06_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine06_oxidizer_flow_kgs
-        double outputs:engine06_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:oxidizer_flow_kgs>
+        double outputs:engine06_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine06_mixture_efficiency
-        double outputs:engine06_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine06.outputs:mixture_efficiency>
+        double outputs:engine06_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:mixture_efficiency>
         float inputs:engine07_enabled = 1.0
         custom double outputs:engine07_thrust_n
-        double outputs:engine07_thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:thrust_n>
+        double outputs:engine07_thrust_n.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:thrust_n>
         custom double outputs:engine07_maximum_thrust_n
-        double outputs:engine07_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:maximum_thrust_n>
+        double outputs:engine07_maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:maximum_thrust_n>
         custom double outputs:engine07_activity
-        double outputs:engine07_activity.connect = </Griffin1/MainPropulsion/Engine07.outputs:activity>
+        double outputs:engine07_activity.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:activity>
         custom double outputs:engine07_chamber_pressure_pa
-        double outputs:engine07_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine07.outputs:chamber_pressure_pa>
+        double outputs:engine07_chamber_pressure_pa.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:chamber_pressure_pa>
         custom double outputs:engine07_propellant_flow
-        double outputs:engine07_propellant_flow.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
+        double outputs:engine07_propellant_flow.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:propellant_flow>
         custom double outputs:engine07_fuel_flow_kgs
-        double outputs:engine07_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:fuel_flow_kgs>
+        double outputs:engine07_fuel_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:fuel_flow_kgs>
         custom double outputs:engine07_oxidizer_flow_kgs
-        double outputs:engine07_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:oxidizer_flow_kgs>
+        double outputs:engine07_oxidizer_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:oxidizer_flow_kgs>
         custom double outputs:engine07_mixture_efficiency
-        double outputs:engine07_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine07.outputs:mixture_efficiency>
+        double outputs:engine07_mixture_efficiency.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:mixture_efficiency>
         custom double outputs:vehicle_inertia_xx_kg_m2
         double outputs:vehicle_inertia_xx_kg_m2.connect = </Griffin1/MainPropulsion/PropellantStatus.outputs:vehicle_inertia_xx_kg_m2>
         custom double outputs:vehicle_inertia_yy_kg_m2
@@ -343,7 +343,7 @@ def Xform "Griffin1" (
             float inputs:auxiliary_mass_flow_kgs
             float inputs:auxiliary_mass_flow_kgs.connect = </Griffin1/MainPropulsion.inputs:rcs_fuel_mass_flow_kgs>
             custom token connectors:outlet
-            token connectors:outlet.connect = [</Griffin1/MainPropulsion/Engine01.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine02.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine03.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine04.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine05.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine06.connectors:fuel_in>, </Griffin1/MainPropulsion/Engine07.connectors:fuel_in>]
+            token connectors:outlet.connect = [</Griffin1/MainPropulsion/Engine01/FuelValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine02/FuelValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine03/FuelValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine04/FuelValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine05/FuelValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine06/FuelValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine07/FuelValve.connectors:inlet>]
             custom double inputs:initial_mass_kg = 1000.0
             custom double inputs:nominal_pressure_pa = 2500000.0
             custom double inputs:pressure_headroom_pa = 500000.0
@@ -367,7 +367,7 @@ def Xform "Griffin1" (
             float inputs:auxiliary_mass_flow_kgs
             float inputs:auxiliary_mass_flow_kgs.connect = </Griffin1/MainPropulsion.inputs:rcs_oxidizer_mass_flow_kgs>
             custom token connectors:outlet
-            token connectors:outlet.connect = [</Griffin1/MainPropulsion/Engine01.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine02.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine03.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine04.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine05.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine06.connectors:oxidizer_in>, </Griffin1/MainPropulsion/Engine07.connectors:oxidizer_in>]
+            token connectors:outlet.connect = [</Griffin1/MainPropulsion/Engine01/OxidizerValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine02/OxidizerValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine03/OxidizerValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine04/OxidizerValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine05/OxidizerValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine06/OxidizerValve.connectors:inlet>, </Griffin1/MainPropulsion/Engine07/OxidizerValve.connectors:inlet>]
             custom double inputs:initial_mass_kg = 1000.0
             custom double inputs:nominal_pressure_pa = 2500000.0
             custom double inputs:pressure_headroom_pa = 500000.0
@@ -450,49 +450,54 @@ def Xform "Griffin1" (
             custom double inputs:oxidizer_specific_inertia_zz_m2 = 0.0
         }
         def Scope "Engine01" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine01_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine01 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine01_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine01 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine01_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine01 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine01Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -502,15 +507,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine01.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine01.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine01.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -589,57 +594,62 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE01 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine01 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE01 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine01 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine01_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine01_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine01_thrust_n"
+            string lunco:telemetry:name = "lander.engine01_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine02" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine02_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine02 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine02_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine02 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine02_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine02 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine02Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -649,15 +659,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine02.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine02.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine02.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -736,57 +746,62 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE02 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine02 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE02 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine02 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine02_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine02_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine02_thrust_n"
+            string lunco:telemetry:name = "lander.engine02_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine03" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine03_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine03 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine03_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine03 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine03_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine03 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine03Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -796,15 +811,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine03.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine03.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine03.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -883,57 +898,62 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE03 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine03 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE03 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine03 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine03_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine03_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine03_thrust_n"
+            string lunco:telemetry:name = "lander.engine03_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine04" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine04_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine04 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine04_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine04 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine04_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine04 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine04Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -943,15 +963,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine04.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine04.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine04.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1030,57 +1050,62 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE04 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine04 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE04 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine04 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine04_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine04_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine04_thrust_n"
+            string lunco:telemetry:name = "lander.engine04_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine05" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine05_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine05 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine05_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine05 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine05_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine05 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine05Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1090,15 +1115,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine05.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine05.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine05.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1177,57 +1202,62 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE05 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine05 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE05 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine05 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine05_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine05_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine05_thrust_n"
+            string lunco:telemetry:name = "lander.engine05_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine06" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine06_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine06 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine06_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine06 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine06_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine06 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine06Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1237,15 +1267,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine06.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine06.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine06.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1324,57 +1354,62 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE06 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine06 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE06 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine06 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine06_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine06_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine06_thrust_n"
+            string lunco:telemetry:name = "lander.engine06_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine07" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            references = @lunco://components/propulsion/pressure_fed_engine.usda@</PressureFedEngine>
         )
         {
-            uniform token info:implementationSource = "sourceAsset"
-            uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PressureFedEngine.mo@
-            uniform bool lunco:program:realtimeSafe = true
-            double inputs:fuel_maximum_flow_kgs = 0.29774747191131945
-            double inputs:fuel_commanded_flow_kgs = 0.29774747191131945
-            double inputs:oxidizer_maximum_flow_kgs = 0.7741434269694306
-            double inputs:oxidizer_commanded_flow_kgs = 0.7741434269694306
-            double inputs:nominal_pressure_drop_pa = 1000000.0
-            double inputs:opening_time_constant_s = 0.08
-            double inputs:availability_transition_mass_kg = 0.01
-            double inputs:oxidizer_to_fuel_ratio = 2.6
-            double inputs:characteristic_velocity_mps = 1550.0
-            double inputs:throat_area_m2 = 0.001063315771689704
-            double inputs:combustion_efficiency = 0.96
-            double inputs:nominal_flow_kgs = 1.0718908988807498
-            custom float inputs:flow_fraction_command
-            float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
-            custom float inputs:enabled
-            float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine07_enabled>
-            custom float inputs:available_fuel_mass_kg
-            float inputs:available_fuel_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
-            custom float inputs:available_oxidizer_mass_kg
-            float inputs:available_oxidizer_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float inputs:effective_exhaust_velocity_mps
-            float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
-            custom token connectors:fuel_in
-            token connectors:fuel_in.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
-            custom token connectors:oxidizer_in
-            token connectors:oxidizer_in.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
-            double outputs:thrust_n = 0.0
-            double outputs:maximum_thrust_n = 0.0
-            double outputs:activity = 0.0
-            double outputs:chamber_pressure_pa = 0.0
-            double outputs:propellant_flow = 0.0
-            double outputs:fuel_flow_kgs = 0.0
-            double outputs:oxidizer_flow_kgs = 0.0
-            double outputs:mixture_ratio = 0.0
-            double outputs:mixture_efficiency = 0.0
-            double outputs:exhaust_velocity_mps = 0.0
-            double outputs:design_exhaust_velocity_mps = 0.0
+            over "FuelValve"
+            {
+                custom string ui:displayName = "Engine07 fuel valve"
+                custom double parameters:maximum_flow_kgs = 0.29774747191131945
+                custom double parameters:commanded_flow_kgs = 0.29774747191131945
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine07_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/FuelTank.connectors:outlet>
+            }
+            over "OxidizerValve"
+            {
+                custom string ui:displayName = "Engine07 oxidizer valve"
+                custom double parameters:maximum_flow_kgs = 0.7741434269694306
+                custom double parameters:commanded_flow_kgs = 0.7741434269694306
+                custom double parameters:nominal_pressure_drop_pa = 1000000.0
+                custom double parameters:opening_time_constant_s = 0.08
+                custom double parameters:availability_transition_mass_kg = 0.01
+                custom float inputs:flow_fraction_command
+                float inputs:flow_fraction_command.connect = </Griffin1/MainPropulsion.inputs:flow_fraction_command>
+                custom float inputs:enabled
+                float inputs:enabled.connect = </Griffin1/MainPropulsion.inputs:engine07_enabled>
+                custom float inputs:available_mass_kg
+                float inputs:available_mass_kg.connect = </Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
+                custom token connectors:inlet
+                token connectors:inlet.connect = </Griffin1/MainPropulsion/OxidizerTank.connectors:outlet>
+            }
+            over "Chamber"
+            {
+                custom string ui:displayName = "Engine07 chamber"
+                custom double parameters:oxidizer_to_fuel_ratio = 2.6
+                custom double parameters:characteristic_velocity_mps = 1550.0
+                custom double parameters:throat_area_m2 = 0.001063315771689704
+                custom double parameters:combustion_efficiency = 0.96
+                custom double parameters:nominal_flow_kgs = 1.0718908988807498
+                custom float inputs:effective_exhaust_velocity_mps
+                float inputs:effective_exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:ideal_exhaust_velocity_mps>
+            }
         }
         def Scope "Engine07Plume" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1384,15 +1419,15 @@ def Xform "Griffin1" (
             uniform asset info:sourceAsset = @lunco://models/LunCo/Propulsion/PlumePhotometry.mo@
             uniform bool lunco:program:realtimeSafe = true
             custom double inputs:thrust_n
-            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:thrust_n>
+            double inputs:thrust_n.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:thrust_n>
             custom double inputs:maximum_thrust_n
-            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine07.outputs:maximum_thrust_n>
+            double inputs:maximum_thrust_n.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:maximum_thrust_n>
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:propellant_flow>
             custom double inputs:exhaust_velocity_mps
-            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine07.outputs:exhaust_velocity_mps>
+            double inputs:exhaust_velocity_mps.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:exhaust_velocity_mps>
             custom double inputs:mixture_ratio
-            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine07.outputs:mixture_ratio>
+            double inputs:mixture_ratio.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:mixture_ratio>
             custom float inputs:nozzle_exit_area_m2
             float inputs:nozzle_exit_area_m2.connect = </Griffin1/MainPropulsion/NozzleDesign.outputs:exit_area>
             float inputs:fuel_family = 3.0
@@ -1471,12 +1506,12 @@ def Xform "Griffin1" (
         )
         {
             bool lunco:telemetry = true
-            string ui:displayName = "\"ENGINE07 THRUST\""
-            string lunco:telemetry:description = "\"Delivered thrust of main engine Engine07 from its PressureFedEngine model.\""
+            string ui:displayName = "ENGINE07 THRUST"
+            string lunco:telemetry:description = "Delivered thrust of main engine Engine07 from its USD-authored valve/chamber assembly."
             custom rel lunco:telemetry:target = </Griffin1/MainPropulsion>
-            string lunco:telemetry:port = "\"engine07_thrust_n\""
-            string lunco:telemetry:name = "\"lander.engine07_thrust\""
-            string lunco:telemetry:unit = "\"N\""
+            string lunco:telemetry:port = "engine07_thrust_n"
+            string lunco:telemetry:name = "lander.engine07_thrust"
+            string lunco:telemetry:unit = "N"
         }
         def Scope "Engine01Wall" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -1506,7 +1541,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine01/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine01Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1557,7 +1592,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine02/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine02Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1608,7 +1643,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine03/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine03Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1659,7 +1694,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine04/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine04Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1710,7 +1745,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine05/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine05Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1761,7 +1796,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine06/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine06Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w
@@ -1812,7 +1847,7 @@ def Xform "Griffin1" (
             custom double outputs:energy_residual_w = 0.0
             custom float outputs:render_emissivity = 0.0
             custom double inputs:propellant_flow_kgs
-            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07.outputs:propellant_flow>
+            double inputs:propellant_flow_kgs.connect = </Griffin1/MainPropulsion/Engine07/Chamber.outputs:propellant_flow>
             custom double inputs:stagnation_temperature_k
             double inputs:stagnation_temperature_k.connect = </Griffin1/MainPropulsion/Engine07Plume.outputs:stagnation_temperature_k>
             custom double inputs:jet_power_w

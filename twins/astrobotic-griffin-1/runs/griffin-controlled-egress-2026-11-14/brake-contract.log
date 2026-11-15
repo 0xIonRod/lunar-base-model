@@ -1,0 +1,66 @@
+   Compiling wgpu-types v30.0.1
+   Compiling bevy_reflect v0.20.0
+   Compiling bevy_ecs v0.20.0
+   Compiling bevy_math v0.20.0
+   Compiling lunco-runtime-context v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-runtime-context)
+   Compiling glam_matrix_extras v0.4.0
+   Compiling lunco-hooks v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-hooks)
+   Compiling lunco-command-contracts v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-command-contracts)
+   Compiling lunco-doc v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-doc)
+   Compiling lunco-modelica-ast v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-modelica-ast)
+   Compiling bevy_shape v0.20.0
+   Compiling bevy_curve v0.20.0
+   Compiling bevy_color v0.20.0
+   Compiling lunco-twin-journal v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-twin-journal)
+   Compiling lunco-twin v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-twin)
+   Compiling bevy_heavy v0.6.0
+   Compiling bevy_app v0.20.0
+   Compiling bevy_time v0.20.0
+   Compiling bevy_input v0.20.0
+   Compiling bevy_transform v0.20.0
+   Compiling bevy_log v0.20.0
+   Compiling bevy_a11y v0.20.0
+   Compiling bevy_diagnostic v0.20.0
+   Compiling big_space v0.14.0-rc.0 (https://github.com/LunCoSim/big_space?rev=581295f909ddddad138a876b497dbc1fdff389b6#581295f9)
+   Compiling bevy_asset v0.20.0
+   Compiling bevy_window v0.20.0
+   Compiling bevy_gilrs v0.20.0
+   Compiling bevy_mesh v0.20.0
+   Compiling bevy_image v0.20.0
+   Compiling bevy_camera v0.20.0
+   Compiling bevy_input_focus v0.20.0
+   Compiling bevy_picking v0.20.0
+   Compiling bevy_internal v0.20.0
+   Compiling bevy v0.20.0
+   Compiling lunco-core v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-core)
+   Compiling lunco-settings v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-settings)
+   Compiling lunco-port-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-port-core)
+   Compiling leafwing-input-manager v0.22.0
+   Compiling lunco-embodiment-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-embodiment-core)
+   Compiling bevy_transform_interpolation v0.6.0
+   Compiling lunco-lint v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-lint)
+   Compiling lunco-core-runtime v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-core-runtime)
+   Compiling lunco-doc-bevy v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-doc-bevy)
+   Compiling lunco-signal v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-signal)
+   Compiling lunco-exposure-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-exposure-core)
+   Compiling avian3d v0.8.0 (https://github.com/LunCoSim/avian?rev=b8d1f5a3d5aeeb61220813e82607ca6a74e7057a#b8d1f5a3)
+   Compiling lunco-time v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-time)
+   Compiling lunco-readiness v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-readiness)
+   Compiling lunco-spatial v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-spatial)
+   Compiling lunco-control-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-control-core)
+   Compiling lunco-telemetry-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-telemetry-core)
+   Compiling lunco-celestial v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-celestial)
+   Compiling lunco-workspace v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-workspace)
+   Compiling lunco-api-core v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-api-core)
+   Compiling lunco-core-session v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-core-session)
+   Compiling lunco-modelica-runtime v0.1.0 (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-modelica-runtime)
+   Compiling lunco-api v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-api)
+   Compiling lunco-physics v0.1.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-physics)
+    Finished `test` profile [optimized + debuginfo] target(s) in 2m 38s
+     Running unittests src/lib.rs (target/debug/deps/lunco_physics-ad0061807b8e1363)
+
+running 1 test
+test joint::tests::local_brake_request_retains_vehicle_hold_and_rejects_missing_or_invalid_samples ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 80 filtered out; finished in 0.00s
+

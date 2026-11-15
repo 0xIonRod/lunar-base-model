@@ -1583,7 +1583,7 @@ fn _named_paths(parent, names) {
 // This is the single source of known Griffin part contracts. Numeric values
 // that are not source-backed are marked as study/TBD in the returned metadata;
 // the linter checks only explicit values and geometry obligations.
-// Shared tanks plus one PressureFedEngine member per typed engine identity.
+// Shared tanks and explicit valve/chamber assemblies per typed engine identity.
 fn main_propulsion_children(root) {
     let children = [root + "/MainPropulsion/FuelTank", root + "/MainPropulsion/OxidizerTank"];
     for name in griffin_spec::main_engine_names() {

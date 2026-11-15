@@ -1,0 +1,515 @@
+{
+  "case": "production scene normal DEPLOY, native release and manual drive",
+  "unlock_flags": [
+    true,
+    true,
+    true
+  ],
+  "live_qualified_release_event": "2026-11-14T09:20:38.124588Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=griffin_flip_egress_unlocked, severity=Info, data=Map({\"restraint\": Map({\"elastic_energy_j\": F64(0.0), \"enabled\": F64(0.0), \"ok\": Bool(true), \"reason\": String(\"both lines are cut and unloaded\"), \"tension0_n\": F64(0.0), \"tension1_n\": F64(0.0)}), \"transfer\": Map({\"angular_speed_radps\": F64(0.0015665040849328837), \"fixed_count\": I64(4), \"front_center_m\": Array([F64(3.167904424923786), F64(0.19390358139592934), F64(-4.131128145238)]), \"front_count\": I64(2), \"front_supported\": Array([Bool(true), Bool(true)]), \"front_toe_clearance_m\": F64(2.2990625958574284), \"mechanically_stable\": Bool(true), \"ok\": Bool(true), \"rear_count\": I64(2), \"rear_supported_count\": I64(2), \"reason\": String(\"stable four-wheel ground transfer\"), \"speed_mps\": F64(0.0015072441617437124), \"track_clearance_m\": F64(0.13087831619679946), \"upright_cos\": F64(0.9947230466488683), \"wheel_count\": I64(4)})}), ts=2461448.2225, sim_secs=239.516667, sim_tick=25201",
+  "before": [
+    [
+      2.662766726752067,
+      0.4831555114914603,
+      -3.5205928069134806
+    ],
+    [
+      0.6242680555760421,
+      -0.09602700575079347,
+      -0.77528588853006
+    ]
+  ],
+  "readiness_before": {
+    "application_available": true,
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "preparation_held": false,
+    "preparation": [],
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "physics_before": {
+    "api_id": 5811092977805847,
+    "usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+    "body_mode": "dynamic",
+    "linear_velocity_mps": [
+      0.10678926855325699,
+      -0.017542921006679535,
+      -0.14128179848194122
+    ],
+    "angular_velocity_radps": [
+      -0.0007883720682002604,
+      0.000239625689573586,
+      -0.0014072933699935675
+    ],
+    "sleeping": false,
+    "sleep_state": {
+      "disabled": false,
+      "timer_s": 0.0,
+      "required_rest_s": 0.5,
+      "linear_threshold_mps": 0.15000000596046448,
+      "angular_threshold_radps": 0.15000000596046448
+    },
+    "constant_linear_acceleration_mps2": [
+      -2.6276788958057296e-06,
+      -1.6249035596847534,
+      3.47509785569855e-06
+    ],
+    "physics_state_ready": true,
+    "physics_state_pending": false,
+    "physics_admission_requested": false,
+    "physics_initialization_pending": false,
+    "physics_initialization_invalid": false,
+    "physics_initialization_paused": false,
+    "physics_initialization_penetration_m": null,
+    "physics_object_paused": false,
+    "simulation_object_paused": false,
+    "simulation_object_pause_reason": null,
+    "physics_pose_seeded": true,
+    "physics_pose_authoritative": false,
+    "rigid_body_disabled": false,
+    "collider_present": true,
+    "continuous_collision_enabled": false,
+    "speculative_collision_distance_m": 0.0,
+    "collider_source_paths": [
+      "/Griffin1SurfaceOps/FLIP/Chassis"
+    ],
+    "collider_local_bounds": {
+      "frame": "body_local",
+      "min": [
+        -0.7379999756813049,
+        -0.3330000042915344,
+        -1.0579999685287476
+      ],
+      "max": [
+        0.7379999756813049,
+        0.06299999356269836,
+        1.0579999685287476
+      ]
+    },
+    "colliders": [
+      {
+        "source_path": "/Griffin1SurfaceOps/FLIP/Chassis",
+        "body_relationship_present": true,
+        "body_is_query_body": true,
+        "body_usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+        "physics_position_m": [
+          2.804355392413469,
+          0.3245997442253805,
+          -3.7046714154366036
+        ],
+        "physics_rotation_xyzw": [
+          -0.05172742158174515,
+          -0.3312130570411682,
+          -0.0017225631745532155,
+          0.9421355724334717
+        ],
+        "body_local_translation_m": [
+          0.0,
+          -0.13500000536441803,
+          0.0
+        ],
+        "body_local_rotation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "disabled": false,
+        "broad_phase_present": true,
+        "broad_phase_body_disabled": false,
+        "shape_local_bounds": {
+          "frame": "collider_local",
+          "min": [
+            -0.7379999756813049,
+            -0.1979999989271164,
+            -1.0579999685287476
+          ],
+          "max": [
+            0.7379999756813049,
+            0.1979999989271164,
+            1.0579999685287476
+          ]
+        }
+      }
+    ],
+    "collider_disabled": false,
+    "authored_mass_kg": 343.0,
+    "mass_override_active": true,
+    "authored_inertia_principal_kgm2": [
+      132.4629364013672,
+      190.2515869140625,
+      66.75328826904297
+    ],
+    "inertia_override_active": true,
+    "authored_center_of_mass_m": [
+      0.0,
+      -0.13500000536441803,
+      0.0
+    ],
+    "center_of_mass_override_active": true,
+    "mass_kg": 343.0,
+    "computed_mass_finite": true,
+    "computed_inertia_finite": true,
+    "center_of_mass_m": [
+      0.0,
+      -0.13500000536441803,
+      0.0
+    ],
+    "inertia_principal_kgm2": [
+      66.75329008412501,
+      132.462933566511,
+      190.2515891997935
+    ],
+    "inertia_tensor_kgm2": [
+      [
+        132.462933566511,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        190.2515891997935,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        66.75329008412501
+      ]
+    ],
+    "support_footprint_count": 0,
+    "support_contact_count": null,
+    "support_sample_tick": null,
+    "support_contacts": [],
+    "wheel_contacts": []
+  },
+  "manual_drive_ports": [
+    {
+      "name": "throttle",
+      "value": 1.0,
+      "direction": "in",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "input surface",
+        "authority": "input owner",
+        "writable": true
+      }
+    },
+    {
+      "name": "brake",
+      "value": 0.0,
+      "direction": "in",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "input surface",
+        "authority": "input owner",
+        "writable": true
+      }
+    },
+    {
+      "name": "throttle",
+      "value": 0.0,
+      "direction": "in",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "Co-simulation participant",
+        "authority": "controller / wire",
+        "writable": true
+      }
+    },
+    {
+      "name": "brake",
+      "value": 0.0,
+      "direction": "out",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "runtime producer",
+        "authority": "producer",
+        "writable": false
+      }
+    }
+  ],
+  "stopped_speed_mps": 0.005811365380721676,
+  "held_brake_ports": [
+    {
+      "name": "brake",
+      "value": 1.0,
+      "direction": "in",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "input surface",
+        "authority": "input owner",
+        "writable": true
+      }
+    },
+    {
+      "name": "brake",
+      "value": 1.0,
+      "direction": "out",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "runtime producer",
+        "authority": "producer",
+        "writable": false
+      }
+    }
+  ],
+  "manual_proof_distance_m": 1.175911405323545,
+  "after": [
+    [
+      8.977956641036087,
+      -0.6407848945154488,
+      -11.956733894454526
+    ],
+    [
+      0.6134271390930355,
+      -0.10549860948081241,
+      -0.7826731044451118
+    ]
+  ],
+  "physics_after": {
+    "api_id": 5811092977805847,
+    "usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+    "body_mode": "dynamic",
+    "linear_velocity_mps": [
+      0.1036403700709343,
+      -0.018014095723628998,
+      -0.13462427258491516
+    ],
+    "angular_velocity_radps": [
+      -0.00029479293152689934,
+      -0.00013073947047814727,
+      -0.00021860201377421618
+    ],
+    "sleeping": false,
+    "sleep_state": {
+      "disabled": false,
+      "timer_s": 0.0,
+      "required_rest_s": 0.5,
+      "linear_threshold_mps": 0.15000000596046448,
+      "angular_threshold_radps": 0.15000000596046448
+    },
+    "constant_linear_acceleration_mps2": [
+      -8.395205441047437e-06,
+      -1.6249055862426758,
+      1.1178602107975166e-05
+    ],
+    "physics_state_ready": true,
+    "physics_state_pending": false,
+    "physics_admission_requested": false,
+    "physics_initialization_pending": false,
+    "physics_initialization_invalid": false,
+    "physics_initialization_paused": false,
+    "physics_initialization_penetration_m": null,
+    "physics_object_paused": false,
+    "simulation_object_paused": false,
+    "simulation_object_pause_reason": null,
+    "physics_pose_seeded": true,
+    "physics_pose_authoritative": false,
+    "rigid_body_disabled": false,
+    "collider_present": true,
+    "continuous_collision_enabled": false,
+    "speculative_collision_distance_m": 0.0,
+    "collider_source_paths": [
+      "/Griffin1SurfaceOps/FLIP/Chassis"
+    ],
+    "collider_local_bounds": {
+      "frame": "body_local",
+      "min": [
+        -0.7379999756813049,
+        -0.3330000042915344,
+        -1.0579999685287476
+      ],
+      "max": [
+        0.7379999756813049,
+        0.06299999356269836,
+        1.0579999685287476
+      ]
+    },
+    "colliders": [
+      {
+        "source_path": "/Griffin1SurfaceOps/FLIP/Chassis",
+        "body_relationship_present": true,
+        "body_is_query_body": true,
+        "body_usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+        "physics_position_m": [
+          8.968340552797542,
+          -0.7747269237797387,
+          -11.942584606738972
+        ],
+        "physics_rotation_xyzw": [
+          -0.051297880709171295,
+          -0.3256240487098694,
+          -0.01326767262071371,
+          0.9440135955810547
+        ],
+        "body_local_translation_m": [
+          0.0,
+          -0.13500000536441803,
+          0.0
+        ],
+        "body_local_rotation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "disabled": false,
+        "broad_phase_present": true,
+        "broad_phase_body_disabled": false,
+        "shape_local_bounds": {
+          "frame": "collider_local",
+          "min": [
+            -0.7379999756813049,
+            -0.1979999989271164,
+            -1.0579999685287476
+          ],
+          "max": [
+            0.7379999756813049,
+            0.1979999989271164,
+            1.0579999685287476
+          ]
+        }
+      }
+    ],
+    "collider_disabled": false,
+    "authored_mass_kg": 343.0,
+    "mass_override_active": true,
+    "authored_inertia_principal_kgm2": [
+      132.4629364013672,
+      190.2515869140625,
+      66.75328826904297
+    ],
+    "inertia_override_active": true,
+    "authored_center_of_mass_m": [
+      0.0,
+      -0.13500000536441803,
+      0.0
+    ],
+    "center_of_mass_override_active": true,
+    "mass_kg": 343.0,
+    "computed_mass_finite": true,
+    "computed_inertia_finite": true,
+    "center_of_mass_m": [
+      0.0,
+      -0.13500000536441803,
+      0.0
+    ],
+    "inertia_principal_kgm2": [
+      66.75329008412501,
+      132.462933566511,
+      190.2515891997935
+    ],
+    "inertia_tensor_kgm2": [
+      [
+        132.462933566511,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        190.2515891997935,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        66.75329008412501
+      ]
+    ],
+    "support_footprint_count": 0,
+    "support_contact_count": null,
+    "support_sample_tick": null,
+    "support_contacts": [],
+    "wheel_contacts": []
+  },
+  "readiness_after": {
+    "application_available": true,
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "preparation_held": false,
+    "preparation": [],
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "final_flags": [
+    true,
+    false,
+    true
+  ],
+  "brake_ports": [
+    {
+      "name": "brake",
+      "value": 0.0,
+      "direction": "in",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "input surface",
+        "authority": "input owner",
+        "writable": true
+      }
+    },
+    {
+      "name": "brake",
+      "value": 0.0,
+      "direction": "out",
+      "metadata": {
+        "type": "scalar",
+        "unit": null,
+        "frame": null,
+        "range": null,
+        "source": "runtime producer",
+        "authority": "producer",
+        "writable": false
+      }
+    }
+  ],
+  "final_transfer": {
+    "fixed_count": 4,
+    "upright_cos": 0.9943842925531311,
+    "speed_mps": 0.1708494328998426,
+    "ok": false
+  },
+  "ok": true,
+  "braking_confirmed": true,
+  "phase_expectations": "Stable four-wheel support and zero tether load are required at native unlock. Manual proof then commands throttle, confirms braking, releases all verifier inputs and pauses transport. Final velocity is the saved pre-pause velocity after brake release; the release-time stability gate is not reapplied to a manually driven rover.",
+  "transport_pause_receipt": "2026-11-14T09:20:59.385221Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=SIMULATION_PAUSED, severity=Info, data=String(\"Paused\"), ts=2461448.2227, sim_secs=254.450000, sim_tick=26097",
+  "actual_request_receipt": "2026-11-14T09:11:23.246223Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=griffin_rover_release_requested, severity=Info, data=Bool(true), ts=2461448.2211, sim_secs=118.850000, sim_tick=17961"
+}

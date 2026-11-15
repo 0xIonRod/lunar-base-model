@@ -1,0 +1,64 @@
+   Compiling lunco-mobility v0.6.0-dev (/home/rod/Documents/luncosim-workspace/griffin-tether-axle/crates/lunco-mobility)
+    Finished `test` profile [optimized + debuginfo] target(s) in 17.48s
+     Running unittests src/lib.rs (target/debug/deps/lunco_mobility-4f0e292daa1ac9bf)
+
+running 56 tests
+test force_law_tests::contact_basis_leaned_lies_in_contact_plane ... ok
+test force_law_tests::contact_basis_upright_matches_flat_wheel ... ok
+test force_law_tests::generated_network_control_surface_releases_brake_without_output_ports ... ok
+test force_law_tests::authored_brake_command_reaches_the_generic_brake_port ... ok
+test force_law_tests::jointed_contact_basis_retains_motor_direction_through_vertical_pitch ... ok
+test force_law_tests::ray_contact_point_follows_authored_strut_geometry ... ok
+test force_law_tests::suspension_damps_the_rebound_half_cycle ... ok
+test force_law_tests::suspension_force_is_nonnegative_and_bounded ... ok
+test force_law_tests::suspension_query_includes_the_authored_rest_endpoint ... ok
+test jointed_tire::tests::parking_invalid_wheel_mass_holds_and_reports_without_panicking ... ok
+test jointed_tire::tests::parking_support_load_includes_native_and_body_contacts_but_excludes_internal_contacts ... ok
+test oracle::bounded_law_caps_a_hard_landing_force ... ok
+test oracle::fixed_law_settles_no_limit_cycle ... ok
+test oracle::fixed_law_tracks_the_continuous_reference_in_the_gentle_regime ... ok
+test raycast_travel::tests::travel_contacts_require_a_native_solver_endpoint ... ok
+test raycast_wheel_mass_tests::a_raycast_rover_masses_the_same_as_its_physical_twin ... ok
+test raycast_wheel_mass_tests::a_wheel_whose_parameters_have_not_landed_yet_defers_the_fold ... ok
+test raycast_wheel_mass_tests::articulated_wheel_mass_is_found_through_its_carrier ... ok
+test raycast_wheel_mass_tests::automatic_carrier_uses_prepared_mass_and_publishes_complete_override ... ok
+test raycast_wheel_mass_tests::folding_twice_does_not_double_the_rover ... ok
+test raycast_wheel_mass_tests::the_mass_acts_where_the_wheels_hang_it ... ok
+test raycast_wheel_mass_tests::the_wheels_arrive_at_their_mounts_not_at_the_centre_of_mass ... ok
+test sensing::tests::contact_pair_resolves_collider_through_registered_body ... ok
+test sensing::tests::ground_height_uses_the_active_physics_frame_at_an_elevated_site ... ok
+test sensing::tests::sensor_events_use_sensor_identity_without_a_zone_name ... ok
+test sensing::tests::zone_events_name_by_sensor_and_carry_the_entrant ... ok
+test tire_patch_tests::a_brake_stop_retains_kinetic_heat_but_static_holding_has_no_work ... ok
+test tire_patch_tests::a_parking_contact_never_propels_an_existing_slip ... ok
+test tire_patch_tests::axle_balances_near_rolling_contact_at_representable_speed ... ok
+test tire_patch_tests::axle_brake_holds_and_airborne_bearing_drag_cannot_reverse_the_shaft ... ok
+test tire_patch_tests::axle_rejects_a_discontinuous_contact_law_without_a_torque_balance ... ok
+test tire_patch_tests::axle_resolves_stiff_rolling_contact_with_rotating_housing_at_float_boundary ... ok
+test tire_patch_tests::axle_starts_both_directions_with_standard_slip_denominators_at_tiny_and_unit_force ... ok
+test tire_patch_tests::axle_step_conserves_work_and_keeps_physical_heat_passive ... ok
+test tire_patch_tests::combined_force_preserves_direction_at_coulomb_limit ... ok
+test tire_patch_tests::lateral_graph_scales_stiffness_below_its_plateau_load ... ok
+test tire_patch_tests::longitudinal_stiffness_uses_dimensionless_slip ... ok
+test tire_patch_tests::parking_brake_cancels_gravity_on_a_holdable_slope ... ok
+test tire_patch_tests::parking_brake_holds_a_preloaded_vertical_contact ... ok
+test tire_patch_tests::parking_brake_opposes_residual_contact_velocity ... ok
+test tire_patch_tests::parking_contact_uses_wheel_mass_for_velocity_and_load_share_for_gravity ... ok
+test tire_patch_tests::parking_preload_does_not_inflate_inertial_mass ... ok
+test tire_patch_tests::rolling_speed_defines_pivot_slip_angle_without_a_threshold ... ok
+test tire_patch_tests::saturated_drive_uses_current_candidate_after_a_small_residual_reversal ... ok
+test tire_patch_tests::zero_load_has_no_patch_force ... ok
+test wheel_kinematics::tests::hub_pose_is_translation_invariant_lever ... ok
+test wheel_kinematics::tests::hub_velocity_adds_rotational_term ... ok
+test wheel_kinematics::tests::roll_rate_is_v_long_over_radius ... ok
+test wheel_kinematics::tests::wheel_heading_follows_authored_axle_and_steering_axes ... ok
+test wheel_kinematics::tests::wheel_heading_uses_physics_attitude_not_render_frame ... ok
+test wheel_raycast_parallel_tests::parallel_wheel_cast_matches_native_query_and_preserves_disabled_state ... ok
+test wheel_raycast_parallel_tests::raycast_wheel_physics_pose_ignores_interpolated_transform ... ok
+test wheel_spin::tests::a_free_spinning_wheel_follows_solved_torque_and_bearing_loss ... ok
+test wheel_spin::tests::raycast_spin_is_floating_origin_invariant ... ok
+test wheel_spin::tests::wheel_inertia_rejects_unprojected_values_instead_of_using_a_floor ... ok
+test raycast_travel::tests::stop_impacts_do_not_create_energy_or_pull_separating_bodies ... ok
+
+test result: ok. 56 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+

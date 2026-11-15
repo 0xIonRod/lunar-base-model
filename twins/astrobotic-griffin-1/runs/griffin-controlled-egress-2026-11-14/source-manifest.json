@@ -1,0 +1,77 @@
+{
+  "engine": {
+    "path": "/home/rod/Documents/luncosim-workspace/griffin-tether-axle",
+    "branch": "fix/griffin-tether-axle",
+    "base_revision": "b90207f6065d3fea44ecee5b6839f3cd46497f00",
+    "binary_sha256": "00fe12c87f4a840e1ebb4ec2963a156fbc129475ee27027e6f9cc1146e84ef05",
+    "source_sha256": {
+      "assets/scripting/policy/lint_usd.rhai": "71a3c892459f6ecb3c967fc3bf13aed8421e7e317d898f88971b8423cdd09953",
+      "crates/lunco-cosim/src/avian.rs": "eff45a7f55cdcb4339bd9b940548605fdb5510df87f18462d749ab10ab32671e",
+      "crates/lunco-mobility/src/jointed_tire.rs": "9de3dece2acd129aab70f39388db1e271dad4f0c4b2dd29a61da39f5f90eb667",
+      "crates/lunco-mobility/src/lib.rs": "aba99bdae73227797b9d88751dcf8ba18f3aeaf37da6e46caae0c7b493254ba3",
+      "crates/lunco-mobility/src/sensing.rs": "85c358101b1e0592fac23cc0af72dcb55f64a2714e45b5c125c69a02daa6af0a",
+      "crates/lunco-physics/src/joint.rs": "3962e20e338b554662c914d43f6eb35e35785c0b768c14b747b4cd361818a2c1",
+      "crates/lunco-usd-sim/src/lib.rs": "2e83f70198527fea52680d6add075dcc82aa956f2cc27f23574b814f04b27e2b"
+    }
+  },
+  "twin": {
+    "path": "/home/rod/Documents/models/lunar-base-model/twins/astrobotic-griffin-1",
+    "base_revision": "6e996ef6610bc9658d5d4387de0f63a84da302d7",
+    "source_sha256": {
+      "twins/astrobotic-griffin-1/README.md": "c064f07abf901fc537aa0243d43b33e6422c0005a04b3fbd86e377de10076aac",
+      "twins/astrobotic-griffin-1/contracts/griffin-manual-release-2026-10-29.md": "9739ea13047b36ecd2417290b51658dba210bfb73599b260a6a3185fbb02fa23",
+      "twins/astrobotic-griffin-1/contracts/griffin-safe-egress-2026-11-13.md": "6914ef93214a9d9da3646eb2bd2ed5df1a09e5e39ccfd9182d352176659ce071",
+      "twins/astrobotic-griffin-1/models/GriffinTetherPairStudy.mo": "0f5db572696fc1d4d517d1368fba72c7607348a438d0f3b1a7cd2c82a991ee61",
+      "twins/astrobotic-griffin-1/requirements/griffin_flip_egress.sysml": "bea86e097efd9db6f67aad59bf59efeda93fdb376116ac428ee19d1ba16c82e7",
+      "twins/astrobotic-griffin-1/requirements/griffin_functional_requirements.sysml": "94bfeff0cb7a0dd29c20f1a24d076b26a880390ce28946084424917a6e192139",
+      "twins/astrobotic-griffin-1/scenarios/griffin_1_surface_ops.rhai": "dabe1f359acfe3d30017eb557687b4134395850c5229d2d95b49da1df0b50e41",
+      "twins/astrobotic-griffin-1/scenarios/griffin_tether_egress.rhai": "e988f6655ecb85e95ca680f7770904be948bb671a77b1ad7961d1cf24adc0bd6",
+      "twins/astrobotic-griffin-1/scenarios/tests/griffin_compact_manual_release.rhai": "eb98299e070897667827b30293c2700450d58c0c4a346e6c9739ae2a719036c8",
+      "twins/astrobotic-griffin-1/scenarios/tests/griffin_native_wrench_response.rhai": "b4dea3977afc87a43ef18f48765ec780d5ba991db78b8cb4b5e0b7303d928400",
+      "twins/astrobotic-griffin-1/scenarios/tests/griffin_tether_wrench_response.rhai": "aaaaae007e4f98224c9d28b8bef6518f4e5c92b01d70f154db3bdb7e0d0c7e41",
+      "twins/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda": "5db231aa7e13ad19b7c8abb7f5d85e2fb9c3cb7a0a171fbdfe7179bec0997e44",
+      "twins/astrobotic-griffin-1/tests/GriffinTetherPairContract.mo": "a98bf7350c454731a2e9a19021be897e2511a0845ff1c6bd689639361587b8d9",
+      "twins/astrobotic-griffin-1/tests/GriffinTetherWrenchProbe.mo": "218611dd925b77c6e6383d7585e93dcd3903b5ee1af861750415781989339d1d",
+      "twins/astrobotic-griffin-1/tests/griffin_native_wrench_response.usda": "c3558048a1acd40a5545097b5b65353d18bf06deb1613b9b592a54ffedd60c72",
+      "twins/astrobotic-griffin-1/tests/griffin_tether_descent.usda": "50e222a831ae25655d603e85179926c1ad7385fc312c0c26253e0a91c17260b7",
+      "twins/astrobotic-griffin-1/tests/griffin_tether_wrench_response.usda": "141d89b2eacc5d7b62b431a6f5a6cfba11b5381352f3258ba3d4de8b388eb770",
+      "twins/astrobotic-griffin-1/tools/check_tether_model.py": "e1a55aa3e8ba4eb3cc5d9bcfe24ffd983229452586a9da89d03b60b83b704ceb",
+      "twins/astrobotic-griffin-1/tools/griffin_controls.rhai": "bc349560a32235e9c5ab3f58b9e5e8fcd8ce61fd166e3bd0accebdd3cccda5dd",
+      "twins/astrobotic-griffin-1/tools/griffin_tether_study.rhai": "70516d2976f23a33e8d59267c6c0a837bb6e690c567b5c785acfcc268dc4191b"
+    },
+    "removed_source_paths": [
+      "twins/astrobotic-griffin-1/scenarios/tests/griffin_tether_descent.rhai",
+      "twins/astrobotic-griffin-1/tests/GriffinTetherPairStudy.mo"
+    ]
+  },
+  "scene_test": {
+    "ticks": 8806,
+    "tick_hz": 60,
+    "threads": 1,
+    "jitter": 0,
+    "seed": 6840157149251759617,
+    "command": "target/debug/luncosim test --scene \"$TWIN/tests/griffin_tether_descent.usda\" --max-ticks 19000 --tick-hz 60 --threads 1 --jitter 0 --readiness-timeout 240 --api 4190",
+    "updates": 8964
+  },
+  "scope": "Study with assumed reduced balanced rear-wheel bridles and ideal powered winches; not flight qualification; no push or commit performed",
+  "desktop": {
+    "api_port": 4189,
+    "pid": 1508402,
+    "request_scene_seconds": 118.85,
+    "completion_scene_seconds": 239.533333,
+    "maximum_descent_speed_mps": 0.13295448362780588,
+    "maximum_line_tension_n": 801.7934757209774,
+    "manual_proof_distance_m": 1.175911405323545,
+    "braked_speed_mps": 0.005811365380721676,
+    "transport_paused": true,
+    "manual_possession_available": true,
+    "verifier_inputs_released": true
+  },
+  "engine_commit": "9a36186b3525b08c2a9222a28867296fd7101278",
+  "twin_commit": "140837200d759cad2a04b504615a8528e042e7ea",
+  "publication": {
+    "engine": "origin/fix/griffin-tether-axle",
+    "twin": "origin/main",
+    "remote_sha_verified": true
+  }
+}

@@ -20,7 +20,7 @@ graph still needs canonical identity migration and generated realization links.
 | `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
 | `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Tank count, type, dimensions, and stations are not established by a public Griffin-1 ICD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider; the surface scene owns one fixed FLIP payload joint | The graph names the adapter and release-joint paths and requires both touchdown/settling and a ready egress path before release; mechanical interface dimensions and release-load ICD remain TBD |
-| `MainPropulsion` | Shared fuel and oxidizer tanks, seven `PressureFedEngine` members with one `PlumePhotometry` each, representative nozzle design | Each engine is the thrust and propellant authority for its own valves and chamber; `engineNN_enabled` models an engine-out | Nozzle contour, engine-out guidance response, and supplier propulsion data remain TBD |
+| `MainPropulsion` | Shared fuel and oxidizer tanks, seven USD engine assemblies with explicit valve/chamber members and one `PlumePhotometry` each, representative nozzle design | Each chamber owns delivered thrust; both valves consume `engineNN_enabled`, and USD owns the fluid topology | Nozzle contour, engine-out guidance response, and supplier propulsion data remain TBD |
 | `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, local plume light and force actuator | Seven non-colliding bells; each applies its own engine's thrust at its station and shows its own plume | Seven main engines are public; bell contour and spacing remain study geometry |
 | `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelFrontPort` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
@@ -90,9 +90,9 @@ share the explicit translate/scale order. The sensor/power fixture declares
 SI metres and Y-up so its composed bounds can verify the allocation directly.
 
 Each Griffin main engine is modelled separately. `MainPropulsion/EngineNN` is
-one `LunCo.Propulsion.PressureFedEngine` (its own fuel/oxidizer valves and
-choked chamber), and both shared tanks feed every engine through acausal
-connectors, so the synthesized MainPropulsion network divides and drains
+a USD assembly with explicit `FuelValve`, `OxidizerValve` and `Chamber`
+program parts. Both shared tanks feed the valves through USD fluid connections,
+and the valves feed their chamber. The single MainPropulsion solver divides and drains
 propellant per engine. `MainPropulsion.inputs:engineNN_enabled` (default 1) is
 the engine's health input: 0 closes its valves, which models an engine-out.
 The root republishes each engine as `engineNN_thrust_n`, `_maximum_thrust_n`,

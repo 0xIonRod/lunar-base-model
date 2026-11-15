@@ -4,6 +4,7 @@ import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
 import "griffin_geometry" as griffin_geometry;
+import "lunco://scripting/tools/pressure_fed_engine" as pressure_fed_engine;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 
 // Twin-local runtime visual assembly builder.
@@ -19,13 +20,8 @@ fn query_ok(record) {
     record != () && record.ok != false
 }
 
-fn main_engine_model_path(root, name) { root + "/MainPropulsion/" + name }
+fn main_engine_model_path(root, name) { root + "/MainPropulsion/" + name + "/Chamber" }
 fn main_engine_plume_path(root, name) { root + "/MainPropulsion/" + name + "Plume" }
-fn main_engine_outputs() {
-    ["thrust_n","maximum_thrust_n","activity","chamber_pressure_pa","propellant_flow",
-     "fuel_flow_kgs","oxidizer_flow_kgs","mixture_ratio","mixture_efficiency",
-     "exhaust_velocity_mps","design_exhaust_velocity_mps"]
-}
 // Root signals republished per engine for actuators, HUD, telemetry and tests.
 fn main_engine_root_outputs() {
     ["thrust_n","maximum_thrust_n","activity","chamber_pressure_pa","propellant_flow",
@@ -42,34 +38,51 @@ fn _engine_parameters(model) {
     let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
     let resolved=[];
     for item in [
-        #{name:"fuel_maximum_flow_kgs",source:"engineFuelReferenceFlowKgs"},
-        #{name:"fuel_commanded_flow_kgs",source:"engineFuelCommandFlowKgs"},
-        #{name:"oxidizer_maximum_flow_kgs",source:"engineOxidizerReferenceFlowKgs"},
-        #{name:"oxidizer_commanded_flow_kgs",source:"engineOxidizerCommandFlowKgs"},
-        #{name:"nominal_pressure_drop_pa",source:"referencePressureDropPa"},
-        #{name:"opening_time_constant_s",source:"valveResponseS"},
-        #{name:"availability_transition_mass_kg",source:"availabilityTransitionMassKg"},
-        #{name:"oxidizer_to_fuel_ratio",source:"oxidizerToFuelRatio"},
-        #{name:"characteristic_velocity_mps",source:"characteristicVelocityMps"},
-        #{name:"throat_area_m2",source:"engineThroatBoreAreaM2"},
-        #{name:"combustion_efficiency",source:"combustionEfficiency"},
-        #{name:"nominal_flow_kgs",source:"engineNominalFlowKgs"}] {
+        #{parts:["FuelValve"],name:"maximum_flow_kgs",source:"engineFuelReferenceFlowKgs"},
+        #{parts:["FuelValve"],name:"commanded_flow_kgs",source:"engineFuelCommandFlowKgs"},
+        #{parts:["OxidizerValve"],name:"maximum_flow_kgs",source:"engineOxidizerReferenceFlowKgs"},
+        #{parts:["OxidizerValve"],name:"commanded_flow_kgs",source:"engineOxidizerCommandFlowKgs"},
+        #{parts:["FuelValve","OxidizerValve"],name:"nominal_pressure_drop_pa",source:"referencePressureDropPa"},
+        #{parts:["FuelValve","OxidizerValve"],name:"opening_time_constant_s",source:"valveResponseS"},
+        #{parts:["FuelValve","OxidizerValve"],name:"availability_transition_mass_kg",source:"availabilityTransitionMassKg"},
+        #{parts:["Chamber"],name:"oxidizer_to_fuel_ratio",source:"oxidizerToFuelRatio"},
+        #{parts:["Chamber"],name:"characteristic_velocity_mps",source:"characteristicVelocityMps"},
+        #{parts:["Chamber"],name:"throat_area_m2",source:"engineThroatBoreAreaM2"},
+        #{parts:["Chamber"],name:"combustion_efficiency",source:"combustionEfficiency"},
+        #{parts:["Chamber"],name:"nominal_flow_kgs",source:"engineNominalFlowKgs"}] {
         let value=_source_number(model,own+item.source);
         if value==() || value<=0.0 {return plan_error("missing main-engine datum: "+item.source);}
-        resolved.push(#{name:item.name,value:value});
+        resolved.push(#{parts:item.parts,name:item.name,value:value});
     }
     #{ok:true,parameters:resolved}
 }
 
-// Seven identical pressure-fed engines. Each is one PressureFedEngine member
-// and one PlumePhotometry member in the MainPropulsion network; both shared
-// tanks feed every engine through acausal connectors, so the synthesized
-// Modelica network splits and drains propellant per engine. Each bell carries
-// its engine's force actuator at its station, so an engine-out removes that
-// engine's thrust and produces the matching torque. `<engine>_enabled` is the
-// failure input. One engine is one batch: the whole cluster's typed ops
-// exceed one Rhai value's data budget. Apply every engine, then the feed plan,
-// which admits the engines into the network.
+// Each reusable USD engine assembly exposes two valves and one chamber as
+// members of the single MainPropulsion solver. One engine is one authoring
+// batch; the final feed plan admits all members together.
+fn _engine_parameter_ops(edit_target, assembly, parameters) {
+    let ops=[];
+    for item in parameters {
+        for part in item.parts {ops.push(#{SetAttribute:#{edit_target:edit_target,path:assembly+"/"+part,
+            name:"parameters:"+item.name,type_name:"double",value:item.value.to_string()}});}
+    }
+    ops
+}
+
+// Prepare the referenced component before its inherited ports are wired.
+fn griffin_main_engine_component_plan(doc, edit_target, root, name) {
+    if !griffin_spec::main_engine_names().contains(name) {return plan_error("unknown main-engine identity");}
+    let main=root+"/MainPropulsion";let assembly=main+"/"+name;
+    if !_exists(doc,main) {return plan_error("MainPropulsion assembly has not composed");}
+    let ops=[];
+    if !_exists(doc,assembly) {ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:name,
+        type_name:"Scope",reference:(),reference_prim_path:()}});}
+    ops.push(#{SetReferenceArcs:#{edit_target:edit_target,path:assembly,
+        references:[#{asset_path:"lunco://components/propulsion/pressure_fed_engine.usda",prim_path:"/PressureFedEngine"}],
+        list_op:"Explicit"}});
+    #{ok:true,kind:"griffin_main_engine_component",engine:name,ops:ops,no_op:false}
+}
+
 fn griffin_main_engine_plan(doc, edit_target, root, name) {
     let model=sysml_requirements::model();
     if !sysml_model_is(model) {return plan_error("main-engine source unavailable");}
@@ -93,8 +106,17 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     let visual=root+"/Nozzle/MainEngineCluster/"+name;
     if !_exists(doc,visual) {return plan_error(visual+": engine bell has not composed");}
     let ops=[];
-    for prim in [#{path:engine,name:name,asset:"PressureFedEngine.mo"},
-        #{path:plume,name:name+"Plume",asset:"PlumePhotometry.mo"}] {
+    let assembly=main+"/"+name;
+    for path in pressure_fed_engine::component_members(assembly) {
+        if !_exists(doc,path) {return plan_error("Install "+assembly+" component reference and wait for composed projection before wiring");}
+    }
+    for part in [#{path:assembly+"/FuelValve",label:name+" fuel valve"},
+        #{path:assembly+"/OxidizerValve",label:name+" oxidizer valve"},
+        #{path:engine,label:name+" chamber"}] {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:part.path,name:"ui:displayName",
+            type_name:"string",value:part.label}});
+    }
+    for prim in [#{path:plume,name:name+"Plume",asset:"PlumePhotometry.mo"}] {
         if !_exists(doc,prim.path) {
             ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:prim.name,
                 type_name:"Scope",reference:(),reference_prim_path:()}});
@@ -107,10 +129,7 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"lunco:program:realtimeSafe",
             type_name:"bool",value:"true"}});
     }
-    for item in parameters.parameters {
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:engine,name:"inputs:"+item.name,
-            type_name:"double",value:item.value.to_string()}});
-    }
+    for op in _engine_parameter_ops(edit_target,assembly,parameters.parameters) {ops.push(op);}
     let enabled=griffin_spec::main_engine_port(name,"enabled");
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:main,name:"inputs:"+enabled,
         type_name:"float",value:"1.0"}});
@@ -118,20 +137,25 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"outputs:"+output,
             type_name:"double",value:"0.0"}});
     }
+    for fluid in [#{valve:"FuelValve",tank:"FuelTank"},#{valve:"OxidizerValve",tank:"OxidizerTank"}] {
+        let valve=assembly+"/"+fluid.valve;
+        for connection in [
+            #{name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
+            #{name:"inputs:enabled",source:main+".inputs:"+enabled,kind:"float"},
+            #{name:"inputs:available_mass_kg",source:main+"/"+fluid.tank+".outputs:mass_kg",kind:"float"},
+            #{name:"connectors:inlet",source:main+"/"+fluid.tank+".connectors:outlet",kind:"token"}] {
+            ops.push(#{SetConnection:#{edit_target:edit_target,path:valve,name:connection.name,
+                type_name:connection.kind,sources:[connection.source]}});
+        }
+    }
     for connection in [
-        #{path:engine,name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
-        #{path:engine,name:"inputs:enabled",source:main+".inputs:"+enabled,kind:"float"},
-        #{path:engine,name:"inputs:available_fuel_mass_kg",source:main+"/FuelTank.outputs:mass_kg",kind:"float"},
-        #{path:engine,name:"inputs:available_oxidizer_mass_kg",source:main+"/OxidizerTank.outputs:mass_kg",kind:"float"},
         #{path:engine,name:"inputs:effective_exhaust_velocity_mps",source:nozzle+".outputs:ideal_exhaust_velocity_mps",kind:"float"},
-        #{path:engine,name:"connectors:fuel_in",source:main+"/FuelTank.connectors:outlet",kind:"token"},
-        #{path:engine,name:"connectors:oxidizer_in",source:main+"/OxidizerTank.connectors:outlet",kind:"token"},
         #{path:plume,name:"inputs:thrust_n",source:engine+".outputs:thrust_n",kind:"double"},
         #{path:plume,name:"inputs:maximum_thrust_n",source:engine+".outputs:maximum_thrust_n",kind:"double"},
         #{path:plume,name:"inputs:propellant_flow_kgs",source:engine+".outputs:propellant_flow",kind:"double"},
         #{path:plume,name:"inputs:exhaust_velocity_mps",source:engine+".outputs:exhaust_velocity_mps",kind:"double"},
         #{path:plume,name:"inputs:mixture_ratio",source:engine+".outputs:mixture_ratio",kind:"double"},
-        #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"float"},
+        #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"double"},
         #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"},
         #{path:plume,name:"inputs:nozzle_exit_mach",source:nozzle+".outputs:exit_mach",kind:"double"},
         #{path:plume,name:"inputs:gas_gamma",source:nozzle+".outputs:gamma_out",kind:"double"},
@@ -139,15 +163,13 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
         ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
             type_name:connection.kind,sources:[connection.source]}});
     }
-    for output in main_engine_outputs() {
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:engine,name:"outputs:"+output,
-            type_name:"double",value:"0.0"}});
-    }
     for output in main_engine_root_outputs() {
         ops.push(#{SetConnection:#{edit_target:edit_target,path:main,
             name:"outputs:"+griffin_spec::main_engine_port(name,output),type_name:"double",
             sources:[engine+".outputs:"+output]}});
     }
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/"+name+"Wall",
+        name:"inputs:propellant_flow_kgs",type_name:"double",sources:[engine+".outputs:propellant_flow"]}});
     ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:plume,name:"inputs:engine_count"}});
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"parameters:engine_count",
         type_name:"int",value:"1"}});
@@ -191,12 +213,12 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     }
     ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:telemetry,schemas:["LunCoTelemetryAPI"]}});
     for field in [#{name:"lunco:telemetry",type_name:"bool",value:"true"},
-        #{name:"ui:displayName",type_name:"string",value:"\""+name.to_upper()+" THRUST\""},
-        #{name:"lunco:telemetry:port",type_name:"string",value:"\""+griffin_spec::main_engine_port(name,"thrust_n")+"\""},
-        #{name:"lunco:telemetry:name",type_name:"string",value:"\"lander."+griffin_spec::main_engine_port(name,"thrust")+"\""},
-        #{name:"lunco:telemetry:unit",type_name:"string",value:"\"N\""},
+        #{name:"ui:displayName",type_name:"string",value:name.to_upper()+" THRUST"},
+        #{name:"lunco:telemetry:port",type_name:"string",value:griffin_spec::main_engine_port(name,"thrust_n")},
+        #{name:"lunco:telemetry:name",type_name:"string",value:"lander."+griffin_spec::main_engine_port(name,"thrust")},
+        #{name:"lunco:telemetry:unit",type_name:"string",value:"N"},
         #{name:"lunco:telemetry:description",type_name:"string",
-            value:"\"Delivered thrust of main engine "+name+" from its PressureFedEngine model.\""}] {
+            value:"Delivered thrust of main engine "+name+" from its USD-authored valve/chamber assembly."}] {
         if ["lunco:telemetry:port","lunco:telemetry:name","lunco:telemetry:unit"].contains(field.name) {
             ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:telemetry,name:field.name}});
         }
@@ -349,13 +371,15 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     for name in names {
         let engine=main_engine_model_path(root,name);
         let plume=main_engine_plume_path(root,name);
-        if !_exists(doc,engine) || !_exists(doc,plume) {
-            return plan_error(name+": apply griffin_main_engine_plan before admitting the feed");
+        if !_exists(doc,engine) || !_exists(doc,plume) || !_exists(doc,main+"/"+name+"Wall") {
+            return plan_error(name+": install valves, chamber, plume and wall before admitting the feed");
         }
-        members.push(engine);
+        let assembly=main+"/"+name;
+        for member in pressure_fed_engine::component_members(assembly) {members.push(member);}
         members.push(plume);
-        fuel_inlets.push(engine+".connectors:fuel_in");
-        oxidizer_inlets.push(engine+".connectors:oxidizer_in");
+        members.push(main+"/"+name+"Wall");
+        fuel_inlets.push(assembly+"/FuelValve.connectors:inlet");
+        oxidizer_inlets.push(assembly+"/OxidizerValve.connectors:inlet");
     }
     ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/FuelTank",name:"connectors:outlet",
         type_name:"token",sources:fuel_inlets}});
@@ -378,6 +402,13 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"outputs:ideal_exhaust_velocity_mps",
         type_name:"float",value:"0.0"}});
     #{ok:true,kind:"griffin_main_engine_feed",engine_count:count,ops:ops,no_op:false}
+}
+
+fn apply_griffin_main_engine_component(doc, edit_target, root, name, parent_gen) {
+    let plan=griffin_main_engine_component_plan(doc,edit_target,root,name);
+    if !plan.ok {return plan;}
+    let command=assembly_edit::batch(doc,"Install Griffin engine component "+name,plan.ops,parent_gen);
+    #{ok:command.ok!=false,kind:plan.kind,command:command,engine:name}
 }
 
 fn apply_griffin_main_engine(doc, edit_target, root, name, parent_gen) {

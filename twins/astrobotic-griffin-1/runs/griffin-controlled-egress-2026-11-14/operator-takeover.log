@@ -1,0 +1,6 @@
+ready
+{"data":{"stdout":"#{\"id\": 123560255936239, \"ok\": true, \"status\": \"applied\"}"}}
+
+takeover {"data":{"stdout":"#{\"id\": 123560283203339, \"ok\": true, \"status\": \"applied\"}"}}
+ok True ticks [5998, 5998] wheel brake requests [1.0, 1.0, 1.0, 1.0] pause {'condition': 'griffin:egress-fault', 'detail': 'Operator took control during automatic tether egress; restraint and parking hold retained'}
+

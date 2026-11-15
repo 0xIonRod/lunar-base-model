@@ -1,0 +1,177 @@
+{
+  "ok": true,
+  "meshes": 12,
+  "faces": 864,
+  "overlaps": [],
+  "bounds": {
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankPX": [
+      [
+        0.15000000596046448,
+        1.5499999523162842
+      ],
+      [
+        -0.05999999865889549,
+        0.05999999865889549
+      ],
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankNX": [
+      [
+        -1.5499999523162842,
+        -0.15000000596046448
+      ],
+      [
+        -0.05999999865889549,
+        0.05999999865889549
+      ],
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankPZ": [
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ],
+      [
+        -0.05999999865889549,
+        0.05999999865889549
+      ],
+      [
+        0.15000000596046448,
+        1.5499999523162842
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankNZ": [
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ],
+      [
+        -0.05999999865889549,
+        0.05999999865889549
+      ],
+      [
+        -1.5499999523162842,
+        -0.15000000596046448
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankPXUpper": [
+      [
+        0.15000000596046448,
+        1.5499999523162842
+      ],
+      [
+        0.3100000023841858,
+        0.4300000071525574
+      ],
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankNXUpper": [
+      [
+        -1.5499999523162842,
+        -0.15000000596046448
+      ],
+      [
+        0.3100000023841858,
+        0.4300000071525574
+      ],
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankPZUpper": [
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ],
+      [
+        0.3100000023841858,
+        0.4300000071525574
+      ],
+      [
+        0.15000000596046448,
+        1.5499999523162842
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankNZUpper": [
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ],
+      [
+        0.3100000023841858,
+        0.4300000071525574
+      ],
+      [
+        -1.5499999523162842,
+        -0.15000000596046448
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankPXLower": [
+      [
+        0.15000000596046448,
+        1.5499999523162842
+      ],
+      [
+        -0.4300000071525574,
+        -0.3100000023841858
+      ],
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankNXLower": [
+      [
+        -1.5499999523162842,
+        -0.15000000596046448
+      ],
+      [
+        -0.4300000071525574,
+        -0.3100000023841858
+      ],
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankPZLower": [
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ],
+      [
+        -0.4300000071525574,
+        -0.3100000023841858
+      ],
+      [
+        0.15000000596046448,
+        1.5499999523162842
+      ]
+    ],
+    "/Griffin1SurfaceOps/Lander/Bus/TankSupportPlate/OpeningTankNZLower": [
+      [
+        -0.699999988079071,
+        0.699999988079071
+      ],
+      [
+        -0.4300000071525574,
+        -0.3100000023841858
+      ],
+      [
+        -1.5499999523162842,
+        -0.15000000596046448
+      ]
+    ]
+  },
+  "scope": "Same-facing coplanar faces on distinct tank-opening frames; 50 um plane and 10 mm2 area tolerances"
+}

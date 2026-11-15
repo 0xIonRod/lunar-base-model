@@ -1,0 +1,535 @@
+{
+  "unsafe_disconnect": "#{\"error\": \"FLIP is still attached to Griffin\", \"ok\": false}",
+  "before": {
+    "elastic_energy": 0.0,
+    "tension0": 0.0,
+    "tension1": 0.0,
+    "enabled": 0.0
+  },
+  "before_flags": [
+    true,
+    false,
+    false
+  ],
+  "initial_curves": [
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 7155487920401174,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Left/Span",
+      "state": "ready",
+      "requested_revision": 725,
+      "completed_revision": 725,
+      "applied_revision": 725,
+      "local_visibility": "inherited",
+      "result_segment_count": 2,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 6152289907030756,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Left/Bridle",
+      "state": "pending",
+      "requested_revision": 730,
+      "completed_revision": 726,
+      "applied_revision": 0,
+      "local_visibility": "inherited",
+      "result_segment_count": 32,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 417503284482140,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Right/Span",
+      "state": "ready",
+      "requested_revision": 731,
+      "completed_revision": 731,
+      "applied_revision": 731,
+      "local_visibility": "inherited",
+      "result_segment_count": 2,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 3972892888537898,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Right/Bridle",
+      "state": "ready",
+      "requested_revision": 732,
+      "completed_revision": 732,
+      "applied_revision": 732,
+      "local_visibility": "inherited",
+      "result_segment_count": 32,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    }
+  ],
+  "parked": {
+    "elastic_energy": 0.0,
+    "tension0": 0.0,
+    "tension1": 0.0,
+    "enabled": 1.0
+  },
+  "parked_flags": [
+    false,
+    true,
+    false
+  ],
+  "parked_hud": {
+    "active_perspective": "sandbox_view",
+    "default_perspective": "sandbox_view",
+    "cards": [
+      {
+        "kind": "scene",
+        "twin": null,
+        "hud": "griffin-controls",
+        "author": null,
+        "hint": "Tethers retained: FLIP is still attached to Griffin.",
+        "objectives": "",
+        "actions": [],
+        "perspectives": null,
+        "visible": true,
+        "interactive": true,
+        "layout": {
+          "width": 320.0,
+          "text_scale": 1.0,
+          "draggable": false
+        }
+      },
+      {
+        "kind": "scene",
+        "twin": 1,
+        "hud": "flip-panel:/Griffin1SurfaceOps/FLIP",
+        "author": null,
+        "hint": "FLIP solar panel",
+        "objectives": "",
+        "actions": [
+          {
+            "id": "/Griffin1SurfaceOps/FLIP|open",
+            "label": "OPEN SOLAR PANEL  O",
+            "enabled": true
+          },
+          {
+            "id": "/Griffin1SurfaceOps/FLIP|stow",
+            "label": "STOW SOLAR PANEL  S",
+            "enabled": true
+          }
+        ],
+        "perspectives": null,
+        "visible": true,
+        "interactive": true,
+        "layout": {
+          "width": 320.0,
+          "text_scale": 1.0,
+          "draggable": false
+        }
+      },
+      {
+        "kind": "scene",
+        "twin": 1,
+        "hud": "griffin-controls",
+        "author": null,
+        "hint": "FLIP parked. Both tethers are unloaded. Click DISCONNECT TETHERS to enable manual drive.",
+        "objectives": "",
+        "actions": [
+          {
+            "id": "unfold_ramps",
+            "label": "FIXED EGRESS TRACKS",
+            "enabled": false
+          },
+          {
+            "id": "release_rover",
+            "label": "DEPLOY FLIP",
+            "enabled": false
+          },
+          {
+            "id": "disconnect_tethers",
+            "label": "DISCONNECT TETHERS",
+            "enabled": true
+          },
+          {
+            "id": "toggle_gnc",
+            "label": "RECONNECT GNC",
+            "enabled": true
+          }
+        ],
+        "perspectives": null,
+        "visible": true,
+        "interactive": true,
+        "layout": {
+          "width": 320.0,
+          "text_scale": 1.0,
+          "draggable": false
+        }
+      }
+    ],
+    "tour": null
+  },
+  "parked_curves": [
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 7155487920401174,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Left/Span",
+      "state": "ready",
+      "requested_revision": 6733,
+      "completed_revision": 6733,
+      "applied_revision": 6733,
+      "local_visibility": "inherited",
+      "result_segment_count": 6,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 6152289907030756,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Left/Bridle",
+      "state": "ready",
+      "requested_revision": 6734,
+      "completed_revision": 6734,
+      "applied_revision": 6734,
+      "local_visibility": "inherited",
+      "result_segment_count": 32,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 417503284482140,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Right/Span",
+      "state": "ready",
+      "requested_revision": 6735,
+      "completed_revision": 6735,
+      "applied_revision": 6735,
+      "local_visibility": "inherited",
+      "result_segment_count": 6,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 3972892888537898,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Right/Bridle",
+      "state": "ready",
+      "requested_revision": 6736,
+      "completed_revision": 6736,
+      "applied_revision": 6736,
+      "local_visibility": "inherited",
+      "result_segment_count": 32,
+      "projection": "spatial_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    }
+  ],
+  "disconnect": "#{\"event\": \"griffin_tethers_disconnect_requested\", \"ok\": true, \"queued\": true}",
+  "cut": {
+    "elastic_energy": 0.0,
+    "tension0": 0.0,
+    "tension1": 0.0,
+    "enabled": 0.0
+  },
+  "cut_curves": [
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 7155487920401174,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Left/Span",
+      "state": "ready",
+      "requested_revision": 6801,
+      "completed_revision": 6801,
+      "applied_revision": 6801,
+      "local_visibility": "hidden",
+      "result_segment_count": 0,
+      "projection": "authored_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 6152289907030756,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Left/Bridle",
+      "state": "ready",
+      "requested_revision": 6802,
+      "completed_revision": 6802,
+      "applied_revision": 6802,
+      "local_visibility": "hidden",
+      "result_segment_count": 0,
+      "projection": "authored_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 417503284482140,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Right/Span",
+      "state": "ready",
+      "requested_revision": 6803,
+      "completed_revision": 6803,
+      "applied_revision": 6803,
+      "local_visibility": "hidden",
+      "result_segment_count": 0,
+      "projection": "authored_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    },
+    {
+      "doc_id": 123685046991613,
+      "entity_id": 3972892888537898,
+      "path": "/Griffin1SurfaceOps/Lander/LiveTethers/Right/Bridle",
+      "state": "ready",
+      "requested_revision": 6804,
+      "completed_revision": 6804,
+      "applied_revision": 6804,
+      "local_visibility": "hidden",
+      "result_segment_count": 0,
+      "projection": "authored_curve",
+      "surface_binding_count": 0,
+      "displayed_surface_binding_count": 0,
+      "surface_texture": null,
+      "index_updated_segments": null,
+      "index_touched_nodes": null,
+      "index_patch_bytes": null,
+      "index_full_uploads": null,
+      "uploaded_patch_bytes": null,
+      "uploaded_patch_batches": null,
+      "index_upload_sequence": null,
+      "uploaded_patch_sequence": null,
+      "error": ""
+    }
+  ],
+  "cut_flags": [
+    false,
+    false,
+    true
+  ],
+  "throttle": {
+    "api_id": 5811092977805847,
+    "ports": [
+      {
+        "name": "throttle",
+        "value": 1.0,
+        "direction": "in",
+        "metadata": {
+          "type": "scalar",
+          "unit": null,
+          "frame": null,
+          "range": null,
+          "source": "input surface",
+          "authority": "input owner",
+          "writable": true
+        }
+      },
+      {
+        "name": "brake",
+        "value": 0.0,
+        "direction": "in",
+        "metadata": {
+          "type": "scalar",
+          "unit": null,
+          "frame": null,
+          "range": null,
+          "source": "input surface",
+          "authority": "input owner",
+          "writable": true
+        }
+      },
+      {
+        "name": "throttle",
+        "value": 0.0,
+        "direction": "in",
+        "metadata": {
+          "type": "scalar",
+          "unit": null,
+          "frame": null,
+          "range": null,
+          "source": "Co-simulation participant",
+          "authority": "controller / wire",
+          "writable": true
+        }
+      },
+      {
+        "name": "brake",
+        "value": 0.0,
+        "direction": "out",
+        "metadata": {
+          "type": "scalar",
+          "unit": null,
+          "frame": null,
+          "range": null,
+          "source": "runtime producer",
+          "authority": "producer",
+          "writable": false
+        }
+      }
+    ]
+  },
+  "manual_distance_m": 0.1069539339101055,
+  "stopped_speed_mps": 0.002893322300743375,
+  "brake": {
+    "api_id": 5811092977805847,
+    "ports": [
+      {
+        "name": "brake",
+        "value": 1.0,
+        "direction": "in",
+        "metadata": {
+          "type": "scalar",
+          "unit": null,
+          "frame": null,
+          "range": null,
+          "source": "input surface",
+          "authority": "input owner",
+          "writable": true
+        }
+      },
+      {
+        "name": "brake",
+        "value": 1.0,
+        "direction": "out",
+        "metadata": {
+          "type": "scalar",
+          "unit": null,
+          "frame": null,
+          "range": null,
+          "source": "runtime producer",
+          "authority": "producer",
+          "writable": false
+        }
+      }
+    ]
+  },
+  "readiness": {
+    "application_available": true,
+    "ready": true,
+    "world_hold": false,
+    "faulted": false,
+    "fault": null,
+    "preparation_held": false,
+    "preparation": [],
+    "readiness_tracked": true,
+    "pending_count": 0,
+    "pending": []
+  },
+  "diagnostics": {
+    "errors": 0,
+    "warnings": 0,
+    "findings": []
+  },
+  "ok": true
+}

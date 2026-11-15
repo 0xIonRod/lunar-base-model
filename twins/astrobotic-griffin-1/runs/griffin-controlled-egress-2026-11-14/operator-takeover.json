@@ -1,0 +1,1648 @@
+{
+  "case": "operator takeover during normal DEPLOY flow",
+  "wheel_ids": [
+    3316818422792539,
+    4478104967918077,
+    2731199800169026,
+    5555945442763527
+  ],
+  "snapshots": [
+    {
+      "physics": {
+        "api_id": 5811092977805847,
+        "usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+        "body_mode": "dynamic",
+        "linear_velocity_mps": [
+          0.045231543481349945,
+          -0.005808514077216387,
+          -0.06615131348371506
+        ],
+        "angular_velocity_radps": [
+          0.017605330795049667,
+          0.001463100197724998,
+          0.016655709594488144
+        ],
+        "sleeping": false,
+        "sleep_state": {
+          "disabled": false,
+          "timer_s": 77.71878814697266,
+          "required_rest_s": 0.5,
+          "linear_threshold_mps": 0.15000000596046448,
+          "angular_threshold_radps": 0.15000000596046448
+        },
+        "constant_linear_acceleration_mps2": [
+          -4.043529600039619e-08,
+          -1.624898076057434,
+          2.2952551148591738e-07
+        ],
+        "physics_state_ready": true,
+        "physics_state_pending": false,
+        "physics_admission_requested": false,
+        "physics_initialization_pending": false,
+        "physics_initialization_invalid": false,
+        "physics_initialization_paused": false,
+        "physics_initialization_penetration_m": null,
+        "physics_object_paused": true,
+        "simulation_object_paused": true,
+        "simulation_object_pause_reason": {
+          "condition": "griffin:egress-fault",
+          "detail": "Operator took control during automatic tether egress; restraint and parking hold retained"
+        },
+        "physics_pose_seeded": true,
+        "physics_pose_authoritative": false,
+        "rigid_body_disabled": true,
+        "collider_present": true,
+        "continuous_collision_enabled": false,
+        "speculative_collision_distance_m": 0.0,
+        "collider_source_paths": [
+          "/Griffin1SurfaceOps/FLIP/Chassis"
+        ],
+        "collider_local_bounds": {
+          "frame": "body_local",
+          "min": [
+            -0.7379999756813049,
+            -0.3330000042915344,
+            -1.0579999685287476
+          ],
+          "max": [
+            0.7379999756813049,
+            0.06299999356269836,
+            1.0579999685287476
+          ]
+        },
+        "colliders": [
+          {
+            "source_path": "/Griffin1SurfaceOps/FLIP/Chassis",
+            "body_relationship_present": true,
+            "body_is_query_body": true,
+            "body_usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+            "physics_position_m": [
+              0.041179826683689254,
+              3.2380564591476086,
+              -0.2369302555681882
+            ],
+            "physics_rotation_xyzw": [
+              -0.03891930729150772,
+              -0.33258259296417236,
+              0.006372350268065929,
+              0.9422491788864136
+            ],
+            "body_local_translation_m": [
+              0.0,
+              -0.13500000536441803,
+              0.0
+            ],
+            "body_local_rotation_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "disabled": true,
+            "broad_phase_present": false,
+            "broad_phase_body_disabled": null,
+            "shape_local_bounds": {
+              "frame": "collider_local",
+              "min": [
+                -0.7379999756813049,
+                -0.1979999989271164,
+                -1.0579999685287476
+              ],
+              "max": [
+                0.7379999756813049,
+                0.1979999989271164,
+                1.0579999685287476
+              ]
+            }
+          }
+        ],
+        "collider_disabled": true,
+        "authored_mass_kg": 343.0,
+        "mass_override_active": true,
+        "authored_inertia_principal_kgm2": [
+          132.4629364013672,
+          190.2515869140625,
+          66.75328826904297
+        ],
+        "inertia_override_active": true,
+        "authored_center_of_mass_m": [
+          0.0,
+          -0.13500000536441803,
+          0.0
+        ],
+        "center_of_mass_override_active": true,
+        "mass_kg": 343.0,
+        "computed_mass_finite": true,
+        "computed_inertia_finite": true,
+        "center_of_mass_m": [
+          0.0,
+          -0.13500000536441803,
+          0.0
+        ],
+        "inertia_principal_kgm2": [
+          66.75329008412501,
+          132.462933566511,
+          190.2515891997935
+        ],
+        "inertia_tensor_kgm2": [
+          [
+            132.462933566511,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            190.2515891997935,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            66.75329008412501
+          ]
+        ],
+        "support_footprint_count": 0,
+        "support_contact_count": null,
+        "support_sample_tick": null,
+        "support_contacts": [],
+        "wheel_contacts": []
+      },
+      "tick": 5998,
+      "ports": {
+        "sim_tick": 5998,
+        "entities": [
+          {
+            "api_id": 5811092977805847,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 0.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": null,
+                  "frame": null,
+                  "range": null,
+                  "source": "input surface",
+                  "authority": "input owner",
+                  "writable": true
+                }
+              },
+              {
+                "name": "program_active",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": null,
+                  "frame": null,
+                  "range": null,
+                  "source": "Co-simulation participant",
+                  "authority": "controller / wire",
+                  "writable": true
+                }
+              },
+              {
+                "name": "brake",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": null,
+                  "frame": null,
+                  "range": null,
+                  "source": "runtime producer",
+                  "authority": "producer",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 3316818422792539,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.1887493011947466,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 4478104967918077,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.18963275873475183,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_FR/Wheel_FR",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 2731199800169026,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.1885975793079766,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_RL/Wheel_RL",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 5555945442763527,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.18990370526381803,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_RR/Wheel_RR",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "physics": {
+        "api_id": 5811092977805847,
+        "usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+        "body_mode": "dynamic",
+        "linear_velocity_mps": [
+          0.045231543481349945,
+          -0.005808514077216387,
+          -0.06615131348371506
+        ],
+        "angular_velocity_radps": [
+          0.017605330795049667,
+          0.001463100197724998,
+          0.016655709594488144
+        ],
+        "sleeping": false,
+        "sleep_state": {
+          "disabled": false,
+          "timer_s": 77.71878814697266,
+          "required_rest_s": 0.5,
+          "linear_threshold_mps": 0.15000000596046448,
+          "angular_threshold_radps": 0.15000000596046448
+        },
+        "constant_linear_acceleration_mps2": [
+          -4.043529600039619e-08,
+          -1.624898076057434,
+          2.2952551148591738e-07
+        ],
+        "physics_state_ready": true,
+        "physics_state_pending": false,
+        "physics_admission_requested": false,
+        "physics_initialization_pending": false,
+        "physics_initialization_invalid": false,
+        "physics_initialization_paused": false,
+        "physics_initialization_penetration_m": null,
+        "physics_object_paused": true,
+        "simulation_object_paused": true,
+        "simulation_object_pause_reason": {
+          "condition": "griffin:egress-fault",
+          "detail": "Operator took control during automatic tether egress; restraint and parking hold retained"
+        },
+        "physics_pose_seeded": true,
+        "physics_pose_authoritative": false,
+        "rigid_body_disabled": true,
+        "collider_present": true,
+        "continuous_collision_enabled": false,
+        "speculative_collision_distance_m": 0.0,
+        "collider_source_paths": [
+          "/Griffin1SurfaceOps/FLIP/Chassis"
+        ],
+        "collider_local_bounds": {
+          "frame": "body_local",
+          "min": [
+            -0.7379999756813049,
+            -0.3330000042915344,
+            -1.0579999685287476
+          ],
+          "max": [
+            0.7379999756813049,
+            0.06299999356269836,
+            1.0579999685287476
+          ]
+        },
+        "colliders": [
+          {
+            "source_path": "/Griffin1SurfaceOps/FLIP/Chassis",
+            "body_relationship_present": true,
+            "body_is_query_body": true,
+            "body_usd_prim_path": "/Griffin1SurfaceOps/FLIP",
+            "physics_position_m": [
+              0.041179826683689254,
+              3.2380564591476086,
+              -0.2369302555681882
+            ],
+            "physics_rotation_xyzw": [
+              -0.03891930729150772,
+              -0.33258259296417236,
+              0.006372350268065929,
+              0.9422491788864136
+            ],
+            "body_local_translation_m": [
+              0.0,
+              -0.13500000536441803,
+              0.0
+            ],
+            "body_local_rotation_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "disabled": true,
+            "broad_phase_present": false,
+            "broad_phase_body_disabled": null,
+            "shape_local_bounds": {
+              "frame": "collider_local",
+              "min": [
+                -0.7379999756813049,
+                -0.1979999989271164,
+                -1.0579999685287476
+              ],
+              "max": [
+                0.7379999756813049,
+                0.1979999989271164,
+                1.0579999685287476
+              ]
+            }
+          }
+        ],
+        "collider_disabled": true,
+        "authored_mass_kg": 343.0,
+        "mass_override_active": true,
+        "authored_inertia_principal_kgm2": [
+          132.4629364013672,
+          190.2515869140625,
+          66.75328826904297
+        ],
+        "inertia_override_active": true,
+        "authored_center_of_mass_m": [
+          0.0,
+          -0.13500000536441803,
+          0.0
+        ],
+        "center_of_mass_override_active": true,
+        "mass_kg": 343.0,
+        "computed_mass_finite": true,
+        "computed_inertia_finite": true,
+        "center_of_mass_m": [
+          0.0,
+          -0.13500000536441803,
+          0.0
+        ],
+        "inertia_principal_kgm2": [
+          66.75329008412501,
+          132.462933566511,
+          190.2515891997935
+        ],
+        "inertia_tensor_kgm2": [
+          [
+            132.462933566511,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            190.2515891997935,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            66.75329008412501
+          ]
+        ],
+        "support_footprint_count": 0,
+        "support_contact_count": null,
+        "support_sample_tick": null,
+        "support_contacts": [],
+        "wheel_contacts": []
+      },
+      "tick": 5998,
+      "ports": {
+        "sim_tick": 5998,
+        "entities": [
+          {
+            "api_id": 5811092977805847,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 0.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": null,
+                  "frame": null,
+                  "range": null,
+                  "source": "input surface",
+                  "authority": "input owner",
+                  "writable": true
+                }
+              },
+              {
+                "name": "program_active",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": null,
+                  "frame": null,
+                  "range": null,
+                  "source": "Co-simulation participant",
+                  "authority": "controller / wire",
+                  "writable": true
+                }
+              },
+              {
+                "name": "brake",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": null,
+                  "frame": null,
+                  "range": null,
+                  "source": "runtime producer",
+                  "authority": "producer",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 3316818422792539,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.1887493011947466,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_FL/Wheel_FL",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 4478104967918077,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.18963275873475183,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_FR/Wheel_FR",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 2731199800169026,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.1885975793079766,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_RL/Wheel_RL",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          },
+          {
+            "api_id": 5555945442763527,
+            "ports": [
+              {
+                "name": "brake",
+                "value": 1.0,
+                "direction": "in",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "connected input",
+                  "writable": true
+                }
+              },
+              {
+                "name": "fixed_contact",
+                "value": 0.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "loaded_contact",
+                "value": 1.0,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "1",
+                    "definition": {
+                      "symbol": "1",
+                      "dimension_si": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 0,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": null,
+                  "range": {
+                    "min": 0.0,
+                    "max": 1.0
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              },
+              {
+                "name": "shaft_speed",
+                "value": 0.18990370526381803,
+                "direction": "out",
+                "metadata": {
+                  "type": "scalar",
+                  "unit": {
+                    "id": "rad/s",
+                    "definition": {
+                      "symbol": "rad/s",
+                      "dimension_si": [
+                        0,
+                        0,
+                        -1,
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      "angle_power": 1,
+                      "relative_quantity": false,
+                      "scale_to_si": 1.0,
+                      "offset_to_si": 0.0,
+                      "scale_exactness": "exact"
+                    }
+                  },
+                  "frame": "lunco:wheel-shaft:AssetId<lunco_usd_bevy_stage::asset::UsdStageAsset>{ index: 0, generation: 0}:/Griffin1SurfaceOps/FLIP/Suspension_RR/Wheel_RR",
+                  "range": {
+                    "min": -3.4028234663852886e+38,
+                    "max": 3.4028234663852886e+38
+                  },
+                  "source": "USD component",
+                  "authority": "component state",
+                  "writable": false
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ok": true,
+  "wheel_brake_requests": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ]
+}

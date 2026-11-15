@@ -1,0 +1,93 @@
+2026-11-13T19:50:35.680355Z  INFO lunco_modelica_library::source_library: [source library] admitted on-disk root /home/rod/.lunco/cache/library
+2026-11-13T19:50:35.681798Z  INFO lunco_modelica_source_roots: [source-roots] registry built: 1 disk roots, 15 bundled examples (all NotLoaded)
+2026-11-13T19:50:35.689785Z  INFO lunco_modelica_worker::worker: [modelica-runtime] solve preparation pool ready: 6 worker thread(s)
+2026-11-13T19:50:35.689833Z  INFO lunco_modelica_worker::worker: [modelica-runtime] live execution pool ready: 6 worker thread(s)
+2026-11-13T19:50:35.689837Z  INFO lunco_modelica_worker::worker: [modelica-runtime] document execution pool ready: 1 worker thread(s)
+2026-11-13T19:50:35.706742Z  INFO lunco_scripting: Initializing LunCo Scripting Bridge...
+2026-11-13T19:50:35.720397Z  INFO lunco_luncosim_simulation: [luncosim] running HEADLESS (--no-ui), execution=Realtime: no window/GPU/egui; local simulation only
+2026-11-13T19:50:35.846106Z  INFO lunco_scripting_rhai_world::policy: [policy] application installed 37 policies
+2026-11-13T19:50:35.846908Z  INFO lunco_workspace::open: [StartupScene] scanning /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests for `shader_asset_contracts.usda` (off-thread)…
+2026-11-13T19:50:35.846937Z  INFO lunco_luncosim_services: [luncosim] queued startup Twin scan for `/home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests` (scene `shader_asset_contracts.usda`)
+2026-11-13T19:50:35.847583Z  INFO lunco_scripting::scenario: [scenario] audience: Unattended
+2026-11-13T19:50:35.882575Z  INFO lunco_assets_runtime::discovery: ASSET_MANIFEST: 945 file(s) under /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets
+2026-11-13T19:50:35.933471Z  INFO lunco_modelica_source_roots: [source library] loading editor index off-thread
+2026-11-13T19:50:35.933635Z  INFO lunco_scene_catalog::catalog: CATALOG_SCAN: scheduled shared asset listing
+2026-11-13T19:50:35.933764Z  INFO lunco_modelica_runner::runner: [experiments] max parallel runs = 4
+2026-11-13T19:50:35.934594Z  INFO lunco_workspace::journal_persistence: [journal] bound twin /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests (session-only; set `[journal] persist = true` in /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests/twin.toml to keep history)
+2026-11-13T19:50:35.934660Z  INFO lunco_assets_runtime::asset_sources: [twin-roots] mounted Twin `tests` at /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests
+2026-11-13T19:50:35.975502Z  INFO twin_policy_activate: lunco_scripting_rhai_world::policy: [policy] Twin /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests installed 37 policies
+2026-11-13T19:50:35.975655Z  INFO lunco_workspace::open: [StartupScene] opened /home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests @ `shader_asset_contracts.usda`
+2026-11-13T19:50:35.976029Z  INFO lunco_avatar: [net] session 0 set name to 'Player'
+2026-11-13T19:50:35.976191Z  WARN lunco_scripting_rhai_world::policy: [application-assets] asset source could not be resolved to its stable URI
+2026-11-13T19:50:35.978220Z  INFO lunco_usd_bevy_runtime_core::scene_runtime: [twin] doc-backing starting scene `twin://tests/shader_asset_contracts.usda` (twin `/home/rod/Documents/luncosim-workspace/griffin-tether-axle/assets/scenes/tests`) — mount follows
+2026-11-13T19:50:35.986863Z  INFO lunco_scene_catalog::catalog: CATALOG_SCAN: scheduled shared asset listing
+2026-11-13T19:50:35.988655Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'literal#% probe' from scenes/tests/twin_search_paths/tools/literal#% probe.rhai
+2026-11-13T19:50:35.988866Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'assembly_audit' from scripting/tools/assembly_audit.rhai
+2026-11-13T19:50:35.989002Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'assembly_builder' from scripting/tools/assembly_builder.rhai
+2026-11-13T19:50:35.990156Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'assembly_edit' from scripting/tools/assembly_edit.rhai
+2026-11-13T19:50:35.990194Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'assembly_ui' from scripting/tools/assembly_ui.rhai
+2026-11-13T19:50:35.990206Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'asset_preflight' from scripting/tools/asset_preflight.rhai
+2026-11-13T19:50:35.990218Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'assets' from scripting/tools/assets.rhai
+2026-11-13T19:50:35.990235Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'authoring_inspection' from scripting/tools/authoring_inspection.rhai
+2026-11-13T19:50:35.990328Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'authoring_measurements' from scripting/tools/authoring_measurements.rhai
+2026-11-13T19:50:35.990433Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'authoring_session' from scripting/tools/authoring_session.rhai
+2026-11-13T19:50:35.990504Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'component_editor' from scripting/tools/component_editor.rhai
+2026-11-13T19:50:35.990521Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'debug_viz' from scripting/tools/debug_viz.rhai
+2026-11-13T19:50:35.990540Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'editor_workflow' from scripting/tools/editor_workflow.rhai
+2026-11-13T19:50:35.990553Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'engine_exhaust' from scripting/tools/engine_exhaust.rhai
+2026-11-13T19:50:35.990561Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'engineering_units' from scripting/tools/engineering_units.rhai
+2026-11-13T19:50:35.990569Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'formation' from scripting/tools/formation.rhai
+2026-11-13T19:50:35.990578Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'gizmo' from scripting/tools/gizmo.rhai
+2026-11-13T19:50:35.990589Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'mechanical_relations' from scripting/tools/mechanical_relations.rhai
+2026-11-13T19:50:35.990654Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'model_authoring' from scripting/tools/model_authoring.rhai
+2026-11-13T19:50:35.990730Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'modelica_editor' from scripting/tools/modelica_editor.rhai
+2026-11-13T19:50:35.990750Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'numerical_settings' from scripting/tools/numerical_settings.rhai
+2026-11-13T19:50:35.990790Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'nurbs' from scripting/tools/nurbs.rhai
+2026-11-13T19:50:35.990814Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'physics_acceptance' from scripting/tools/physics_acceptance.rhai
+2026-11-13T19:50:35.990838Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'program_editor' from scripting/tools/program_editor.rhai
+2026-11-13T19:50:35.990855Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'recover' from scripting/tools/recover.rhai
+2026-11-13T19:50:35.990864Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'rhai_editor' from scripting/tools/rhai_editor.rhai
+2026-11-13T19:50:35.990876Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'runtime_ui' from scripting/tools/runtime_ui.rhai
+2026-11-13T19:50:35.990896Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'scenarios' from scripting/tools/scenarios.rhai
+2026-11-13T19:50:35.990908Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'scene_interaction' from scripting/tools/scene_interaction.rhai
+2026-11-13T19:50:35.990932Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'spatial_relations' from scripting/tools/spatial_relations.rhai
+2026-11-13T19:50:35.990945Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'survey' from scripting/tools/survey.rhai
+2026-11-13T19:50:35.990956Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'sysml_editor' from scripting/tools/sysml_editor.rhai
+2026-11-13T19:50:35.991132Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'sysml_modelica_constraints' from scripting/tools/sysml_modelica_constraints.rhai
+2026-11-13T19:50:35.994396Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'sysml_requirement_checks' from scripting/tools/sysml_requirement_checks.rhai
+2026-11-13T19:50:35.994640Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'sysml_requirements' from scripting/tools/sysml_requirements.rhai
+2026-11-13T19:50:35.994814Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'terrain' from scripting/tools/terrain.rhai
+2026-11-13T19:50:35.994844Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'tutorials' from scripting/tools/tutorials.rhai
+2026-11-13T19:50:35.995107Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] activated tool library 'waypoint_editor' from scripting/tools/waypoint_editor.rhai
+2026-11-13T19:50:36.021371Z  INFO lunco_scripting_rhai_world::world_bridge: [rhai] authored prelude is ready
+2026-11-13T19:50:36.024464Z  INFO lunco_scene_catalog::catalog: SHADER_CATALOG: published +36 shader(s)
+2026-11-13T19:50:36.032607Z  INFO lunco_usd_bevy_runtime_core::twin_projection: [usd-e1b] default scene `twin://tests/shader_asset_contracts.usda` is doc-backed (DocumentId(123542880417124)) — mounting native layers
+2026-11-13T19:50:36.032838Z  INFO lunco_usd_bevy_runtime_core::scene_runtime: [load-scene] admitted `twin://tests/shader_asset_contracts.usda` for the next scene lifecycle phase
+2026-11-13T19:50:36.035737Z  INFO lunco_usd_bevy_runtime_core::scene_runtime: [load-scene] reload path=`twin://tests/shader_asset_contracts.usda` root=``
+2026-11-13T19:50:36.035789Z  INFO lunco_usd_bevy_runtime_core::scene: [scene] cleanup: 0 grid children and 0 stage prims queued for despawn
+2026-11-13T19:50:36.037257Z  INFO lunco_celestial_spatial: [celestial] scene teardown retired 0 derived entities
+2026-11-13T19:50:36.040179Z  INFO lunco_usd_bevy_runtime_core::scene: [scene] spawned `twin://tests/shader_asset_contracts.usda` @ `` (entity 1367v0)
+2026-11-13T19:50:36.040770Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=usd.document.projected, severity=Info, data=Map({"changed_prim_paths": Array([]), "doc_id": U64(123542880417124), "generation": U64(0)}), ts=2451545.0000, sim_secs=0.000000, sim_tick=0
+2026-11-13T19:50:36.067588Z  INFO lunco_modelica_source_roots: [source library] editor index loaded off-thread
+2026-11-13T19:50:36.081239Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=SCENE_DATA_REQUIRED, severity=Warning, data=String("Discovering scene data requirements"), ts=2451545.0000, sim_secs=0.000000, sim_tick=0
+2026-11-13T19:50:36.086134Z  INFO lunco_scripting_rhai_runtime::commands: [scripting] loading scenario script `lunco://scenarios/tests/shader_asset_contracts.rhai` for 1367v0 as `lunco://scenarios/tests/shader_asset_contracts.rhai`
+2026-11-13T19:50:36.087160Z  INFO lunco_assets_datasets::plugin: [datasets] 7 declared dataset(s) from assets/manifests
+2026-11-13T19:50:36.089797Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=SCENE_DATA_READY, severity=Info, data=String("Scene data ready. Simulation continues after remaining scene preparation; manual pause is preserved."), ts=2451545.0000, sim_secs=0.000000, sim_tick=0
+2026-11-13T19:50:36.093991Z ERROR lunco_usd_bevy_runtime_core::scene: [scene] `twin://tests/shader_asset_contracts.usda` finished loading with no DirectionalLight — author a \
+             UsdLux DistantLight or a celestial site anchor
+2026-11-13T19:50:36.094325Z  INFO lunco_usd_sim_celestial: [usd-time] settled scene `twin://tests/shader_asset_contracts.usda` selected computer_time epoch JD 2461358.32760737
+2026-11-13T19:50:36.094501Z  INFO lunco_time::domain: [time] scene epoch computer_time installed at SimTick=0 JD 2461358.32760737
+[test] scene-readiness freeze held 33 updates (0.4s wall)
+2026-11-13T19:50:36.098458Z  INFO lunco_usd_bevy_diagnostics: [usd-bevy-diagnostics] diagnostic label font loaded (757076 bytes)
+[test] physics admission settled in 2 zero-duration updates (0.4s wall)
+[test] participant preparation settled in 0 zero-duration updates after 33 load and 2 physics-admission updates (0.4s wall)
+2026-11-13T19:50:36.110846Z  INFO lunco_scripting::scenario: [scenario] scene participants ready — lifecycle execution enabled
+2026-11-13T19:50:36.113584Z  WARN lunco_celestial_spatial::cadence: [celestial] cadence tolerance is 0 (EXACT): the gate solves EVERY frame by definition, costing ~10 ms/frame. That is intended for `scene_test` determinism — outside one it is a misconfiguration.
+2026-11-13T19:50:36.113669Z  WARN lunco_settings: [Settings:celestial_cadence] refusing to persist invalid runtime section: tolerance_deg must be finite and greater than zero
+2026-11-13T19:50:36.120432Z  INFO lunco_telemetry_core::log: [BLACKBOX] EVENT: name=SIMULATION_STARTED, severity=Info, data=String("Started"), ts=2461358.3276, sim_secs=0.000000, sim_tick=0
+2026-11-13T19:50:36.236747Z  INFO rhai_user_scenario_hook{hook="on_tick" entity=1367v0 gid=748381696056595}: lunco_scripting_rhai_world::world_bridge: [rhai] TESTS_OK 71
+2026-11-13T19:50:36.236821Z  INFO rhai_user_scenario_hook{hook="on_tick" entity=1367v0 gid=748381696056595}: lunco_scripting_rhai_world::world_bridge: [rhai] SHADER ASSET CONTRACTS: PASS
+2026-11-13T19:50:36.237216Z  INFO rhai_user_scenario_hook{hook="on_tick" entity=1367v0 gid=748381696056595}: lunco_telemetry_core::log: [BLACKBOX] EVENT: name=SHADER_ASSET_CONTRACTS, severity=Info, data=Map({"check_count": I64(71), "failures": Array([]), "verdict": String("PASS")}), ts=2461358.3276, sim_secs=0.450000, sim_tick=27
+2026-11-13T19:50:36.237258Z  INFO rhai_user_scenario_hook{hook="on_tick" entity=1367v0 gid=748381696056595}: lunco_scene_runner: [luncosim test] verdict received on channel SHADER_ASSET_CONTRACTS: PASS
+2026-11-13T19:50:36.237313Z  INFO rhai_user_scenario_hook{hook="on_tick" entity=1367v0 gid=748381696056595}: lunco_avatar: [notify:success] SHADER ASSET CONTRACTS: PASS
+luncosim test PASS  scene=assets/scenes/tests/shader_asset_contracts.usda  channel=SHADER_ASSET_CONTRACTS  ticks=27  updates=32  sim=0.45s  threads=1  jitter=0.000  seed=6840157149251759617  tick_hz=60.0000

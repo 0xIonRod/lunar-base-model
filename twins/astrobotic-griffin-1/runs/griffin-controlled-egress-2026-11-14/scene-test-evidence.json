@@ -1,0 +1,51 @@
+[
+  {
+    "name": "GRIFFIN_TETHER_DESCENT_EVIDENCE",
+    "sim_tick": 8806,
+    "data": {
+      "channel": "GRIFFIN_TETHER_DESCENT",
+      "check_count": 7,
+      "error_count": 0,
+      "evidence_chunked": false,
+      "evidence_result_events": 0,
+      "failure_count": 0,
+      "failures": [],
+      "inconclusive_count": 0,
+      "metrics": {
+        "descent_distance_m": 4.553851230813213,
+        "dynamic_support_distinguished": true,
+        "final_fixed_support_wheels": 4,
+        "final_grounded_wheels": 4,
+        "final_tension0_n": 0.0,
+        "final_tension1_n": 0.0,
+        "final_track_clearance_m": 0.37423928803886275,
+        "ground_requalifications": 0,
+        "invalid_local_brake_rejected": true,
+        "manual_proof_distance_m": 0.10257219001919038,
+        "maximum_controlled_descent_speed_mps": 0.13395800289370816,
+        "maximum_imbalance_n": 363.34952847194796,
+        "maximum_rover_speed_mps": 0.4895175497487715,
+        "maximum_tension_n": 790.0889982154368,
+        "minimum_upright_cos": 0.027230887656664537,
+        "scope": "Two reduced balanced rear-wheel bridles apply native wheel resultants and equal/opposite lander reactions; assumed rigging and ideal powered winches, no fabric or attachment failure, no flight qualification",
+        "stage": "finish"
+      },
+      "non_pass_count": 0,
+      "non_pass_results": [],
+      "ok": true,
+      "pass_count": 7,
+      "requirement_count": 0,
+      "requirement_names": [],
+      "requirement_summary": {},
+      "result_count": 0,
+      "results": [],
+      "schema_version": 3,
+      "source_files": [],
+      "source_revision": true,
+      "title": "GRIFFIN CONTROLLED TETHER EGRESS",
+      "unverified_count": 0,
+      "verdict": "pass",
+      "verification": ""
+    }
+  }
+]

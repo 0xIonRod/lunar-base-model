@@ -1,0 +1,11 @@
+ready; waiting for delayed request at scene 65.67 s
+ready; normal DEPLOY request
+#{"id": 123643644256082, "ok": true, "status": "applied"}
+qualified normal unlock
+{'accepted': True}
+{'intent': 'forward', 'held': True, 'target': '6631v1', 'source': 'ApiTransport { producer_id: 2026111401 }', 'producer_id': 2026111401, 'correlation_id': 7, 'admission': {'scene_generation': 2, 'effective_tick': 25476, 'sequence': 1}}
+{'intent': 'forward', 'held': False, 'target': '6631v1', 'source': 'ApiTransport { producer_id: 2026111401 }', 'producer_id': 2026111401, 'correlation_id': 8, 'admission': {'scene_generation': 2, 'effective_tick': 25622, 'sequence': 1}}
+{'intent': 'brake', 'held': True, 'target': '6631v1', 'source': 'ApiTransport { producer_id: 2026111401 }', 'producer_id': 2026111401, 'correlation_id': 9, 'admission': {'scene_generation': 2, 'effective_tick': 25676, 'sequence': 1}}
+{'intent': 'brake', 'held': False, 'target': '6631v1', 'source': 'ApiTransport { producer_id: 2026111401 }', 'producer_id': 2026111401, 'correlation_id': 10, 'admission': {'scene_generation': 2, 'effective_tick': 25980, 'sequence': 1}}
+{'accepted': True}
+PASS manual distance 1.175911405323545 flags [True, False, True]
