@@ -21,15 +21,24 @@ runtime discovers `tools/*.rhai` at the top level only.
 | `contracts/*.md` | Twin authors | Explain part obligations, units, provenance, and acceptance policy. |
 | `requirements/*.sysml` | Twin authors | Domain-split Griffin requirements, integration usages, component contracts, study limits, and verification cases. |
 | `requirements/flip_*.sysml` | Twin authors | Separately owned FLIP rover and subsystem requirements; FLIP remains an independently loaded component. |
-| `tools/griffin_spec.rhai` | Twin authors | Read-only compatibility projection of SysML values for the Rhai test API. |
+| `tools/griffin_spec.rhai` | Twin authors | Read-only typed projection of SysML values for authoring and verification. |
 | `tools/griffin_requirements.rhai` | Twin authors | Stable Rhai API for lint, reports, live gates, and command limiters. |
-| `tools/griffin_visual_builder.rhai` | Twin authors | Dry/apply component assembly recipe over the generic typed USD tools. |
+| `tools/griffin_visual_builder.rhai` | Twin authors | Presentation geometry, component references, collision proxies, materials, and render exhaust bindings. |
+| `tools/griffin_propulsion_builder.rhai` | Twin authors | Executable main/RCS feed topology, propellant mass properties, force-actuator installation, and guidance authority. |
+| `tools/griffin_power_builder.rhai` | Twin authors | Electrical/thermal network assembly and source-owned Griffin/FLIP electrical ratings. |
+| `tools/griffin_assembly_support.rhai` | Twin authors | Shared composed-document reads, authoring identities, and typed plan diagnostics. |
 | `tools/griffin_surface_ramp_ops.rhai` | Twin authors | Source-targeted physical hinge command batches; mission sequencing and settlement remain in one scenario. |
 | `tools/griffin_surface_mission_report.rhai` | Twin authors | Bounded mission evidence and verdict construction from explicitly passed mission state. |
-| `components/**/*.usda` | Twin authors | Small replaceable render-only component assets; no flight CAD/B-rep. |
+| `components/**/*.usda` | Twin authors | Reusable component assets with explicit presentation or physical roles; no flight CAD/B-rep. |
 | composed USD | Editor / typed USD command bus | Own authored geometry, transforms, schemas, relationships, and metadata. |
 | scenario test | Twin scenario | Mount the composed stage and emit the production verdict. |
 | Rust runtime | generic simulator | Supplies query, typed edit, projection, and test seams; no Griffin-specific policy. |
+
+Presentation plans consume propulsion identities and public output paths;
+they do not own feed wiring, mass properties, or controller force ratings.
+The vehicle USD composes those subsystem plans into one installed assembly.
+Each builder returns a dry typed operation plan before applying it through
+the shared journal boundary.
 
 Do not duplicate a numeric requirement in a scene file and a script. A value
 belongs in its domain or component SysML package; Rhai observers read that
@@ -51,7 +60,7 @@ The same check functions are used in two contexts:
 1. `griffin_requirements::lint((), root)` runs against the mounted Twin stage
    in a production scene test.
 2. `griffin_requirements::runtime_report((), root)` is the runtime suite: it
-   returns the current structural findings, audits all 20 manifest parts,
+   returns the current structural findings, audits every manifest-owned component,
    runs the relational layout report, and returns machine-readable results
    for the Twin scenario to combine with named constraint observations.
 3. `griffin_requirements::lint_live(doc_id, root)` and the focused reports run
@@ -69,8 +78,9 @@ Live authoring must use typed `ApplyUsdOps` plans through the Editor tools. A
 check failure is evidence for the next edit; it is never repaired by hiding a
 proxy, clamping a pose in Rust, or rewriting USDA on disk.
 
-The runtime suite is driven through the existing headful session's
-`RunRhai`/`RunScenario` path. It must not start a second simulator process.
+Run the runtime suite through the task's owned production session using
+`RunRhai`/`RunScenario`, or through its mapped production scene-test gate.
+Session identity, scene revision, and the resulting verdict belong to the run.
 The authored check catalog and Planned/mission/process groupings are status
 metadata, not execution receipts. A green result covers only the structural,
 layout, part, provenance, and explicit payload/ramp boundary observations

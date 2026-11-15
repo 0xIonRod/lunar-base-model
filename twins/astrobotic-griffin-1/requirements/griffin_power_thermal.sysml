@@ -86,11 +86,18 @@ package GriffinPowerThermalRequirements {
         attribute skyRadiationTemperature : ThermodynamicTemperatureValue = 3.0[SI::K];
         attribute groundRadiationTemperature : ThermodynamicTemperatureValue = 250.0[SI::K];
         attribute sustainedObservationDuration : DurationValue = 3600.0[SI::s];
+        // Computational horizons for separate held-forcing studies, not flight limits.
+        attribute equilibriumObservationDuration : DurationValue = 7200.0[SI::s];
+        attribute minimumSettledDuration : DurationValue = 300.0[SI::s];
         attribute maximumSettledTemperatureRate : ScalarQuantityValue = .001[kelvinPerSecond];
         doc /* Bounded solar/battery/cooling study. 28 V comes from the
          * historical Astrobotic guide p.28; capacity, resistance, load power,
          * initial SOC, heat capacity and cooler ratings below are explicit
          * project assumptions, not flight inventories or supplier ratings.
+         * Below the selected cell reference temperature, the coefficient is held
+         * at its reference value as an explicit conservative study assumption;
+         * actual cell temperature and off-calibration status remain observable.
+         * Temperatures above the published upper limit reject the model step.
          * Each panel uses a 6000 J/K lumped thermal capacitance. The ideal
          * external coolant removes at most 200 W per panel, only above 301.15 K.
          * https://www.astrobotic.com/wp-content/uploads/2022/01/PUGLanders_011222.pdf
@@ -128,7 +135,8 @@ package GriffinPowerThermalRequirements {
         doc /* GEP-001: each of the three source-defined cell fields shall use
          * its active geometric area, physical irradiance, framed incidence and
          * terrain visibility. Available electrical power shall follow the
-         * selected reference-cell temperature law. Absorbed power shall equal
+         * selected reference-cell temperature law, with the declared cold reference
+         * hold below its calibration range. Absorbed power shall equal
          * delivered electrical power plus heat within the study tolerance.
          * This verifies the declared reference-cell study, not flight output.
          */
@@ -148,7 +156,7 @@ package GriffinPowerThermalRequirements {
          * its thermal mass, whose temperature feeds electrical conversion.
          * Cooling shall be nonnegative, not exceed maximumPanelCooling, and
          * be zero at or below minimumCoolantTemperature. Observe temperature
-         * evolution and thermal-node balance through observationDuration.
+         * change in either direction and thermal-node balance through observationDuration.
          */
         require GEP002_CoolingClosed;
     }
@@ -192,25 +200,43 @@ package GriffinPowerThermalRequirements {
         in emittingAreaMatches : Boolean;
         in radiativeLawMatches : Boolean;
         in thermalBalanceClosed : Boolean;
-        in referenceRangeMaintained : Boolean;
-        in settledAtHorizon : Boolean;
+        in coefficientRangeMaintained : Boolean;
         in fullHorizonObserved : Boolean;
         radiationTopologyClosed and emittingAreaMatches and radiativeLawMatches
-            and thermalBalanceClosed and referenceRangeMaintained
-            and settledAtHorizon and fullHorizonObserved;
+            and thermalBalanceClosed and coefficientRangeMaintained
+            and fullHorizonObserved;
     }
     requirement def GEP005_RadiativeThermalStudy {
         doc /* GEP-005: each collecting face shall exchange infrared heat with
          * both prescribed sky and ground boundaries using its source-selected
          * emissivity, geometric area and view factors. Thermal balance shall
          * close with solar heat and bounded coolant rejection. Over one hour
-         * under the observed held Sun boundary, each panel shall remain in the
-         * selected photovoltaic coefficient range and settle within the study
-         * temperature-rate bound. This is a reduced external-boundary study,
+         * under the observed held Sun boundary, coefficient evaluation shall remain
+         * in its authored range and actual cold excursions shall remain visible.
+         * Retain the actual end temperatures and temperature rates; convergence
+         * at one hour is not an acceptance condition. This is a reduced external-boundary study,
          * not flight calibration or a one-hour mission trajectory.
          */
         require GEP005_SustainedHeatRejection;
     }
+    constraint def GEP006_StableRateWindow {
+        in settledWindowObserved : Boolean;
+        settledWindowObserved == true;
+    }
+    requirement def GEP006_EquilibriumThermalStudy {
+        doc /* GEP-006: under the same held public inputs and unchanged generated
+         * network, observe the bounded equilibriumObservationDuration horizon.
+         * All radiative, thermal and coefficient-range conditions remain required.
+         * Every panel's absolute heat-flow/capacitance temperature rate shall
+         * remain within maximumSettledTemperatureRate throughout at least the
+         * final minimumSettledDuration sampled window. Retain the one-hour
+         * transient checkpoint as well as the actual equilibrium-study endpoint.
+         * A failure to converge is a failing study result, not permission to
+         * change heat capacity, forcing, radiation or the rate threshold. */
+        require GEP005_SustainedHeatRejection;
+        require GEP006_StableRateWindow;
+    }
+    requirement <'GEP-006'> gep006 : GEP006_EquilibriumThermalStudy { subject power : GriffinPowerThermalStudy; }
     requirement <'GEP-005'> gep005 : GEP005_RadiativeThermalStudy { subject power : GriffinPowerThermalStudy; }
     requirement <'GEP-004'> gep004 : GEP004_LowSupplyProtection { subject power : GriffinPowerThermalStudy; }
     requirement <'GEP-001'> gep001 : GEP001_SolarConversion { subject power : GriffinPowerThermalStudy; }
@@ -230,5 +256,9 @@ package GriffinPowerThermalRequirements {
     verification def Verify_GriffinSustainedThermal {
         subject power : GriffinPowerThermalStudy;
         objective { verify gep005; }
+    }
+    verification def Verify_GriffinEquilibriumThermal {
+        subject power : GriffinPowerThermalStudy;
+        objective { verify gep006; }
     }
 }

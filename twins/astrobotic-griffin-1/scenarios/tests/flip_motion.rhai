@@ -1,5 +1,6 @@
 // Native motion and physical stopping against the Twin-owned study envelope.
-import "twin://astrobotic-griffin-1/scenarios/tests/flip_manual_controls" as checks;
+import "./flip_manual_controls.rhai" as checks;
+import "lunco://scripting/tools/sysml_requirements" as source;
 const FLIP="/Griffin1SurfaceOps/FLIP";
 const PI=3.141592653589793;
 fn simulation_dependencies(me,ctx) {
@@ -19,6 +20,71 @@ fn intent(name,held) {
     let result=cmd("SimulateIntent",#{target:find_path(FLIP),intent:name,held:held});
     if result.ok!=true {throw("FLIP motion input rejected: "+name+" "+result);}
 }
+fn direction_observations(state,direction) {
+    let motion=state.evidence[direction];let stop=state.evidence[direction+"_stop"];
+    let hold=state.evidence[direction+"_hold"];
+    let values=#{panelSamples:state.panel_samples.to_float(),
+        maximumPanelAngleErrorDeg:state.panel_max_error_deg,
+        maximumPanelRateDegPerS:state.panel_max_rate_deg_s,
+        nativeSequenceComplete:state.phase=="hold" && state.direction<0.0
+            && state.time>=state.config.stoppedDwellS};
+    if motion!=() {
+        values.signedTravelM=motion.travel_m;
+        values.minimumUprightAxisY=motion.after.upright;
+        let minimum_rate=();let minimum_dot=();
+        for wheel in motion.after.wheels {
+            let rate=abs(wheel.rate);
+            minimum_rate=if minimum_rate==() {rate}else{min(minimum_rate,rate)};
+            minimum_dot=if minimum_dot==() {wheel.rotation_dot}else{min(minimum_dot,wheel.rotation_dot)};
+        }
+        values.minimumWheelRateRadPerS=minimum_rate;values.minimumRenderRotationDot=minimum_dot;
+    }
+    if stop!=() {
+        if values.minimumUprightAxisY!=() {
+            values.minimumUprightAxisY=min(values.minimumUprightAxisY,stop.upright_axis_y);
+        }
+        values.entrySpeedMps=stop.initial_speed_mps;values.stoppedSpeedMps=stop.final_speed_mps;
+        values.stopDurationS=stop.elapsed_s;values.stopDistanceM=stop.distance_m;
+    }
+    if hold!=() {
+        values.maximumHoldSpeedMps=hold.maximum_speed_mps;values.maximumHoldDriftM=hold.maximum_drift_m;
+    }
+    // Command rejection, missing samples and wheel-binding failures remain
+    // part of the observed native procedure, in addition to scalar bounds.
+    for check in state.checks {if check!="" {values.nativeSequenceComplete=false;}}
+    values
+}
+fn source_acceptance(state) {
+    let prefix="FlipMotionRequirements::";let requirement=prefix+"fmr001";
+    let verification=prefix+"Verify_FLIPMotion";let constraint=prefix+"FMR001_DirectionEnvelope";
+    let model=source::model();
+    let ir=source::required_constraint_ir(model,model.requirement(requirement),constraint);
+    if ir.ok!=true {throw("FMR-001 constraint did not compile: "+ir);}
+    let limits=[];
+    for name in state.config.keys() {
+        let attribute=model.attribute(prefix+"MotionStudy::"+name);
+        let observation=model.source_literal_observation(attribute);
+        for dependency in ir.constraint.dependencies {
+            if dependency==observation.path {limits.push(observation);break;}
+        }
+    }
+    let formal=[];
+    for direction in ["forward","reverse"] {
+        let values=direction_observations(state,direction);let bindings=limits;
+        for parameter in ir.constraint.parameters {
+            let value=values[parameter.name];
+            let observation=#{provider:"telemetry",state:if value==() {"unavailable"}else{"value"},
+                value:value,source_revision:model.source_revision,provider_generation:sim_tick(),
+                document_id:(),document_generation:(),
+                sample_interval:#{clock:"simulation",start_tick:state.start_tick,end_tick:sim_tick()}};
+            bindings.push(source::scalar_constraint_observation(ir,parameter.name,observation));
+        }
+        formal.push(source::required_constraints_check("FMR-001-"+direction,"flip_motion",requirement,
+            verification,constraint,bindings,"typed",0.0));
+    }
+    let selection=source::source_with_selection([],[requirement],[verification]);
+    source::evaluate(selection,formal)
+}
 fn finish(state) {
     state.done=true;
     if state.config.maximumPanelAngleErrorDeg!=() {
@@ -36,7 +102,12 @@ fn finish(state) {
     }
     let brake=cmd("SimulateIntent",#{target:find_path(FLIP),intent:"brake",held:true});
     state.checks.push(t_true(brake.ok==true,"terminal brake rejected: "+brake));
-    emit("FLIP_MOTION_EVIDENCE_RESULT",#{requirement:"FlipMotionRequirements::fmr001",
+    try {
+        let acceptance=source_acceptance(state);
+        report_structured_verdict(acceptance,"FLIP MOTION SOURCE ACCEPTANCE","FLIP_MOTION_ACCEPTANCE");
+        state.checks.push(t_true(acceptance.ok==true,"FMR-001 source acceptance did not pass: "+acceptance.verdict));
+    } catch(error) {state.checks.push("FMR-001 source acceptance unavailable: "+error);}
+    emit("FLIP_MOTION_METRICS",#{requirement:"FlipMotionRequirements::fmr001",
         phase:state.phase,config:state.config,result:state.evidence});
     report_verdict(state.checks,"FLIP MOTION COMPLETE","FLIP_MOTION_COMPLETE");
     state
@@ -74,6 +145,7 @@ fn observe_panel(state) {
 }
 fn on_start(me,ctx) {
     this.phase="settle";this.time=0.0;this.done=false;this.evidence=#{};
+    this.start_tick=sim_tick();
     this.checks=[];this.config=#{};this.direction=1.0;
     this.panel_samples=0;this.panel_max_error_deg=0.0;this.panel_max_rate_deg_s=0.0;
     try {
@@ -81,8 +153,7 @@ fn on_start(me,ctx) {
         this.apply_brake=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/Scenario/Test",
             attrs:["inputs:apply_brake"]}).attrs["inputs:apply_brake"];
         if type_of(this.apply_brake)!="bool" {throw("motion fixture requires explicit inputs:apply_brake");}
-        let acquired=cmd("AcquireControl",#{target:find_path(FLIP),
-            source:find_path("/Griffin1SurfaceOps/Avatar"),bind_camera:false});
+        let acquired=cmd("AcquireControl",#{target:find_path(FLIP),bind_camera:true});
         if acquired.ok!=true {throw("control acquisition rejected: "+acquired);}
         intent("forward",false);intent("backward",false);intent("brake",true);
     } catch(error) {this=fail(this,"FLIP motion setup: "+error);}

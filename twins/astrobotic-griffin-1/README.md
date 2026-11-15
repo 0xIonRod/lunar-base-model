@@ -22,6 +22,8 @@ published on LunCoSim's `tutorials` branch. Use the complete matching asset set;
 a binary-only rebuild with older shared assets is insufficient.
 See [the saved system diagrams](views/README.md) for full-scene, feed and internal
 engine views.
+The [system architecture](contracts/system-architecture.md) defines current subsystem
+ownership, runtime interactions, model fidelity and release qualification.
 
 The current plume interface requires the coordinated single-volume propulsion
 update in LunCoSim: `plume.wesl`, `plume_field.wesl`, `blackbody_radiance.wesl`,
@@ -68,13 +70,14 @@ transfer and unloading. When the HUD reports both lines unloaded, click
 disabled while attached, loaded or unstable. The
 production scene and headless verification use the same controller. Modelica
 models two routed, tension-only rear-wheel bridles with a reduced balanced-sling
-resultant and ideal powered payout/take-up. Native wheel wrench ports carry the
+resultant, bounded powered payout/take-up, finite electrical demand and lumped
+heat rejection. Native wheel wrench ports carry the
 loads and the lander receives the opposite reaction. End rigging, geometry,
 fabric properties, actuator limits and the sequence are study assumptions, not released Astrolab flight
 requirements. The [safe-egress review](contracts/griffin-safe-egress-2026-11-13.md)
 records references, implementation boundaries and [runtime evidence](contracts/griffin-safe-egress-2026-11-13.md#validation).
-The deterministic deployment gate passes all seven checks, including restrained
-descent, line release and manual drive. Live ribbons follow the Modelica routing
+The mapped deployment gate checks seven egress requirements plus the two
+source-bound landing datums, including restrained descent, line release and manual drive. Live ribbons follow the Modelica routing
 and rear-wheel bridles; the disconnect command removes their view. Use Standard
 rendering for lighting inspection: Fast deliberately renders standard materials
 unlit. Tank-support frames have shared coplanar face coverage removed.
@@ -381,7 +384,9 @@ Sources:
 | tools/griffin_spec.rhai | Rhai compatibility projection of limits read from the SysML source |
 | tools/griffin_requirements.rhai | Stable public contract API, visual-only and physical part/layout audits, payload/ramp gates, and typed live-edit gate |
 | tools/check_landing_determinism.sh | Twin-local two-process harness comparing the Rhai landing trial at a fixed SI clock |
-| tools/griffin_visual_builder.rhai | Idempotent dry/apply runtime builder using generic `assembly_builder` + `assembly_edit` |
+| tools/griffin_propulsion_builder.rhai | Main-engine and RCS assembly, feed topology, propellant mass properties and actuator plans |
+| tools/griffin_power_builder.rhai | Electrical and thermal network assembly and source-derived ratings |
+| tools/griffin_visual_builder.rhai | Presentation geometry, materials, collision proxies and exhaust rendering |
 | tools/griffin_controls.rhai | Twin-local possession, handoff, and control briefing helpers |
 | tools/griffin_surface_ramp_ops.rhai | SysML-targeted atomic ramp hinge command batches |
 | tools/griffin_surface_mission_report.rhai | Bounded mission event trace, phase failure evidence, and final verdict |
@@ -671,7 +676,7 @@ SysML constraint subset; Rhai binds composed observations and still owns
 structural predicates whose generic USD-provider migration remains open.
 The report distinguishes the authored requirement-check catalog from results
 actually measured in this run. Payload and ramp boundary rows use their
-focused SysML verification cases. The current suite checks all 20 manifest parts
+focused SysML verification cases. The current suite checks every registered manifest component
 individually, verifies the relational layout report, executes the Moon Base SI
 metric/metres/Y-up contract, validates the metres/Y-up policy catalog, and
 exercises both sides of the payload and ramp limiter boundaries. These results

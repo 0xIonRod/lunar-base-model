@@ -763,6 +763,10 @@ members = [
     "/Griffin1SurfaceOps/Lander/SolarPanelFrontStarboard/PanelCollision/Frame8",
     "/Griffin1SurfaceOps/Lander/SolarPanelFrontStarboard/PanelCollision/Frame9",
     "/Griffin1SurfaceOps/Lander/SolarPanelFrontStarboard/PowerEnvironment",
+    "/Griffin1SurfaceOps/Lander/ElectricalPower/WinchDrive",
+    "/Griffin1SurfaceOps/Lander/ElectricalPower/WinchHeat",
+    "/Griffin1SurfaceOps/Lander/ElectricalPower/WinchMass",
+    "/Griffin1SurfaceOps/Lander/ElectricalPower/WinchRadiator",
 ]
 
 [views."Full Griffin systems".groups."full:propulsion"]

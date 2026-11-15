@@ -42,6 +42,9 @@ model GriffinTetherPairStudy
     parameter Real payout_extension(unit="m")=0.0;
     parameter Real tension_limit(unit="N")=0.0;
     input Real enabled=0.0;
+    input Real drive_powered=1.0 "Powered drum permission; zero engages the passive hold";
+    parameter Real maximum_motor_power_w(unit="W")=10000.0
+      "Per-drum motoring limit; isolated benches omit an external electrical supply";
     input Real regulate=0.0;
     input Real drive_scale=1.0;
     input Real payout_scale=1.0;
@@ -96,10 +99,15 @@ model GriffinTetherPairStudy
     Real restraint_target(unit="N");
     Real regulated_tension(unit="N",start=preload_tension,fixed=true);
     Real positive_rate_limit(unit="m/s");
+    Real requested_paid_rate(unit="m/s");
+    Real motor_base_load(unit="N");
+    Real motor_damping(unit="N.s/m");
+    Real motor_rate_limit(unit="m/s");
+    Real motor_load_norm(unit="N");
   equation
     assert(stiffness>0 and damping>=0 and initial_length>0 and preload_tension>0
       and payout_extension>0 and tension_limit>0 and governed_material_speed>0
-      and loading_response_time>0 and unloading_response_time>0,
+      and loading_response_time>0 and unloading_response_time>0 and maximum_motor_power_w>0,
       "Positive tether and actuator study parameters required");
     axis={axis_x,axis_y,axis_z}/sqrt(axis_x^2+axis_y^2+axis_z^2);
     span=if routed>0.5 then routedGuide({dx,dy,dz},guides,axis,inboard,up,
@@ -126,8 +134,8 @@ model GriffinTetherPairStudy
     takeup_factor=min(1.0,extension/payout_extension);
     // A load governor may oppose outgoing material, but must not pull a
     // returning wheel/body harder merely because its speed magnitude rose.
-    // The same ideal bidirectional actuator can relieve stored elastic load
-    // on rebound; nominal deployment payout remains command bounded.
+    // The powered bidirectional drive may relieve stored elastic load on
+    // rebound; deployment payout and motoring work remain separately bounded.
     restraint_target=max(preload_tension+(1.0-drive_scale)*(governor_tension-preload_tension)
       *max(0.0,min(1.0,contact_rate/governed_material_speed)),
       preload_tension+pose_load*(pose_tension-preload_tension));
@@ -142,7 +150,7 @@ model GriffinTetherPairStudy
     regulated_rate=if noEvent(regulate>0.5) then
       contact_rate+stiffness/damping*(distance-length
         -regulated_tension/stiffness) else 0.0;
-    paid_rate=if noEvent(enabled>0.5) then
+    requested_paid_rate=if noEvent(enabled>0.5) then
       (if payout_speed>0.0 then
         (if noEvent(regulate>0.5 and takeup_factor>1e-6) then
           if regulated_rate<0.0 then max(-reel_speed_limit,regulated_rate)
@@ -151,6 +159,23 @@ model GriffinTetherPairStudy
        else if payout_speed<0.0 then payout_speed*max(0.0,min(1.0,
          (preload_tension-stiffness*extension)/preload_tension)) else 0.0)
       else 0.0;
+    // A de-energized drum holds its material length. Rope elasticity and
+    // damping remain passive; reel-in shaft work cannot exceed its rating.
+    // For reel-in speed v, shaft power is (base_load + damping*v)*v.
+    // Solve its positive quadratic root before evaluating tension, preserving
+    // the preload cap without feeding the solved tension back into drum rate.
+    motor_damping=if noEvent(enabled>0.5 and extension>0.0) then damping else 0.0;
+    motor_base_load=if noEvent(enabled>0.5 and extension>0.0)
+      then stiffness*extension+damping*contact_rate else 0.0;
+    motor_load_norm=sqrt(motor_base_load^2+4.0*motor_damping*maximum_motor_power_w);
+    // The preload cap also keeps the zero-damping/slack boundary defined.
+    // Rationalize the negative-base branch to avoid cancellation.
+    motor_rate_limit=2.0*maximum_motor_power_w/max(2.0*preload_tension,
+      if noEvent(motor_base_load>=0.0) then motor_base_load+motor_load_norm
+      else 4.0*motor_damping*maximum_motor_power_w
+        /max(preload_tension,motor_load_norm-motor_base_load));
+    paid_rate=if drive_powered>0.5 then
+      max(-motor_rate_limit,requested_paid_rate) else 0.0;
     der(length)=paid_rate;
     stretch_rate=contact_rate-paid_rate;
     tension=if noEvent(enabled>0.5 and extension>0.0)
@@ -165,6 +190,9 @@ model GriffinTetherPairStudy
       then (tension-stiffness*extension)*stretch_rate else 0.0;
   end Line;
 
+  input Real drive_powered=1.0 "External drive availability; zero holds both drums";
+  parameter Real maximum_motor_power_w(unit="W")=10000.0 "Per-drum motoring limit";
+  output Real actuator_enabled=enabled;
   parameter Real stiffness(unit="N/m")=0.0;
   parameter Real damping(unit="N.s/m")=0.0;
   parameter Real initial_length(unit="m")=0.0;
@@ -248,7 +276,8 @@ model GriffinTetherPairStudy
   input Real lander_arm1_x=0.0; input Real lander_arm1_y=0.0; input Real lander_arm1_z=0.0;
   Line line0(stiffness=stiffness,damping=damping,initial_length=initial_length,
     preload_tension=preload_tension,governor_tension=governor_tension,reel_speed_limit=reel_speed_limit,payout_speed=payout_speed0,payout_extension=payout_extension,tension_limit=tension_limit,
-    enabled=enabled,regulate=regulate,drive_scale=restraint_scale,payout_scale=payout_scale,
+    enabled=enabled,drive_powered=drive_powered,maximum_motor_power_w=maximum_motor_power_w,
+    regulate=regulate,drive_scale=restraint_scale,payout_scale=payout_scale,
     pose_load=if front_grounded<0.5 then pitch_position_demand else 0.0,pose_tension=pose_tension,
     loading_response_time=loading_response_time,unloading_response_time=unloading_response_time,
     governed_material_speed=if wheel_radius>0 then wheel_radius*governed_angular_speed else governed_speed,
@@ -261,7 +290,8 @@ model GriffinTetherPairStudy
     omega_x=omega0_x,omega_y=omega0_y,omega_z=omega0_z);
   Line line1(stiffness=stiffness,damping=damping,initial_length=initial_length,
     preload_tension=preload_tension,governor_tension=governor_tension,reel_speed_limit=reel_speed_limit,payout_speed=payout_speed1,payout_extension=payout_extension,tension_limit=tension_limit,
-    enabled=enabled,regulate=regulate,drive_scale=restraint_scale,payout_scale=payout_scale,
+    enabled=enabled,drive_powered=drive_powered,maximum_motor_power_w=maximum_motor_power_w,
+    regulate=regulate,drive_scale=restraint_scale,payout_scale=payout_scale,
     pose_load=if front_grounded<0.5 then pitch_position_demand else 0.0,pose_tension=pose_tension,
     loading_response_time=loading_response_time,unloading_response_time=unloading_response_time,
     governed_material_speed=if wheel_radius>0 then wheel_radius*governed_angular_speed else governed_speed,
@@ -321,6 +351,10 @@ model GriffinTetherPairStudy
   output Real length0=line0.length;
   output Real length1=line1.length;
   output Real elastic_energy=line0.elastic_energy+line1.elastic_energy;
+  output Real spool_power0=line0.spool_power;
+  output Real spool_power1=line1.spool_power;
+  output Real damper_power0=line0.damper_power;
+  output Real damper_power1=line1.damper_power;
   output Real spool_power=line0.spool_power+line1.spool_power;
   output Real damper_power=line0.damper_power+line1.damper_power;
 equation

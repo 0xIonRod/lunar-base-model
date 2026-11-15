@@ -1,3 +1,4 @@
+import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "griffin_1_surface_ops.rhai" as mission;
 const TEST_KIND="headless";
 const ROOT="/Griffin1SurfaceOps";
@@ -310,6 +311,7 @@ fn on_start(me,ctx) {
     this.disconnect_requested=this.verification;this.disconnect_ready=false;
     this.motion_granted=false;this.brake_clear_since=();
     this.stage="wait_landing";this.started=sim_tick();this.done=false;
+    this.landing_setup=();
     this.failure=();this.failure_reported=false;this.restraint_armed=false;this.impact_ratio=();this.pause_reason=();
     this.arm_since=();this.ground_since=();this.release_since=();
     this.ground_requalify_since=();this.ground_requalifications=0;
@@ -318,7 +320,7 @@ fn on_start(me,ctx) {
     this.front_transfer_start=();this.front_transfer_base=0.0;this.front_ground_confirmed=false;
     this.ground_wheels_down=false;this.speed_braking=false;this.restraint_lost_since=();this.rear_restraint_brake=false;this.saw_dynamic_support=false;this.brake_probe_done=false;
     this.unlock_seen=false;this.unlock_tick=();this.drive_start=();this.drive_forward=();
-    this.drive_done_tick=();this.blocked_after_unlock=0;
+    this.drive_done_tick=();this.final_ground_since=();this.blocked_after_unlock=0;
     this.max_tension=0.0;this.max_imbalance=0.0;this.min_upright=1.0;this.max_speed=0.0;this.max_descent_speed=0.0;
     this.max_descent_distance=0.0;
     this.descent_progress=0.0;this.descent_progress_tick=();
@@ -340,6 +342,7 @@ fn on_start(me,ctx) {
     this.maximum_arming_radial_speed=griffin_tether_study::datum("maximumArmingRadialSpeedMps");
     this.post_detach=griffin_tether_study::datum("postDetachSettleTicks").to_int();
     this.minimum_ground_dwell=griffin_tether_study::datum("minimumGroundDwellTicks").to_int();
+    this.manual_stop_timeout=griffin_tether_study::datum("manualStopTimeoutTicks").to_int();
     this.unload_rate=griffin_tether_study::datum("unloadPayoutSpeedMps");
     this.release_tension=griffin_tether_study::datum("releaseTensionN");
     this.release_energy=griffin_tether_study::datum("releaseElasticEnergyJ");
@@ -386,6 +389,8 @@ fn on_start(me,ctx) {
     this.validity=find_path(ROOT+"/Lander/ContactValidity");
     subscribe("griffin.contact-validity-exceeded");
     subscribe("simulation-object-paused");
+    subscribe_from("griffin_compact_egress_held",find_path(ROOT+"/Scenario"));
+    subscribe_from("griffin_surface_ops_geometry_failed",find_path(ROOT+"/Scenario"));
     subscribe_from("griffin_flip_egress_unlocked",find_path(ROOT+"/Scenario"));
     subscribe("griffin_flip_egress_blocked");
     subscribe_from("griffin_flip_tether_motion_granted",find_path(ROOT+"/Scenario"));
@@ -394,6 +399,10 @@ fn on_start(me,ctx) {
 }
 
 fn on_event(me,event,ctx) {
+    if event.name=="griffin_compact_egress_held" {this.landing_setup=event.value;}
+    if event.name=="griffin_surface_ops_geometry_failed" {
+        this.failure="Landing setup preflight rejected the authored target, terrain or gear";
+    }
     if event.name=="griffin_flip_tether_disconnect_granted" && event.source==find_path(ROOT+"/Scenario") {
         this.disconnect_requested=true;
     }
@@ -497,7 +506,7 @@ fn step_egress(me,ctx) {
             return;
         }
         this.done=true;
-        report_structured_verdict(#{ok:false,verdict:"fail",check_count:1,pass_count:0,failure_count:1,non_pass_count:1,
+        report_structured_verdict(#{ok:false,verdict:"fail",verification:"Griffin1Requirements::Verify_GriffinSurfaceOperations",check_count:1,pass_count:0,failure_count:1,non_pass_count:1,
             failures:[this.failure],metrics:#{stage:this.stage,tick:sim_tick(),impact_ratio:this.impact_ratio,
               pause_reason:this.pause_reason,safe_tether_hold:safe_hold,parking_brake:brake,
               mission_unlock_seen:this.unlock_seen,
@@ -851,27 +860,85 @@ fn step_egress(me,ctx) {
         this.stage="verify_manual_drive";
     } else if this.stage=="verify_manual_drive" {
         let displacement=vdot(world_pos3(this.rover)-this.drive_start,this.drive_forward);
-        if displacement>=this.minimum_unlock_distance || displacement>=0.20 {
-            cmd("SimulateIntent",#{intent:"forward",held:false,target:this.rover});
-            griffin_controls::hold_rover_brake();
+        if displacement>=this.minimum_unlock_distance {
+            let released=cmd("SimulateIntent",#{intent:"forward",held:false,target:this.rover});
+            let braked=griffin_controls::hold_rover_brake();
+            if released==() || released.ok!=true || braked==() || braked.ok!=true {
+                this.failure="Manual proof drive could not apply its final brake hold";return;
+            }
             this.drive_done_tick=sim_tick();this.drive_distance=displacement;this.stage="finish";
         } else if sim_tick()-this.unlock_tick>300 {
             cmd("SimulateIntent",#{intent:"forward",held:false,target:this.rover});
             this.failure="Drive remained locked after the restraint and ground-transfer gates";return;
         }
-    } else if this.stage=="finish" && sim_tick()-this.drive_done_tick>=30 {
-        let failures=[];
-        if !this.unlock_seen {failures.push("Mission did not emit the qualified egress unlock event");}
-        if this.blocked_after_unlock!=0 {failures.push("A drive block was emitted after the qualified unlock");}
-        if this.drive_distance<this.minimum_unlock_distance {failures.push("FLIP did not travel the minimum proof distance after unlock");}
-        if this.max_tension>this.maximum_line_load {failures.push("Modeled tether load exceeded the per-line operating gate");}
+    } else if this.stage=="finish" {
         let final_restraint=griffin_controls::compact_tether_release_status();
-        if final_restraint.ok!=true || transfer.ok!=true {failures.push("Final native restraint release or stable fixed-world support was not confirmed");}
-        if !this.brake_probe_done {failures.push("Invalid local brake admission was not checked");}
-        if !this.saw_dynamic_support || transfer.fixed_count!=4 {failures.push("Wheel telemetry did not distinguish the dynamic lander from fixed ground");}
+        if final_restraint.ok==true && transfer.ok==true {
+            if this.final_ground_since==() {this.final_ground_since=sim_tick();}
+        } else {this.final_ground_since=();}
+        if sim_tick()-this.drive_done_tick>this.manual_stop_timeout {
+            this.failure="Manual proof drive did not reach a continuously stable braked stop before its deadline";return;
+        }
+        if this.final_ground_since==() || sim_tick()-this.final_ground_since<this.minimum_ground_dwell {return;}
+        let conditions=[this.unlock_seen && this.restraint_armed && this.detached_tick!=(),
+            this.blocked_after_unlock==0,this.drive_distance>=this.minimum_unlock_distance,
+            this.max_tension<=this.maximum_line_load,final_restraint.ok==true && transfer.ok==true,
+            this.brake_probe_done,this.saw_dynamic_support && transfer.fixed_count==4];
+        let names=[];let checks=[];let model=sysml_requirements::model();
+        for i in 0..conditions.len() {
+            let id="gfe00"+(i+1).to_string();let name="GriffinFlipEgressStudy::"+id;
+            names.push(name);
+            let ir=sysml_requirements::required_constraint_ir(model,model.requirement(name),
+                "GriffinFlipEgressStudy::GFEObservedAcceptance");
+            let observed=#{provider:"telemetry",state:"value",value:conditions[i],
+                source_revision:model.source_revision,provider_generation:sim_tick(),
+                document_id:(),document_generation:(),
+                sample_interval:#{clock:"simulation",start_tick:this.started,end_tick:sim_tick()}};
+            let binding=sysml_requirements::scalar_constraint_observation(ir,"accepted",observed);
+            checks.push(sysml_requirements::required_constraints_check(id,"payload_egress",name,
+                "Griffin1Requirements::Verify_GriffinSurfaceOperations",
+                "GriffinFlipEgressStudy::GFEObservedAcceptance",[binding],"typed",0.0));
+        }
+        if this.landing_setup==() || this.landing_setup.source_revision!=model.source_revision {
+            throw("Qualified landing setup evidence is missing or belongs to a different source revision");
+        }
+        for row in [["gr037","GR037_LandingTargetDatumMatchesSource","landingTargetDatumToleranceM",
+                     "GR037_LandingTargetDatum",this.landing_setup.target_y,this.landing_setup.source_target_y],
+                    ["gr038","GR038_LandingTerrainDatum","landingSurfaceDatumToleranceM",
+                     "GR038_LandingSurfaceDatum",this.landing_setup.surface_y,this.landing_setup.source_surface_y]] {
+            let prefix="GriffinSimulationAccuracyRequirements::";let name=prefix+row[0];names.push(name);
+            let ir=sysml_requirements::required_constraint_ir(model,model.requirement(name),prefix+row[1]);
+            let actual_name=if row[0]=="gr037" {"authoredTargetY"}else{"measuredTerrainY"};
+            let expected_name=if row[0]=="gr037" {"sourceTargetY"}else{"sourceTerrainY"};
+            let observations=[];
+            let actual=#{provider:"telemetry",state:"value",value:row[4],
+                source_revision:model.source_revision,provider_generation:this.landing_setup.sample_tick,
+                document_id:(),document_generation:(),sample_interval:#{clock:"simulation",
+                    start_tick:this.landing_setup.sample_tick,end_tick:this.landing_setup.sample_tick}};
+            observations.push(sysml_requirements::scalar_constraint_observation(ir,actual_name,actual));
+            for parameter in [[expected_name,row[5]],["toleranceM",model.value(prefix+row[3]+"::"+row[2])]] {
+                observations.push(sysml_requirements::scalar_constraint_observation(ir,parameter[0],
+                    #{provider:"source_literal",state:"value",value:parameter[1],
+                      source_revision:model.source_revision,provider_generation:model.source_revision}));
+            }
+            if row[0]=="gr038" {
+                let available=actual;available.value=true;
+                observations.push(sysml_requirements::scalar_constraint_observation(ir,"surfaceAvailable",available));
+            }
+            checks.push(sysml_requirements::required_constraints_check(row[0],"landing",name,
+                "Griffin1Requirements::Verify_GriffinSurfaceOperations",prefix+row[1],observations,"typed",0.0));
+        }
+        let source=sysml_requirements::source_with_selection([],names,
+            ["Griffin1Requirements::Verify_GriffinSurfaceOperations"]);
+        let evaluated=sysml_requirements::evaluate(source,checks);
         this.done=true;
-        report_structured_verdict(#{ok:failures.len()==0,verdict:if failures.len()==0{"pass"}else{"fail"},
-            check_count:7,pass_count:7-failures.len(),failure_count:failures.len(),failures:failures,
+        report_structured_verdict(#{ok:evaluated.ok,verdict:evaluated.verdict,
+            verification:"Griffin1Requirements::Verify_GriffinSurfaceOperations",
+            check_count:evaluated.check_count,requirement_count:evaluated.requirement_count,
+            pass_count:evaluated.pass_count,failure_count:evaluated.failure_count,
+            non_pass_count:evaluated.non_pass_count,failures:evaluated.failures,
+            non_pass_results:evaluated.non_pass_results,results:evaluated.results,
+            source_revision:source.source_revision,source_files:source.source_files,
             metrics:#{stage:this.stage,maximum_tension_n:this.max_tension,maximum_imbalance_n:this.max_imbalance,
               maximum_rover_speed_mps:this.max_speed,maximum_controlled_descent_speed_mps:this.max_descent_speed,
               minimum_upright_cos:this.min_upright,ground_requalifications:this.ground_requalifications,
@@ -879,7 +946,7 @@ fn step_egress(me,ctx) {
               final_grounded_wheels:transfer.wheel_count,final_fixed_support_wheels:transfer.fixed_count,
               final_track_clearance_m:transfer.track_clearance_m,final_tension0_n:state.tension0,final_tension1_n:state.tension1,
               invalid_local_brake_rejected:this.brake_probe_done,dynamic_support_distinguished:this.saw_dynamic_support,
-              scope:"Two reduced balanced rear-wheel bridles apply native wheel resultants and equal/opposite lander reactions; assumed rigging and ideal powered winches, no fabric or attachment failure, no flight qualification"}},
+              scope:"Two reduced balanced rear-wheel bridles apply native wheel resultants and equal/opposite lander reactions; assumed rigging, finite winch electrical demand and lumped heat rejection, no fabric or attachment failure, no flight qualification"}},
             "GRIFFIN CONTROLLED TETHER EGRESS","GRIFFIN_TETHER_DESCENT");
     }
 

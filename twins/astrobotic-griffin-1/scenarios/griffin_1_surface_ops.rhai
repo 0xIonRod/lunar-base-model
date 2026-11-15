@@ -1219,7 +1219,13 @@ fn compact_landing_task() {
                 if updated==() || updated.ok!=true {throw("Landed route data could not follow the actual ramp frame");}
             }
             griffin_controls::show_touchdown_actions();
-            emit("griffin_compact_egress_held");true
+            emit("griffin_compact_egress_held",#{
+                source_revision:this.landing_setup_evidence.source_revision,
+                target_y:this.landing_setup_evidence.landing_target.actual_y,
+                source_target_y:this.landing_setup_evidence.landing_target.expected_y,
+                surface_y:this.landing_setup_evidence.landing_surface.measured_surface_y,
+                source_surface_y:this.landing_setup_evidence.landing_surface.expected_surface_y,
+                sample_tick:this.landing_setup_evidence.landing_surface.sample_tick});true
         })
     ])
 }

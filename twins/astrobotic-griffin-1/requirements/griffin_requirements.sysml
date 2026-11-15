@@ -168,17 +168,23 @@ package Griffin1Requirements {
 
 
     verification def Verify_GriffinSurfaceOperations {
+        doc /* Execute the production landing and restrained FLIP deployment
+         * controller through ground transfer, unloaded disconnect and manual
+         * drive. The fixture composes the production mission and enables its
+         * observer's explicit verification mode. */
         subject lander : Griffin1Lander;
         subject rover : HostedRoverInterface;
-        subject ramp : GriffinRampRequirements::GriffinEgressRamp;
+        subject egress : GriffinFlipEgressStudy::ControlledDescent;
         objective {
-            verify GriffinFunctionalRequirements::gr004;
-            verify GriffinFunctionalRequirements::gr007;
-            verify GriffinFunctionalRequirements::gr026;
-            verify GriffinRampRequirements::grr017;
             verify GriffinSimulationAccuracyRequirements::gr037;
-            verify GriffinSimulationAccuracyRequirements::gr039;
             verify GriffinSimulationAccuracyRequirements::gr038;
+            verify GriffinFlipEgressStudy::gfe001;
+            verify GriffinFlipEgressStudy::gfe002;
+            verify GriffinFlipEgressStudy::gfe003;
+            verify GriffinFlipEgressStudy::gfe004;
+            verify GriffinFlipEgressStudy::gfe005;
+            verify GriffinFlipEgressStudy::gfe006;
+            verify GriffinFlipEgressStudy::gfe007;
         }
     }
 

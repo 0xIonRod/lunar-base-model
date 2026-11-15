@@ -78,7 +78,14 @@ def main():
                 or 'NO-VERDICT' in text or '[rhai] on_tick() failed' in text:
             raise RuntimeError(f'{name} did not produce its required terminal verdict; {log}')
         if expected_code == 0:
-            assert '[rhai] TESTS_OK 44' in text, log
+            assert '[rhai] TESTS_OK 45' in text, log
+            assert '[rhai] FLIP MOTION SOURCE ACCEPTANCE: PASS' in text, log
+            reports = [json.loads(line.split(' ', 1)[1]) for line in text.splitlines()
+                       if line.startswith('LUNCO_SCENE_TEST_REPORT ')]
+            assert len(reports) == 1, log
+            receipt = reports[0]
+            assert receipt['verdict'] == 'pass' and not receipt['non_pass_checks'], log
+            assert receipt['source_revision_at_start'] == receipt['source_revision_at_end'], log
         else:
             for detail in ['braking: stopped-speed requirement failed', 'initial=', 'elapsed=', 'distance=']:
                 assert detail in text, (detail, log)
@@ -88,7 +95,7 @@ def main():
     results = [run('positive', source, 0, verification=True)] if 'positive' in selected else []
     if 'no-brake-command' not in selected:
         (output / 'results-positive.json').write_text(json.dumps(results, indent=2) + '\n')
-        print('PASS: 44 authored physical motion and panel-hold checks')
+        print('PASS: 45 authored physical motion, panel-hold and source-acceptance checks')
         return
     target = twin / 'tests/_motion_failure_no_brake_command.usda'
     if target.exists():

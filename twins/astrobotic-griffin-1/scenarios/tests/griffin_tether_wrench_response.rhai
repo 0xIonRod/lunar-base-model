@@ -43,7 +43,6 @@ fn release_body_wrench(rover) {
 }
 
 fn verdict(state) {
-    state.done=true;
     let failures=[];
     if abs(state.force_output-PROBE_FORCE_N)>0.01 {failures.push("Modelica force output did not match the bounded pulse");}
     if abs(state.torque_output-PROBE_TORQUE_NM)>0.01 {failures.push("Modelica torque output did not match the bounded pulse");}
@@ -121,6 +120,7 @@ fn on_tick(me,ctx) {
         this.cancel_omega_y=(physics.angular_velocity_radps[1]-this.baseline_w)-this.delta_omega_y;
         write_probe(this.probe,0.0,0.0);
         write_body_wrench(this.rover,0.0,0.0);
+        this.done=true;
         verdict(this);
     }
 }

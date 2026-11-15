@@ -1,449 +1,19 @@
+import "griffin_assembly_support" as support;
+import "griffin_propulsion_builder" as griffin_propulsion_builder;
 import "lunco://scripting/tools/engine_exhaust" as engine_exhaust;
 import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "lunco://scripting/tools/mechanical_relations" as mechanical_relations;
 import "griffin_geometry" as griffin_geometry;
-import "lunco://scripting/tools/pressure_fed_engine" as pressure_fed_engine;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 
-// Twin-local runtime visual assembly builder.
+// Twin-local presentation and geometry authoring plans.
 //
-// This is deliberately a thin policy layer over LunCoSim's generic
-// assembly_builder and assembly_edit tools. It emits typed AddPrim and
-// transform operations that are journaled by ApplyUsdOps; it never writes
-// USDA text and it never starts or reloads the Editor. Component identities
-// and placement are kept here because they are presentation policy, while
-// dimensions and geometry remain in the referenced USD component assets.
-
-fn query_ok(record) {
-    record != () && record.ok != false
-}
-
-fn main_engine_model_path(root, name) { root + "/MainPropulsion/" + name + "/Chamber" }
-fn main_engine_plume_path(root, name) { root + "/MainPropulsion/" + name + "Plume" }
-// Root signals republished per engine for actuators, HUD, telemetry and tests.
-fn main_engine_root_outputs() {
-    ["thrust_n","maximum_thrust_n","activity","chamber_pressure_pa","propellant_flow",
-     "fuel_flow_kgs","oxidizer_flow_kgs","mixture_efficiency"]
-}
-
-fn _source_number(model, name) { f64_from(model.value(name)) }
-
-fn _exists(doc, path) {
-    query_ok(assembly_builder::composed_query(doc,#{path:path,children:false}))
-}
-
-fn _engine_parameters(model) {
-    let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
-    let resolved=[];
-    for item in [
-        #{parts:["FuelValve"],name:"maximum_flow_kgs",source:"engineFuelReferenceFlowKgs"},
-        #{parts:["FuelValve"],name:"commanded_flow_kgs",source:"engineFuelCommandFlowKgs"},
-        #{parts:["OxidizerValve"],name:"maximum_flow_kgs",source:"engineOxidizerReferenceFlowKgs"},
-        #{parts:["OxidizerValve"],name:"commanded_flow_kgs",source:"engineOxidizerCommandFlowKgs"},
-        #{parts:["FuelValve","OxidizerValve"],name:"nominal_pressure_drop_pa",source:"referencePressureDropPa"},
-        #{parts:["FuelValve","OxidizerValve"],name:"opening_time_constant_s",source:"valveResponseS"},
-        #{parts:["FuelValve","OxidizerValve"],name:"availability_transition_mass_kg",source:"availabilityTransitionMassKg"},
-        #{parts:["Chamber"],name:"oxidizer_to_fuel_ratio",source:"oxidizerToFuelRatio"},
-        #{parts:["Chamber"],name:"characteristic_velocity_mps",source:"characteristicVelocityMps"},
-        #{parts:["Chamber"],name:"throat_area_m2",source:"engineThroatBoreAreaM2"},
-        #{parts:["Chamber"],name:"combustion_efficiency",source:"combustionEfficiency"},
-        #{parts:["Chamber"],name:"nominal_flow_kgs",source:"engineNominalFlowKgs"}] {
-        let value=_source_number(model,own+item.source);
-        if value==() || value<=0.0 {return plan_error("missing main-engine datum: "+item.source);}
-        resolved.push(#{parts:item.parts,name:item.name,value:value});
-    }
-    #{ok:true,parameters:resolved}
-}
-
-// Each reusable USD engine assembly exposes two valves and one chamber as
-// members of the single MainPropulsion solver. One engine is one authoring
-// batch; the final feed plan admits all members together.
-fn _engine_parameter_ops(edit_target, assembly, parameters) {
-    let ops=[];
-    for item in parameters {
-        for part in item.parts {ops.push(#{SetAttribute:#{edit_target:edit_target,path:assembly+"/"+part,
-            name:"parameters:"+item.name,type_name:"double",value:item.value.to_string()}});}
-    }
-    ops
-}
-
-// Prepare the referenced component before its inherited ports are wired.
-fn griffin_main_engine_component_plan(doc, edit_target, root, name) {
-    if !griffin_spec::main_engine_names().contains(name) {return plan_error("unknown main-engine identity");}
-    let main=root+"/MainPropulsion";let assembly=main+"/"+name;
-    if !_exists(doc,main) {return plan_error("MainPropulsion assembly has not composed");}
-    let ops=[];
-    if !_exists(doc,assembly) {ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:name,
-        type_name:"Scope",reference:(),reference_prim_path:()}});}
-    ops.push(#{SetReferenceArcs:#{edit_target:edit_target,path:assembly,
-        references:[#{asset_path:"lunco://components/propulsion/pressure_fed_engine.usda",prim_path:"/PressureFedEngine"}],
-        list_op:"Explicit"}});
-    #{ok:true,kind:"griffin_main_engine_component",engine:name,ops:ops,no_op:false}
-}
-
-fn griffin_main_engine_plan(doc, edit_target, root, name) {
-    let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("main-engine source unavailable");}
-    if !griffin_spec::main_engine_names().contains(name) {
-        return plan_error(name+" is not a typed main-engine identity");
-    }
-    let nozzle_source="GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
-    let parameters=_engine_parameters(model);
-    if !parameters.ok {return parameters;}
-    let force=_source_number(model,
-        "GriffinPropulsionRequirements::GriffinPressureFedStudy::engineActuatorForceEnvelopeN");
-    let fuel_family=_source_number(model,nozzle_source+"plumeFuelFamily");
-    let stoichiometric=_source_number(model,nozzle_source+"plumeStoichiometricMixtureRatio");
-    if force==() || force<=0.0 || fuel_family==() || stoichiometric==() || stoichiometric<=0.0 {
-        return plan_error("main-engine actuator or plume source is incomplete");
-    }
-    let main=root+"/MainPropulsion";
-    let nozzle=main+"/NozzleDesign";
-    let engine=main_engine_model_path(root,name);
-    let plume=main_engine_plume_path(root,name);
-    let visual=root+"/Nozzle/MainEngineCluster/"+name;
-    if !_exists(doc,visual) {return plan_error(visual+": engine bell has not composed");}
-    let ops=[];
-    let assembly=main+"/"+name;
-    for path in pressure_fed_engine::component_members(assembly) {
-        if !_exists(doc,path) {return plan_error("Install "+assembly+" component reference and wait for composed projection before wiring");}
-    }
-    for part in [#{path:assembly+"/FuelValve",label:name+" fuel valve"},
-        #{path:assembly+"/OxidizerValve",label:name+" oxidizer valve"},
-        #{path:engine,label:name+" chamber"}] {
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:part.path,name:"ui:displayName",
-            type_name:"string",value:part.label}});
-    }
-    for prim in [#{path:plume,name:name+"Plume",asset:"PlumePhotometry.mo"}] {
-        if !_exists(doc,prim.path) {
-            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:prim.name,
-                type_name:"Scope",reference:(),reference_prim_path:()}});
-        }
-        ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:prim.path,schemas:["LunCoProgramAPI"]}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"info:implementationSource",
-            type_name:"token",value:"\"sourceAsset\""}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"info:sourceAsset",
-            type_name:"asset",value:"@lunco://models/LunCo/Propulsion/"+prim.asset+"@"}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:prim.path,name:"lunco:program:realtimeSafe",
-            type_name:"bool",value:"true"}});
-    }
-    for op in _engine_parameter_ops(edit_target,assembly,parameters.parameters) {ops.push(op);}
-    let enabled=griffin_spec::main_engine_port(name,"enabled");
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:main,name:"inputs:"+enabled,
-        type_name:"float",value:"1.0"}});
-    for output in ["exit_mach","gamma_out","exit_lip_angle_rad"] {
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"outputs:"+output,
-            type_name:"double",value:"0.0"}});
-    }
-    for fluid in [#{valve:"FuelValve",tank:"FuelTank"},#{valve:"OxidizerValve",tank:"OxidizerTank"}] {
-        let valve=assembly+"/"+fluid.valve;
-        for connection in [
-            #{name:"inputs:flow_fraction_command",source:main+".inputs:flow_fraction_command",kind:"float"},
-            #{name:"inputs:enabled",source:main+".inputs:"+enabled,kind:"float"},
-            #{name:"inputs:available_mass_kg",source:main+"/"+fluid.tank+".outputs:mass_kg",kind:"float"},
-            #{name:"connectors:inlet",source:main+"/"+fluid.tank+".connectors:outlet",kind:"token"}] {
-            ops.push(#{SetConnection:#{edit_target:edit_target,path:valve,name:connection.name,
-                type_name:connection.kind,sources:[connection.source]}});
-        }
-    }
-    for connection in [
-        #{path:engine,name:"inputs:effective_exhaust_velocity_mps",source:nozzle+".outputs:ideal_exhaust_velocity_mps",kind:"float"},
-        #{path:plume,name:"inputs:thrust_n",source:engine+".outputs:thrust_n",kind:"double"},
-        #{path:plume,name:"inputs:maximum_thrust_n",source:engine+".outputs:maximum_thrust_n",kind:"double"},
-        #{path:plume,name:"inputs:propellant_flow_kgs",source:engine+".outputs:propellant_flow",kind:"double"},
-        #{path:plume,name:"inputs:exhaust_velocity_mps",source:engine+".outputs:exhaust_velocity_mps",kind:"double"},
-        #{path:plume,name:"inputs:mixture_ratio",source:engine+".outputs:mixture_ratio",kind:"double"},
-        #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"double"},
-        #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"},
-        #{path:plume,name:"inputs:nozzle_exit_mach",source:nozzle+".outputs:exit_mach",kind:"double"},
-        #{path:plume,name:"inputs:gas_gamma",source:nozzle+".outputs:gamma_out",kind:"double"},
-        #{path:plume,name:"inputs:exit_lip_angle_rad",source:nozzle+".outputs:exit_lip_angle_rad",kind:"double"}] {
-        ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
-            type_name:connection.kind,sources:[connection.source]}});
-    }
-    for output in main_engine_root_outputs() {
-        ops.push(#{SetConnection:#{edit_target:edit_target,path:main,
-            name:"outputs:"+griffin_spec::main_engine_port(name,output),type_name:"double",
-            sources:[engine+".outputs:"+output]}});
-    }
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/"+name+"Wall",
-        name:"inputs:propellant_flow_kgs",type_name:"double",sources:[engine+".outputs:propellant_flow"]}});
-    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:plume,name:"inputs:engine_count"}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"parameters:engine_count",
-        type_name:"int",value:"1"}});
-    for parameter in [#{name:"fuel_family",value:fuel_family.to_string()},
-        #{name:"stoichiometric_mixture_ratio",value:stoichiometric.to_string()},
-        #{name:"ambient_pressure_pa",value:"0.0"}] {
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+parameter.name,
-            type_name:"float",value:parameter.value}});
-    }
-    for item in [#{input:"gas_constant_j_kg_k",source:"gasConstantJkgK"},
-        #{input:"radiative_fraction",source:"mainRadiativeFraction"},
-        #{input:"luminous_efficacy_lm_w",source:"luminousEfficacyLmW"}] {
-        let value=_source_number(model,"GriffinPropulsionRequirements::GriffinPlumeStudy::"+item.source);
-        if value==() {return plan_error("plume optical assumption missing: "+item.source);}
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"inputs:"+item.input,
-            type_name:"double",value:value.to_string()}});
-    }
-    for output in engine_exhaust::physical_outputs() {
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"outputs:"+output,
-            type_name:if engine_exhaust::render_outputs().contains(output) {"float"} else {"double"},value:"0.0"}});
-    }
-    for op in engine_exhaust::connection_ops(edit_target,visual,plume,#{}) {ops.push(op);}
-
-    // The bell owns its engine's thrust: force at the engine station, along
-    // the body +Y axis, commanded by that engine's delivered thrust.
-    let thrust=main+".outputs:"+griffin_spec::main_engine_port(name,"thrust_n");
-    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:visual,schemas:["LunCoForceActuatorAPI"]}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:visual,name:"lunco:forceActuator:direction",
-        type_name:"float3",value:"(0, 1, 0)"}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:visual,name:"lunco:forceActuator:maxForce",
-        type_name:"double",value:force.to_string()}});
-    ops.push(#{SetRelationship:#{edit_target:edit_target,path:visual,
-        name:"lunco:forceActuator:commandSource",targets:[thrust]}});
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:visual,name:"inputs:force_command",
-        type_name:"double",sources:[thrust]}});
-
-    let telemetry=main+"/"+name+"ThrustTelemetry";
-    if !_exists(doc,telemetry) {
-        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:name+"ThrustTelemetry",
-            type_name:"Scope",reference:(),reference_prim_path:()}});
-    }
-    ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:telemetry,schemas:["LunCoTelemetryAPI"]}});
-    for field in [#{name:"lunco:telemetry",type_name:"bool",value:"true"},
-        #{name:"ui:displayName",type_name:"string",value:name.to_upper()+" THRUST"},
-        #{name:"lunco:telemetry:port",type_name:"string",value:griffin_spec::main_engine_port(name,"thrust_n")},
-        #{name:"lunco:telemetry:name",type_name:"string",value:"lander."+griffin_spec::main_engine_port(name,"thrust")},
-        #{name:"lunco:telemetry:unit",type_name:"string",value:"N"},
-        #{name:"lunco:telemetry:description",type_name:"string",
-            value:"Delivered thrust of main engine "+name+" from its USD-authored valve/chamber assembly."}] {
-        if ["lunco:telemetry:port","lunco:telemetry:name","lunco:telemetry:unit"].contains(field.name) {
-            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:telemetry,name:field.name}});
-        }
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:telemetry,name:field.name,
-            type_name:field.type_name,value:field.value}});
-    }
-    ops.push(#{SetRelationship:#{edit_target:edit_target,path:telemetry,
-        name:"lunco:telemetry:target",targets:[main]}});
-    #{ok:true,kind:"griffin_main_engine",engine:name,ops:ops,no_op:false}
-}
-
-// Equal live mass at each station of an explicitly assigned tank pair.
-// Reject layouts requiring products of inertia; the current body port owns
-// a diagonal tensor and cannot represent an arbitrary asymmetric grouping.
-fn _propellant_group(model, attribute, names, stations) {
-    let members=model.value(attribute);
-    if !array_is(members) || members.len()!=2 {return plan_error("two typed tank identities required: "+attribute);}
-    let points=[];
-    for member in members {
-        if !sysml_enum_is(member) {return plan_error("invalid tank identity");}
-        let index=names.index_of(member.literal);
-        if index<0 {return plan_error("unknown tank identity: "+member.literal);}
-        points.push(stations[index]);
-    }
-    if members[0].literal==members[1].literal {return plan_error("tank pair must contain distinct stations");}
-    let a=points[0]; let b=points[1];
-    if abs(a.x+b.x)>1.0e-8 || abs(a.z+b.z)>1.0e-8
-        || abs(a.y-b.y)>1.0e-8 || abs(a.x*a.z)>1.0e-8 {
-        return plan_error("mass study requires opposed axis-aligned horizontal pairs");
-    }
-    let c=[(a.x+b.x)/2.0,(a.y+b.y)/2.0,(a.z+b.z)/2.0];
-    let spread=[0.0,0.0,0.0];
-    for p in points {
-        let x=p.x-c[0];let y=p.y-c[1];let z=p.z-c[2];
-        spread[0]+=(y*y+z*z)/2.0;
-        spread[1]+=(x*x+z*z)/2.0;
-        spread[2]+=(x*x+y*y)/2.0;
-    }
-    #{ok:true,centroid:c,specific_inertia:spread}
-}
-
-fn griffin_propellant_mass_plan(doc, edit_target, root) {
-    let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("propellant mass source unavailable");}
-    let own="GriffinPropulsionRequirements::GriffinPropellantMassStudy::";
-    let names=griffin_spec::propellant_tank_names();
-    let stations=griffin_spec::component_tank_stations();
-    if names.len()!=4 || stations.len()!=4 {return plan_error("four typed tank stations required");}
-    let fuel=_propellant_group(model,own+"fuelTankInstances",names,stations);
-    let oxidizer=_propellant_group(model,own+"oxidizerTankInstances",names,stations);
-    if !fuel.ok {return fuel;} if !oxidizer.ok {return oxidizer;}
-    let used=[];
-    for attr in ["fuelTankInstances","oxidizerTankInstances"] {
-        for member in model.value(own+attr) {
-            if used.contains(member.literal) {return plan_error("tank belongs to both reactant groups");}
-            used.push(member.literal);
-        }
-    }
-    let dry=_source_number(model,own+"dryMassKg");
-    let dc=[];let di=[];
-    for axis in ["X","Y","Z"] {dc.push(_source_number(model,own+"dryCom"+axis+"M"));}
-    for axis in ["Xx","Yy","Zz"] {di.push(_source_number(model,own+"dryInertia"+axis+"KgM2"));}
-    if dry==() || dry<=0.0 {return plan_error("positive dry mass required");}
-    for i in 0..3 {if dc[i]==() || di[i]==() || di[i]<=0.0 {return plan_error("dry tensor source unavailable");}}
-    if abs(dc[0])>1.0e-8 || abs(dc[2])>1.0e-8 {
-        return plan_error("diagonal mass study requires the dry centroid on the tank-pair symmetry axis");
-    }
-    let pressure="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
-    let fm=_source_number(model,pressure+"initialFuelMassKg");
-    let om=_source_number(model,pressure+"initialOxidizerMassKg");
-    if fm==() || om==() || fm<0.0 || om<0.0 {return plan_error("initial species masses unavailable");}
-    let mass=dry+fm+om; let com=[]; let inertia=[];
-    for i in 0..3 {com.push((dry*dc[i]+fm*fuel.centroid[i]+om*oxidizer.centroid[i])/mass);}
-    for i in 0..3 {
-        let j=(i+1)%3;let k=(i+2)%3;
-        let value=di[i];
-        for g in [#{m:dry,c:dc,s:[0.0,0.0,0.0]},
-            #{m:fm,c:fuel.centroid,s:fuel.specific_inertia},
-            #{m:om,c:oxidizer.centroid,s:oxidizer.specific_inertia}] {
-            value+=g.m*(g.s[i]+(g.c[j]-com[j])**2+(g.c[k]-com[k])**2);
-        }
-        inertia.push(value);
-    }
-    let status=root+"/MainPropulsion/PropellantStatus";let params=[];
-    params.push(#{name:"dry_mass_kg",value:dry});
-    params.push(#{name:"initial_propellant_mass_kg",value:fm+om});
-    let axes=["x","y","z"];
-    for i in 0..3 {
-        let axis=axes[i];
-        params.push(#{name:"dry_com_"+axis+"_m",value:dc[i]});
-        params.push(#{name:"dry_inertia_"+axis+axis+"_kg_m2",value:di[i]});
-        for g in [#{name:"fuel",value:fuel},#{name:"oxidizer",value:oxidizer}] {
-            params.push(#{name:g.name+"_position_"+axis+"_m",value:g.value.centroid[i]});
-            params.push(#{name:g.name+"_specific_inertia_"+axis+axis+"_m2",value:g.value.specific_inertia[i]});
-        }
-    }
-    let ops=[];
-    for p in params {
-        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:status,name:"inputs:"+p.name}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:status,name:"inputs:"+p.name,type_name:"double",value:p.value.to_string()}});
-    }
-    for p in [#{name:"physics:mass",type_name:"float",value:mass.to_string()},
-        #{name:"physics:centerOfMass",type_name:"point3f",value:"("+com[0]+", "+com[1]+", "+com[2]+")"},
-        #{name:"physics:diagonalInertia",type_name:"float3",value:"("+inertia[0]+", "+inertia[1]+", "+inertia[2]+")"}] {
-        // Recreate each schema declaration atomically with its typed value.
-        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:root,name:p.name}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:p.name,type_name:p.type_name,value:p.value}});
-    }
-    #{ok:true,kind:"griffin_propellant_mass",ops:ops,mass:mass,com:com,inertia:inertia,no_op:false}
-}
-
-// Admit every engine into the MainPropulsion network: shared throttle, tank
-// outlets, nozzle design, and the explicit member collection.
-fn griffin_main_engine_feed_plan(doc, edit_target, root) {
-    let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("main-engine source unavailable");}
-    let names=griffin_spec::main_engine_names();
-    let count=griffin_spec::main_engine_count();
-    if count==() || count<=0 || names.len()!=count {
-        return plan_error("typed main-engine identities and count are incomplete");
-    }
-    let own="GriffinPropulsionRequirements::GriffinPressureFedStudy::";
-    let nozzle_source="GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
-    let main=root+"/MainPropulsion";
-    let nozzle=main+"/NozzleDesign";
-    let ops=[];
-    let mass_plan=griffin_propellant_mass_plan(doc,edit_target,root);
-    if !mass_plan.ok {return mass_plan;}
-    for op in mass_plan.ops {ops.push(op);}
-    // Lander.mo publishes the shared throttle; runtime Modelica is the writer.
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:root,name:"outputs:throttle",
-        type_name:"float",value:"0.0"}});
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main,name:"inputs:flow_fraction_command",
-        type_name:"float",sources:[root+".outputs:throttle"]}});
-    for tank in [#{name:"FuelTank",mass:"initialFuelMassKg"},#{name:"OxidizerTank",mass:"initialOxidizerMassKg"}] {
-        let path=main+"/"+tank.name;
-        for item in [#{name:"initial_mass_kg",source:tank.mass},
-            #{name:"nominal_pressure_pa",source:"nominalTankPressurePa"},
-            #{name:"pressure_headroom_pa",source:"tankPressureHeadroomPa"}] {
-            let value=_source_number(model,own+item.source);
-            if value==() || value<=0.0 {return plan_error("missing tank datum: "+item.source);}
-            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+item.name}});
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+item.name,
-                type_name:"double",value:value.to_string()}});
-        }
-    }
-    let members=[main+"/FuelTank",main+"/OxidizerTank",nozzle,main+"/PropellantStatus"];
-    let fuel_inlets=[];
-    let oxidizer_inlets=[];
-    for name in names {
-        let plume=main_engine_plume_path(root,name);
-        let assembly=main+"/"+name;
-        let required=pressure_fed_engine::component_members(assembly);
-        required.push(plume);required.push(main+"/"+name+"Wall");
-        for member in required {
-            if !_exists(doc,member) {return plan_error(member+": required propulsion member has not composed");}
-            members.push(member);
-        }
-        fuel_inlets.push(assembly+"/FuelValve.connectors:inlet");
-        oxidizer_inlets.push(assembly+"/OxidizerValve.connectors:inlet");
-    }
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/FuelTank",name:"connectors:outlet",
-        type_name:"token",sources:fuel_inlets}});
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/OxidizerTank",name:"connectors:outlet",
-        type_name:"token",sources:oxidizer_inlets}});
-    ops.push(#{SetRelationship:#{edit_target:edit_target,path:main,name:"collection:components:includes",targets:members}});
-    for item in [#{name:"throat_radius",source:own+"throatBoreRadiusM"},
-        #{name:"exit_radius",source:nozzle_source+"exitBoreRadiusM"},
-        #{name:"length",source:nozzle_source+"bellHeightM"},
-        #{name:"contour",source:nozzle_source+"bellContourExponent"},
-        #{name:"p_chamber",source:own+"referenceChamberPressurePa"},
-        #{name:"gamma",source:own+"gasGamma"},
-        #{name:"characteristic_velocity_mps",source:own+"characteristicVelocityMps"}] {
-        let value=_source_number(model,item.source);
-        if value==() || value<=0.0 {return plan_error("missing nozzle datum: "+item.source);}
-        ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:nozzle,name:"inputs:"+item.name}});
-        ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"inputs:"+item.name,
-            type_name:"double",value:value.to_string()}});
-    }
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:nozzle,name:"outputs:ideal_exhaust_velocity_mps",
-        type_name:"float",value:"0.0"}});
-    #{ok:true,kind:"griffin_main_engine_feed",engine_count:count,ops:ops,no_op:false}
-}
-
-fn apply_griffin_main_engine_component(doc, edit_target, root, name, parent_gen) {
-    let plan=griffin_main_engine_component_plan(doc,edit_target,root,name);
-    if !plan.ok {return plan;}
-    let command=assembly_edit::batch(doc,"Install Griffin engine component "+name,plan.ops,parent_gen);
-    #{ok:command.ok!=false,kind:plan.kind,command:command,engine:name}
-}
-
-fn apply_griffin_main_engine(doc, edit_target, root, name, parent_gen) {
-    let plan=griffin_main_engine_plan(doc,edit_target,root,name);
-    if !plan.ok {return plan;}
-    let command=assembly_edit::batch(doc,"Model Griffin main engine "+name,plan.ops,parent_gen);
-    #{ok:command.ok!=false,kind:plan.kind,command:command,engine:name}
-}
-
-fn apply_griffin_main_engine_feed(doc, edit_target, root, parent_gen) {
-    let plan=griffin_main_engine_feed_plan(doc,edit_target,root);
-    if !plan.ok {return plan;}
-    let command=assembly_edit::batch(doc,"Feed Griffin main engines from shared tanks",plan.ops,parent_gen);
-    #{ok:command.ok!=false,kind:plan.kind,command:command,engine_count:plan.engine_count}
-}
-
-// Guidance converts acceleration demand with the nominal cluster rating. It is
-// a configuration fact, not a live sum, so an engine failure is not signalled
-// to guidance; closed-loop guidance and RCS absorb it.
-fn griffin_guidance_thrust_rating_plan(doc, edit_target, gnc) {
-    let rating=griffin_spec::_typed_model_number(
-        "GriffinPropulsionRequirements::GriffinPressureFedStudy::guidanceClusterThrustN");
-    if rating==() || rating<=0.0 {return plan_error("guidance cluster thrust rating unavailable");}
-    if !_exists(doc,gnc) {return plan_error(gnc+": guidance prim has not composed");}
-    #{ok:true,kind:"griffin_guidance_thrust_rating",rating:rating,no_op:false,ops:[
-        #{RemoveAttribute:#{edit_target:edit_target,path:gnc,name:"inputs:max_thrust"}},
-        #{SetAttribute:#{edit_target:edit_target,path:gnc,name:"inputs:max_thrust",
-            type_name:"float",value:rating.to_string()}}]}
-}
-
-fn apply_griffin_guidance_thrust_rating(doc, edit_target, gnc, parent_gen) {
-    let plan=griffin_guidance_thrust_rating_plan(doc,edit_target,gnc);
-    if !plan.ok {return plan;}
-    let command=assembly_edit::batch(doc,"Use nominal Griffin cluster thrust rating",plan.ops,parent_gen);
-    #{ok:command.ok!=false,kind:plan.kind,command:command,rating:plan.rating}
-}
+// These plans use the generic assembly_builder and assembly_edit tools to
+// journal typed component, geometry and material operations. Propulsion and
+// electrical/thermal assembly belong to their domain builders; dimensions
+// and installed identities come from the typed SysML and USD sources.
 
 // Size reconstruction plans consume the canonical typed source. These are
 // explicit collision/presentation proxies; see requirements/griffin-size-evidence.md.
@@ -463,7 +33,7 @@ fn griffin_body_collision_component_plan(doc, edit_target, root) {
     let profile = griffin_spec::visual_outer_body_profile_coordinates();
     if !vec3_is_native(dims) || dims.x <= 0.0 || dims.y <= 0.0
         || dims.z <= 0.0 || profile.len() != 8 {
-        return plan_error("body collision reconstruction needs positive typed dimensions and octagon");
+        return support::plan_error("griffin_visual_component_assembly", "body collision reconstruction needs positive typed dimensions and octagon");
     }
     // Five inscribed boxes avoid an invisible collider outside the visual
     // octagon. They omit the diagonal triangular wedges, an explicit proxy
@@ -480,8 +50,8 @@ fn griffin_body_collision_component_plan(doc, edit_target, root) {
     let ops=[];
     for spec in specs {
         let path=root+"/"+spec.name;
-        let record=_component_query(doc,path);
-        if !record.ok || record.type_name != "Cube" {return plan_error(path+": expected existing collision Cube");}
+        let record=support::component_query(doc,path);
+        if !record.ok || record.type_name != "Cube" {return support::plan_error("griffin_visual_component_assembly", path+": expected existing collision Cube");}
         for op in _resize_cube_ops(edit_target,path,spec.size,spec.center,1.0) {ops.push(op);}
     }
     #{ok:true,ops:ops}
@@ -495,7 +65,7 @@ fn _solar_station_ops(doc, edit_target, root, index) {
     let q = griffin_spec::component_solar_orientation(index);
     if index < 0 || index >= names.len() || positions.len() != names.len()
         || widths.len() != names.len() || nominal_width == () || nominal_width <= 0.0
-        || !quat_is_valid(q) { return plan_error("solar station source incomplete"); }
+        || !quat_is_valid(q) { return support::plan_error("griffin_visual_component_assembly", "solar station source incomplete"); }
     let path = root + "/" + names[index];
     let ops = [#{SetTranslate: #{edit_target: edit_target, path: path, value: vec3_array(positions[index])}},
         #{SetScale: #{edit_target: edit_target, path: path, value: [widths[index]/nominal_width,1.0,1.0]}},
@@ -519,7 +89,7 @@ fn griffin_solar_station_plan(doc, edit_target, root, index) {
     let path = root + "/" + griffin_spec::solar_array_names()[index];
     let current = assembly_builder::composed_query(doc,
         #{path: path, children: false, attrs: ["xformOp:rotateXYZ"]});
-    if !query_ok(current) || current.type_name != "Xform" { return plan_error("solar station must exist"); }
+    if !support::query_ok(current) || current.type_name != "Xform" { return support::plan_error("griffin_visual_component_assembly", "solar station must exist"); }
     if current.attrs["xformOp:rotateXYZ"] != () {
         plan.ops.push(#{RemoveAttribute: #{edit_target: edit_target, path: path, name: "xformOp:rotateXYZ"}});
     }
@@ -529,7 +99,7 @@ fn griffin_solar_station_plan(doc, edit_target, root, index) {
 fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
     let plan=#{ok:true,ops:[]};
     let layout=griffin_spec::solar_installed_cell_layout(index);
-    if layout==() {return plan_error("installed solar field cannot fit the source module");}
+    if layout==() {return support::plan_error("griffin_visual_component_assembly", "installed solar field cannot fit the source module");}
     let cw=layout.local_cell_width_m;let sx=layout.scale_x;
     let color=sysml_requirements::model().value("GriffinSolarRequirements::GriffinSolarArrayAssembly::substrateDisplayColor");
     if group=="frame" {
@@ -565,7 +135,7 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
     }
     if group=="cleanup" {
         let current=assembly_builder::composed_query(doc,#{path:path,children:true,attrs:[]});
-        if !query_ok(current) {return plan_error("solar cleanup cannot inspect component");}
+        if !support::query_ok(current) {return support::plan_error("griffin_visual_component_assembly", "solar cleanup cannot inspect component");}
         for child in current.children {
             let child_path=if string_is(child) {child} else {child.path};
             if child_path!=() && child_path.contains("/CellDivider") {
@@ -585,16 +155,16 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
             for rail_index in 0..rails.len() {
                 if rails[rail_index]==mounts[index*2+endpoint] {local=qrot(quat_inverse(q),rail_positions[rail_index]+bus-station);break;}
             }
-            if local==() {return plan_error("solar bus attachment datum unavailable");}
+            if local==() {return support::plan_error("griffin_visual_component_assembly", "solar bus attachment datum unavailable");}
             let side=if endpoint==0 {"NegativeX"} else {"PositiveX"};let sign=if endpoint==0 {-1.0} else {1.0};
             let rail_x=local.x/sx;let panel_x=sign*griffin_spec::solar_panel_frame_width_m()/2.0;
             let bracket=_component_cube_visual_ops(doc,edit_target,path,"MountBracket"+side,[rail_x,local.y,local.z],(),
                 [_solar_number("mountBracketWidthM")/sx,_solar_number("mountBracketThicknessM"),_solar_number("mountBracketDepthM")],[0.12,0.15,0.20]);
             if !bracket.ok {return bracket;}for op in bracket.ops {plan.ops.push(op);}
             let dy=-local.y;let dx=panel_x-rail_x;
-            if dy<=0.0 {return plan_error("solar frame must sit above its rear bracket in local Y");}
+            if dy<=0.0 {return support::plan_error("griffin_visual_component_assembly", "solar frame must sit above its rear bracket in local Y");}
             let overlap=_solar_number("minimumMountOverlapM");
-            if overlap<=0.0 {return plan_error("solar link seating overlap must be positive");}
+            if overlap<=0.0 {return support::plan_error("griffin_visual_component_assembly", "solar link seating overlap must be positive");}
             let length=sqrt(dx*dx+dy*dy)+2.0*overlap;
             let angle=-atan(dx/dy)*180.0/acos(-1.0);
             let link=_component_cube_visual_ops(doc,edit_target,path,"MountLink"+side,[(panel_x+rail_x)/2.0,local.y/2.0,local.z],
@@ -605,13 +175,9 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
     plan
 }
 
-fn _color3_literal(color) {
-    "("+color[0].to_string()+", "+color[1].to_string()+", "+color[2].to_string()+")"
-}
-
 fn griffin_solar_cell_row_plan(doc,edit_target,path,index,row) {
     let layout=griffin_spec::solar_installed_cell_layout(index);
-    if layout==() {return plan_error("solar row source unavailable");}
+    if layout==() {return support::plan_error("griffin_visual_component_assembly", "solar row source unavailable");}
     let geometry=griffin_geometry::solar_cell_row_geometry(layout,row,
         _solar_number("cellOffsetYM")+_solar_number("cellThicknessM"),_solar_number("cellThicknessM"),
         _solar_number("cellGapM"),_solar_number("cellCornerClipM"));
@@ -624,37 +190,37 @@ fn griffin_solar_cell_row_plan(doc,edit_target,path,index,row) {
 }
 
 fn griffin_solar_component_group_plan(doc,edit_target,root,index,group) {
-    if !solar_edit_groups().contains(group) {return plan_error("unknown solar edit group");}
+    if !solar_edit_groups().contains(group) {return support::plan_error("griffin_visual_component_assembly", "unknown solar edit group");}
     _solar_panel_geometry_ops(doc,edit_target,root,index,group)
 }
 
 // Shared blanket material template, consumed by the engine-bay component.
 fn griffin_bus_finish_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("Griffin appearance source unavailable");}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "Griffin appearance source unavailable");}
     let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let material=root+"/Looks/ExteriorPanels";let shader=material+"/Surface";
     let surface=assembly_builder::composed_query(doc,#{path:shader,attrs:[]});
-    if !query_ok(surface) || surface.type_name!="Shader" {
-        return plan_error("Griffin exterior material network is missing: "+shader);
+    if !support::query_ok(surface) || surface.type_name!="Shader" {
+        return support::plan_error("griffin_visual_component_assembly", "Griffin exterior material network is missing: "+shader);
     }
     let ops=[];
     for input in griffin_spec::bus_foil_shader_inputs() {
         let value=model.value(prefix+input.source);
         let literal=();
         if input.color {
-            if !array_is(value) || value.len()!=3 {return plan_error("Bus foil color missing: "+input.source);}
+            if !array_is(value) || value.len()!=3 {return support::plan_error("griffin_visual_component_assembly", "Bus foil color missing: "+input.source);}
             for c in value {
                 let channel=f64_from(c);
                 if channel==() || !griffin_geometry::scalar_is_finite(channel) || channel<0.0 || channel>1.0 {
-                    return plan_error("Bus foil color invalid: "+input.source);
+                    return support::plan_error("griffin_visual_component_assembly", "Bus foil color invalid: "+input.source);
                 }
             }
             literal=assembly_builder::_mesh_tuple3(value,"bus foil color");
         } else {
             let number=f64_from(value);
             if number==() || !griffin_geometry::scalar_is_finite(number) || number<=0.0
-                || (input.normalized && number>1.0) {return plan_error("Bus foil control invalid: "+input.source);}
+                || (input.normalized && number>1.0) {return support::plan_error("griffin_visual_component_assembly", "Bus foil control invalid: "+input.source);}
             literal=number.to_string();
         }
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:"inputs:"+input.input,
@@ -673,17 +239,17 @@ fn griffin_bus_finish_plan(doc, edit_target, root) {
 // Keep the exposed frame distinct from blanket faces. Geometry is unchanged.
 fn griffin_bus_frame_finish_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("Griffin frame appearance source unavailable");}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "Griffin frame appearance source unavailable");}
     let prefix="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let rails=_griffin_model_enum_names(model,"frameRails");
-    if rails.len()!=8 {return plan_error("Griffin frame rail inventory unavailable");}
+    if rails.len()!=8 {return support::plan_error("griffin_visual_component_assembly", "Griffin frame rail inventory unavailable");}
     let paths=[root+"/PerimeterFrame",root+"/TopDeckOctagon",
         root+"/RoverPayloadDeck",root+"/LowerServiceSkirtOctagon"];
     for name in ["PayloadSupportPort","PayloadSupportStarboard","PayloadSupportForward","PayloadSupportRear",
         "PayloadCrossmemberAcrossX","PayloadCrossmemberAcrossZ"] {paths.push(root+"/"+name);}
     for name in rails {paths.push(root+"/"+name);}
     let color=model.value(prefix+"silverDisplayColor");
-    if !array_is(color) || color.len()!=3 {return plan_error("Griffin silver frame palette missing");}
+    if !array_is(color) || color.len()!=3 {return support::plan_error("griffin_visual_component_assembly", "Griffin silver frame palette missing");}
     let plan=griffin_surface_material_plan(doc,edit_target,root,"FrameMetal",paths,color,
         f64_from(model.value(prefix+"silverMetallic")),f64_from(model.value(prefix+"silverRoughness")));
     if !plan.ok {return plan;}
@@ -711,12 +277,12 @@ fn flip_chassis_size_plan(doc, edit_target, root) {
     let dz=f64_from(model.value(prefix+"payloadDeckWidthM"));
     let dc=f64_from(model.value(prefix+"payloadDeckCenterYM"));
     if x==() || y==() || z==() || ex==() || ey==() || ez==() || cy==()
-        || dx==() || dy==() || dz==() || dc==() {return plan_error("FLIP chassis source incomplete");}
+        || dx==() || dy==() || dz==() || dc==() {return support::plan_error("griffin_visual_component_assembly", "FLIP chassis source incomplete");}
     let ops=[];
     let details=model.value("FlipChassisRequirements::FlipChassisComponent::detailDimensions");
     let centers=model.value("FlipChassisRequirements::FlipChassisComponent::detailCenters");
     if !array_is(details) || !array_is(centers) || details.len()!=2 || centers.len()!=2 {
-        return plan_error("FLIP bumper/service-panel typed datums missing");
+        return support::plan_error("griffin_visual_component_assembly", "FLIP bumper/service-panel typed datums missing");
     }
     let specs=[#{name:"LowerFrame",size:[x,y,z],center:[0.0,0.0,0.0]},
         #{name:"WhiteEquipmentBox",size:[ex,ey,ez],center:[0.0,cy,0.0]},
@@ -725,8 +291,8 @@ fn flip_chassis_size_plan(doc, edit_target, root) {
         #{name:"ServicePanel",size:vec3_array(details[1]),center:vec3_array(centers[1])}];
     for spec in specs {
         let path=root+"/"+spec.name;
-        let record=_component_query(doc,path);
-        if !record.ok || record.type_name!="Cube" {return plan_error(path+": expected existing chassis Cube");}
+        let record=support::component_query(doc,path);
+        if !record.ok || record.type_name!="Cube" {return support::plan_error("griffin_visual_component_assembly", path+": expected existing chassis Cube");}
         for op in _resize_cube_ops(edit_target,path,spec.size,spec.center,2.0) {ops.push(op);}
     }
     #{ok:true,ops:ops}
@@ -736,8 +302,8 @@ fn flip_chassis_size_plan(doc, edit_target, root) {
 // change the vehicle's control owner or physical root.
 fn griffin_camera_focus_plan(doc, edit_target, root) {
     let height=griffin_spec::lander_camera_focus_height_m();
-    let controls=_component_query(doc,root+"/Controls");
-    if height==() || !controls.ok {return plan_error("Griffin camera source or control surface missing");}
+    let controls=support::component_query(doc,root+"/Controls");
+    if height==() || !controls.ok {return support::plan_error("griffin_visual_component_assembly", "Griffin camera source or control surface missing");}
     #{ok:true,ops:[#{SetAttribute:#{edit_target:edit_target,path:root+"/Controls",
         name:"lunco:cameraFollowHeight",type_name:"double",value:height.to_string()}}]}
 }
@@ -747,19 +313,19 @@ fn flip_vehicle_size_plan(doc, edit_target, root) {
     let xs=griffin_spec::rover_wheel_station_x();
     let ys=griffin_spec::rover_wheel_station_y();
     let zs=griffin_spec::rover_wheel_station_z();
-    if names.len()!=4 || xs.len()!=4 || ys.len()!=4 || zs.len()!=4 {return plan_error("FLIP station source incomplete");}
+    if names.len()!=4 || xs.len()!=4 || ys.len()!=4 || zs.len()!=4 {return support::plan_error("griffin_visual_component_assembly", "FLIP station source incomplete");}
     let width=griffin_spec::_sysml_attribute("wheelWidthM");
     let radius=griffin_spec::rover_wheel_radius_m();
     let rest=griffin_spec::_sysml_attribute("suspensionRestLengthM");
     if width==() || radius==() || rest==() || width<=0.0 || radius<=0.0 || rest<=0.0 {
-        return plan_error("FLIP wheel dimensions are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "FLIP wheel dimensions are incomplete");
     }
     let ops=[];
     for i in 0..names.len() {
         let carrier=root+"/Suspension_"+names[i];
         let wheel=carrier+"/Wheel_"+names[i];
-        let record=_component_query(doc,wheel);
-        if !record.ok || record.type_name!="Cylinder" {return plan_error(wheel+": wheel Cylinder missing");}
+        let record=support::component_query(doc,wheel);
+        if !record.ok || record.type_name!="Cylinder" {return support::plan_error("griffin_visual_component_assembly", wheel+": wheel Cylinder missing");}
         ops.push(#{SetTranslate:#{edit_target:edit_target,path:carrier,value:[xs[i],ys[i],zs[i]]}});
         for a in [#{name:"axis",type_name:"token",value:"\"Z\""},
             #{name:"radius",type_name:"double",value:radius.to_string()},
@@ -775,14 +341,14 @@ fn flip_vehicle_size_plan(doc, edit_target, root) {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:carrier+"/Visual",name:"xformOpOrder",type_name:"token[]",value:"[\"xformOp:rotateXYZ\"]"}});
     }
     let offset=griffin_spec::_sysml_attribute("forwardYawOffsetRad");
-    if offset==() {return plan_error("FLIP travel heading source missing");}
+    if offset==() {return support::plan_error("griffin_visual_component_assembly", "FLIP travel heading source missing");}
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:root+"/Drivetrain",
         name:"parameters:forward_yaw_offset",type_name:"double",value:offset.to_string()}});
     let surface = flip_wheel_surface_plan(doc, edit_target, root);
     if !surface.ok { return surface; }
     for op in surface.ops { ops.push(op); }
     let solar=sysml_requirements::model().value("FlipRequirements::FlipRover::solarArrayMount");
-    if solar.len()!=3 {return plan_error("FLIP solar mount incomplete");}
+    if solar.len()!=3 {return support::plan_error("griffin_visual_component_assembly", "FLIP solar mount incomplete");}
     ops.push(#{SetTranslate:#{edit_target:edit_target,path:root+"/SolarArray",value:solar}});
     #{ok:true,ops:ops}
 }
@@ -794,7 +360,7 @@ fn remove_legacy_semantic_string_ops(doc, edit_target, path) {
             "lunco:mass_properties_status"],
         children: false});
     let ops = [];
-    if query_ok(record) && record.attrs != () {
+    if support::query_ok(record) && record.attrs != () {
         for name in ["lunco:collider:geometrySource", "lunco:requirement",
             "lunco:component_role", "lunco:mechanism",
             "lunco:mass_properties_status"] {
@@ -805,33 +371,6 @@ fn remove_legacy_semantic_string_ops(doc, edit_target, path) {
         }
     }
     ops
-}
-
-// Use the shared composed query for both source-component documents and
-// referenced children in an assembly.  The Editor inspection facade is
-// selection-oriented and can return an empty type for a composed descendant;
-// that made a valid referenced Cube look like a malformed component to the
-// visual builder.  The composed query is the authoritative typed readback at
-// this planning boundary and remains generation-addressed by the document id.
-fn _component_query(doc, path) {
-    let record = assembly_builder::composed_query(doc, #{path: path, children: false});
-    if !query_ok(record) {
-        return #{ok: false, error: path + ": component prim is missing"};
-    }
-    #{ok: true, type_name: record.type_name, path: path}
-}
-
-fn plan_error(message) {
-    #{ ok: false, kind: "griffin_visual_component_assembly", error: message, ops: [] }
-}
-
-fn absolute_root(root) {
-    root != () && string_is(root) && root != ""
-        && root.starts_with("/") && !(root.ends_with("/") && root != "/")
-}
-
-fn component_asset(relative) {
-    "twin://" + twin_source_identity() + "/components/" + relative
 }
 
 fn _sysml_number(report, name) {
@@ -988,7 +527,7 @@ fn _mount_frame_ops(doc, edit_target, spec, root) {
     let path = spec.parent + "/" + spec.name;
     let existing = assembly_builder::composed_query(doc, #{path: path, children: false});
     let ops = [];
-    if !query_ok(existing) {
+    if !support::query_ok(existing) {
         let frame = assembly_builder::frame_plan(edit_target, spec.parent,
             spec.name, spec.translation, spec.rotation, ());
         if !frame.ok { return frame; }
@@ -1073,9 +612,9 @@ fn align_visual_mounts(doc, edit_target, root, parent_gen) {
 fn _component_plan(doc, edit_target, spec) {
     let path = spec.parent + "/" + spec.name;
     let existing = assembly_builder::composed_query(doc, #{path: path, children: false});
-    if query_ok(existing) {
+    if support::query_ok(existing) {
         if existing.type_name != spec.type_name {
-            return plan_error(path + ": existing visual component has type "
+            return support::plan_error("griffin_visual_component_assembly", path + ": existing visual component has type "
                 + existing.type_name + ", expected " + spec.type_name);
         }
         let placement = #{ok: true, ops: []};
@@ -1097,11 +636,11 @@ fn _component_plan(doc, edit_target, spec) {
 /// Reference each maintained vehicle once. Child component geometry belongs
 /// to the vehicle source assets, never to this combined review scene.
 fn visual_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("visual_component_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "visual_component_plan requires a document, edit target, and absolute root");
     }
     let specs = visual_component_specs(root);
-    if specs.len() != 2 { return plan_error("typed visual review stations are missing"); }
+    if specs.len() != 2 { return support::plan_error("griffin_visual_component_assembly", "typed visual review stations are missing"); }
     let ops = [];
     let paths = [];
     let existing = [];
@@ -1135,64 +674,13 @@ fn apply_visual_components(doc, edit_target, root, parent_gen) {
       command: command}
 }
 
-/// Derive the battery model's Ah input from the SysML energy rating and
-/// nominal bus voltage, and project the rated solar output limit from its
-/// source-owned value. This is the explicit boundary between energy/power
-/// requirements and the generic storage/PV component interfaces.
-fn flip_electrical_model_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("flip_electrical_model_plan requires a document, edit target, and absolute root");
-    }
-    let energy_kwh = griffin_spec::rover_battery_energy_kwh();
-    let nominal_voltage_v = griffin_spec::rover_battery_nominal_voltage_v();
-    let capacity_ah = griffin_spec::rover_battery_capacity_ah();
-    let peak_power_w = griffin_spec::rover_solar_peak_power_w();
-    if energy_kwh == () || nominal_voltage_v == () || capacity_ah == () || peak_power_w == ()
-        || nominal_voltage_v <= 0.0 || energy_kwh <= 0.0 || peak_power_w <= 0.0 {
-        return plan_error("FLIP electrical requirement values are missing or invalid");
-    }
-    for path in [root + "/Battery", root + "/SolarArray"] {
-        if !_component_query(doc, path).ok {
-            return plan_error("FLIP electrical component is missing at " + path);
-        }
-    }
-    let battery = root + "/Battery";
-    let solar = root + "/SolarArray";
-    let ops = [
-        #{SetAttribute: #{edit_target: edit_target, path: battery,
-            name: "inputs:voltage_nom", type_name: "float",
-            value: nominal_voltage_v.to_string()}},
-        #{SetAttribute: #{edit_target: edit_target, path: battery,
-            name: "inputs:capacity", type_name: "float",
-            value: capacity_ah.to_string()}},
-        #{SetAttribute: #{edit_target: edit_target, path: solar,
-            name: "inputs:peak_power_rating_w", type_name: "float",
-            value: peak_power_w.to_string()}}
-    ];
-    #{ok: true, kind: "flip_electrical_model", root: root,
-      battery_energy_kwh: energy_kwh, battery_nominal_voltage_v: nominal_voltage_v,
-      battery_capacity_ah: capacity_ah, solar_peak_power_w: peak_power_w,
-      paths: [battery, solar], ops: ops, no_op: false}
-}
-
-fn apply_flip_electrical_model(doc, edit_target, root, parent_gen) {
-    let plan = flip_electrical_model_plan(doc, edit_target, root);
-    if !plan.ok { return plan; }
-    let command = assembly_edit::batch(doc, "Realize FLIP source-owned electrical ratings",
-        plan.ops, parent_gen);
-    #{ok: command.ok != false, kind: plan.kind, root: root,
-      battery_energy_kwh: plan.battery_energy_kwh,
-      battery_capacity_ah: plan.battery_capacity_ah,
-      solar_peak_power_w: plan.solar_peak_power_w, command: command}
-}
-
 // Route markers are part of the mission interface, not a second navigation
 // implementation. Their ordered names and XYZ datums come from the primary
 // Griffin SysML package; this Editor plan only projects those values into the
 // existing route-data Xforms and journals the result in the scene layer.
 fn surface_route_marker_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("surface_route_marker_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "surface_route_marker_plan requires a document, edit target, and absolute root");
     }
     let names = griffin_spec::surface_route_marker_names();
     let xs = griffin_spec::surface_route_marker_x();
@@ -1200,15 +688,15 @@ fn surface_route_marker_plan(doc, edit_target, root) {
     let zs = griffin_spec::surface_route_marker_z();
     if names.len() == 0 || xs.len() != names.len() || ys.len() != names.len()
         || zs.len() != names.len() {
-        return plan_error("surface route marker SysML arrays must have equal non-zero cardinality");
+        return support::plan_error("griffin_visual_component_assembly", "surface route marker SysML arrays must have equal non-zero cardinality");
     }
     let ops = [];
     let paths = [];
     for index in 0..names.len() {
         let path = root + "/" + names[index];
         let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
-        if !query_ok(prim) || prim.type_name != "Xform" {
-            return plan_error(path + ": route datum must already be an existing Xform");
+        if !support::query_ok(prim) || prim.type_name != "Xform" {
+            return support::plan_error("griffin_visual_component_assembly", path + ": route datum must already be an existing Xform");
         }
         let placement = assembly_builder::place_plan(edit_target, path,
             [xs[index], ys[index], zs[index]], (), ());
@@ -1270,7 +758,7 @@ fn _isolated_griffin_specs(root) {
             };
             let scale = if record.scale_enabled { vec3_array(record.pose.scale) } else { () };
             specs.push(#{parent: parent, name: record.name, type_name: "Xform",
-                asset: component_asset(record.asset),
+                asset: support::component_asset(record.asset),
                 translation: vec3_array(record.pose.translation),
                 rotation: vec3_array(quat_to_euler_xyz_deg(record.pose.rotation)), scale: scale});
         }
@@ -1303,7 +791,7 @@ fn _isolated_mount_ops(doc, edit_target, root) {
     if socket_x == () || socket_y == () || socket_z == ()
         || hinge_x == () || hinge_y == () || hinge_z == ()
         || port_angle_rad == () || starboard_angle_rad == () {
-        return plan_error("ramp SysML mount datums are missing");
+        return support::plan_error("griffin_visual_component_assembly", "ramp SysML mount datums are missing");
     }
     let port_angle = port_angle_rad * 180.0 / 3.141592653589793;
     let starboard_angle = starboard_angle_rad * 180.0 / 3.141592653589793;
@@ -1348,11 +836,11 @@ fn _isolated_mount_ops(doc, edit_target, root) {
 }
 
 fn isolated_griffin_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("isolated_griffin_component_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "isolated_griffin_component_plan requires a document, edit target, and absolute root");
     }
     let specs = _isolated_griffin_specs(root);
-    if specs.len() == 0 { return plan_error("SysML Griffin visual parameters are missing"); }
+    if specs.len() == 0 { return support::plan_error("griffin_visual_component_assembly", "SysML Griffin visual parameters are missing"); }
     let ops = [];
     let paths = [];
     for spec in specs {
@@ -1363,7 +851,7 @@ fn isolated_griffin_component_plan(doc, edit_target, root) {
     }
     for detail in _isolated_griffin_detail_specs(root) {
         let path = detail.parent + "/" + detail.name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
+        if support::query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
         let result = _detail_ops(edit_target, detail);
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
@@ -1412,8 +900,8 @@ fn _detail_matches_task(detail, task) {
 }
 
 fn isolated_griffin_component_plan_for(doc, edit_target, root, task) {
-    if doc == () || edit_target == () || !absolute_root(root) || task == () || task == "" {
-        return plan_error("isolated_griffin_component_plan_for requires a document, edit target, root, and task");
+    if doc == () || edit_target == () || !support::absolute_root(root) || task == () || task == "" {
+        return support::plan_error("griffin_visual_component_assembly", "isolated_griffin_component_plan_for requires a document, edit target, root, and task");
     }
     // Ramps own a hinge frame, mount relation, and deployment contract.  Keep
     // that behavior in the dedicated one-ramp planner instead of partially
@@ -1423,13 +911,13 @@ fn isolated_griffin_component_plan_for(doc, edit_target, root, task) {
             if task == "EgressRampPort" { "port" } else { "starboard" });
     }
     let specs = _isolated_griffin_specs(root);
-    if specs.len() == 0 { return plan_error("SysML Griffin visual parameters are missing"); }
+    if specs.len() == 0 { return support::plan_error("griffin_visual_component_assembly", "SysML Griffin visual parameters are missing"); }
     let selected = [];
     for spec in specs {
         if _griffin_task_match(spec.name, task) { selected.push(spec); }
     }
     if selected.len() == 0 {
-        return plan_error("unknown Griffin visual component task ");
+        return support::plan_error("griffin_visual_component_assembly", "unknown Griffin visual component task ");
     }
     let ops = [];
     let paths = [];
@@ -1442,7 +930,7 @@ fn isolated_griffin_component_plan_for(doc, edit_target, root, task) {
     for detail in _isolated_griffin_detail_specs(root) {
         if !_detail_matches_task(detail, task) { continue; }
         let path = detail.parent + "/" + detail.name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
+        if support::query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) { continue; }
         let detail_plan = _detail_ops(edit_target, detail);
         if !detail_plan.ok { return detail_plan; }
         for op in detail_plan.ops { ops.push(op); }
@@ -1472,7 +960,7 @@ fn _griffin_payload_frame_geometry(model, width, depth, thickness) {
     if profile == () || profile.len() != 8 || wheel_z.len() != 4
         || track_width == () || track_width <= 0.0 || thickness <= 0.0
         || width <= 2.0 * thickness || depth <= 2.0 * thickness {
-        return plan_error("Payload support frame requires source profile, wheel stations and track width");
+        return support::plan_error("griffin_visual_component_assembly", "Payload support frame requires source profile, wheel stations and track width");
     }
     let stations = [];
     for point in profile {
@@ -1484,7 +972,7 @@ fn _griffin_payload_frame_geometry(model, width, depth, thickness) {
     let members = [perimeter];
     let tracks = [];
     for z in wheel_z { if !tracks.contains(z) { tracks.push(z); } }
-    if tracks.len() != 2 { return plan_error("FLIP support requires exactly two wheel track stations"); }
+    if tracks.len() != 2 { return support::plan_error("griffin_visual_component_assembly", "FLIP support requires exactly two wheel track stations"); }
     for z in tracks {
         // Clip both rail edges to the octagonal footprint, rather than
         // letting a rectangular rail project beyond a clipped corner.
@@ -1501,7 +989,7 @@ fn _griffin_payload_frame_geometry(model, width, depth, thickness) {
                     if x > 0.0 && (span == () || x < span) { span = x; }
                 }
             }
-            if span == () { return plan_error("Wheel support rail is outside the adapter footprint"); }
+            if span == () { return support::plan_error("griffin_visual_component_assembly", "Wheel support rail is outside the adapter footprint"); }
             if span < half_span { half_span = span; }
         }
         let rail = griffin_geometry::rectangular_prism_geometry(vec3(0.0,0.0,z),
@@ -1522,12 +1010,12 @@ fn _griffin_payload_frame_geometry(model, width, depth, thickness) {
 fn _outer_body_prism_geometry(width, depth, height) {
     let source_profile = griffin_spec::visual_outer_body_profile_coordinates();
     if source_profile.len() != 8 || width <= 0.0 || depth <= 0.0 || height <= 0.0 {
-        return plan_error("outer-body prism requires eight typed SysML profile points and positive dimensions");
+        return support::plan_error("griffin_visual_component_assembly", "outer-body prism requires eight typed SysML profile points and positive dimensions");
     }
     let profile = [];
     for point in source_profile {
         if !vec2_is_native(point) || !vec2_is_finite(point) {
-            return plan_error("outer-body profile coordinates must project as finite native Vec2 values");
+            return support::plan_error("griffin_visual_component_assembly", "outer-body profile coordinates must project as finite native Vec2 values");
         }
         profile.push(vec2(point.x * width / 2.0, point.y * depth / 2.0));
     }
@@ -1589,7 +1077,7 @@ fn physical_top_deck_collider_geometry() {
         || width <= 0.0 || depth <= 0.0 || thickness <= 0.0
         || bus_mount == () || !vec3_is_native(bus_mount)
         || deck_center_y == () || !griffin_geometry::scalar_is_finite(deck_center_y) {
-        return plan_error("source-owned top-deck dimensions and COM-frame mount are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "source-owned top-deck dimensions and COM-frame mount are incomplete");
     }
     let ring_center_y = bus_mount.y + deck_center_y;
     let ring_beams = [];
@@ -1598,7 +1086,7 @@ fn physical_top_deck_collider_geometry() {
         let b = profile[(index + 1) % profile.len()];
         if !vec2_is_native(a) || !vec2_is_native(b)
             || !vec2_is_finite(a) || !vec2_is_finite(b) {
-            return plan_error("top-deck perimeter requires finite native SysML profile points");
+            return support::plan_error("griffin_visual_component_assembly", "top-deck perimeter requires finite native SysML profile points");
         }
         let ax = a.x * width / 2.0;
         let az = a.y * depth / 2.0;
@@ -1607,7 +1095,7 @@ fn physical_top_deck_collider_geometry() {
         let dx = bx - ax;
         let dz = bz - az;
         let edge_length = (dx * dx + dz * dz).sqrt();
-        if edge_length <= 0.0 { return plan_error("top-deck profile has a zero-length edge"); }
+        if edge_length <= 0.0 { return support::plan_error("griffin_visual_component_assembly", "top-deck profile has a zero-length edge"); }
         // Cube local X rotates toward -Z about Y. atan(dz/dx) is sufficient
         // for an undirected beam axis; reversing an edge leaves the same box.
         let rotation_y = if dx.abs() <= 1.0e-12 { -90.0 }
@@ -1624,7 +1112,7 @@ fn physical_top_deck_collider_geometry() {
     if adapter_width == () || adapter_depth == () || adapter_thickness == ()
         || adapter_center_y == () || adapter_width <= 0.0
         || adapter_depth <= 0.0 || adapter_thickness <= 0.0 {
-        return plan_error("source-owned rover payload adapter dimensions are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "source-owned rover payload adapter dimensions are incomplete");
     }
     let adapter_mesh = _griffin_payload_frame_geometry(sysml_requirements::model(),
         adapter_width, adapter_depth, adapter_thickness);
@@ -1644,8 +1132,8 @@ fn physical_top_deck_collider_geometry() {
 /// rover platform. The obsolete solid convex hull is removed before any new
 /// colliders are authored through the typed Editor journal.
 fn physical_top_deck_collider_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("physical_top_deck_collider_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "physical_top_deck_collider_plan requires a document, edit target, and absolute root");
     }
     let geometry = physical_top_deck_collider_geometry();
     if geometry.ok != true { return geometry; }
@@ -1653,31 +1141,31 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
     let perimeter_source_path = root + "/Bus/TopDeckOctagon";
     let perimeter_source = assembly_builder::composed_query(doc,
         #{path: perimeter_source_path, children: false});
-    if !query_ok(perimeter_source) || perimeter_source.type_name != "Mesh" {
-        return plan_error(perimeter_source_path + ": source-owned octagonal deck mesh is required");
+    if !support::query_ok(perimeter_source) || perimeter_source.type_name != "Mesh" {
+        return support::plan_error("griffin_visual_component_assembly", perimeter_source_path + ": source-owned octagonal deck mesh is required");
     }
     let adapter_source_path = root + "/Bus/RoverPayloadDeck";
     let adapter_source = assembly_builder::composed_query(doc,
         #{path: adapter_source_path, children: false});
-    if !query_ok(adapter_source) || adapter_source.type_name != "Mesh" {
-        return plan_error(adapter_source_path + ": source-owned rover platform mesh is required");
+    if !support::query_ok(adapter_source) || adapter_source.type_name != "Mesh" {
+        return support::plan_error("griffin_visual_component_assembly", adapter_source_path + ": source-owned rover platform mesh is required");
     }
     for op in remove_legacy_semantic_string_ops(doc, edit_target,
         root + "/PayloadAdapter") {
         ops.push(op);
     }
     let legacy_path = root + "/TopDeckCollisionProxy";
-    if query_ok(assembly_builder::composed_query(doc,
+    if support::query_ok(assembly_builder::composed_query(doc,
         #{path: legacy_path, children: false})) {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
     }
     for beam in geometry.ring_beams {
         let path = root + "/" + beam.name;
         let current = assembly_builder::composed_query(doc, #{path: path, children: false});
-        if query_ok(current) && current.type_name != "Cube" {
-            return plan_error(path + ": octagonal ring collider must be a Cube");
+        if support::query_ok(current) && current.type_name != "Cube" {
+            return support::plan_error("griffin_visual_component_assembly", path + ": octagonal ring collider must be a Cube");
         }
-        if !query_ok(current) {
+        if !support::query_ok(current) {
             let shape = assembly_builder::cube_shape_plan(edit_target, root,
                 beam.name, 1.0, beam.dimensions, true);
             if !shape.ok { return shape; }
@@ -1710,10 +1198,10 @@ fn physical_top_deck_collider_plan(doc, edit_target, root) {
     let adapter_path = root + "/RoverPayloadDeckCollider";
     let adapter_current = assembly_builder::composed_query(doc,
         #{path: adapter_path, children: false});
-    if query_ok(adapter_current) && adapter_current.type_name != "Mesh" {
-        return plan_error(adapter_path + ": rover platform collider must be a Mesh");
+    if support::query_ok(adapter_current) && adapter_current.type_name != "Mesh" {
+        return support::plan_error("griffin_visual_component_assembly", adapter_path + ": rover platform collider must be a Mesh");
     }
-    if !query_ok(adapter_current) {
+    if !support::query_ok(adapter_current) {
         let shape = assembly_builder::mesh_shape_plan(edit_target, root,
             "RoverPayloadDeckCollider", geometry.adapter_points,
             geometry.adapter_face_counts, geometry.adapter_face_indices,
@@ -1836,7 +1324,7 @@ fn physical_top_deck_collider_observation(doc, root) {
         children: true, collision_geometry: true};
     if doc != () { request.doc_id = doc; }
     let batch = query("QueryUsdPrims", request);
-    if !query_ok(batch) || batch.records == () || batch.records.len() != paths.len() {
+    if !support::query_ok(batch) || batch.records == () || batch.records.len() != paths.len() {
         return #{ok: false, state: "unavailable",
             detail: "one-snapshot Avian collider geometry is unavailable"};
     }
@@ -1921,7 +1409,7 @@ fn physical_top_deck_collider_observation(doc, root) {
     let adapter = records[expected.ring_beams.len()];
     if adapter.doc_id != doc_id || adapter.document_generation != document_generation
         || adapter.stage_generation != stage_generation { all_beams_match = false; }
-    let adapter_matches = query_ok(adapter) && adapter.type_name == "Mesh"
+    let adapter_matches = support::query_ok(adapter) && adapter.type_name == "Mesh"
         && adapter.attrs != ()
         && adapter.attrs["faceVertexCounts"] == expected.adapter_face_counts
         && adapter.attrs["faceVertexIndices"] == expected.adapter_face_indices;
@@ -1944,17 +1432,17 @@ fn physical_top_deck_collider_observation(doc, root) {
             if adapter_point_deviation > tolerance { adapter_matches = false; }
         }
     }
-    let adapter_collides = query_ok(adapter) && adapter.attrs != ()
+    let adapter_collides = support::query_ok(adapter) && adapter.attrs != ()
         && adapter.attrs["physics:collisionEnabled"] == true
         && adapter.attrs["physics:approximation"] == "convexHull"
         && adapter.collision_geometry != ()
         && adapter.collision_geometry.approximation == "convexHull"
         && adapter.api_schemas.contains("PhysicsCollisionAPI")
         && adapter.api_schemas.contains("PhysicsMeshCollisionAPI");
-    let adapter_hidden = query_ok(adapter) && adapter.attrs != ()
+    let adapter_hidden = support::query_ok(adapter) && adapter.attrs != ()
         && adapter.attrs["visibility"] == "invisible"
         && adapter.attrs["purpose"] == "proxy";
-    let adapter_targets = if query_ok(adapter) && adapter.relationships != () {
+    let adapter_targets = if support::query_ok(adapter) && adapter.relationships != () {
         adapter.relationships["lunco:collider:geometrySource"]
     } else { () };
     let adapter_source_linked = adapter_targets != ()
@@ -2022,7 +1510,7 @@ fn physical_landing_leg_pad_geometry() {
        ["GriffinLandingLegRequirements::Verify_GriffinLandingLegRequirements",
         "Griffin1Requirements::Verify_GriffinSurfaceOperations"]);
     if source.ok != true {
-        return plan_error("SysML landing-leg geometry source is unavailable");
+        return support::plan_error("griffin_visual_component_assembly", "SysML landing-leg geometry source is unavailable");
     }
     let body_children = sysml_requirement_checks::source_enum_identifiers(source, visual + "bodyChildNames");
     let radius = sysml_requirements::number(source, visual + "footPadRadiusM");
@@ -2062,7 +1550,7 @@ fn physical_landing_leg_pad_geometry() {
         || max_force <= 0.0 || pose_tolerance <= 0.0
         || station_tolerance <= 0.0 || rotation_tolerance <= 0.0;
     if geometry_missing || spring_missing || station_missing || values_invalid {
-        return plan_error("SysML landing-leg geometry, spring, or touchdown datums are incomplete or invalid");
+        return support::plan_error("griffin_visual_component_assembly", "SysML landing-leg geometry, spring, or touchdown datums are incomplete or invalid");
     }
     #{ok: true, radius_m: radius, height_m: height, center_y_m: center_y,
       body_children: body_children,
@@ -2077,8 +1565,8 @@ fn physical_landing_leg_pad_geometry() {
 }
 
 fn physical_landing_leg_pad_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("physical_landing_leg_pad_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "physical_landing_leg_pad_plan requires a document, edit target, and absolute root");
     }
     let geometry = physical_landing_leg_pad_geometry();
     if geometry.ok != true { return geometry; }
@@ -2089,8 +1577,8 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         let leg_path = root + "/Leg" + suffixes[index];
         let leg = assembly_builder::composed_query(doc,
             #{path: leg_path, children: false, schemas:true});
-        if !query_ok(leg) || leg.type_name != "Xform" {
-            return plan_error(leg_path + ": dynamics leg body is missing or is not an Xform");
+        if !support::query_ok(leg) || leg.type_name != "Xform" {
+            return support::plan_error("griffin_visual_component_assembly", leg_path + ": dynamics leg body is missing or is not an Xform");
         }
         // This relation targeted the enclosing compound body, so it filtered
         // no distinct rigid body. Clear its target list through the typed USD
@@ -2116,7 +1604,7 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         let spring_target = 0.0;
         spring_targets.push(spring_target);
         let joint = assembly_builder::composed_query(doc, #{path:joint_path,children:false});
-        if query_ok(joint) {
+        if support::query_ok(joint) {
             for attribute in [
                 #{name: "physics:lowerLimit", value: geometry.spring_lower_limit_m},
                 #{name: "physics:upperLimit", value: geometry.spring_upper_limit_m},
@@ -2131,23 +1619,23 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
                     value: attribute.value.to_string()}});
             }
         } else {
-            return plan_error(joint_path + ": physical suspension joint is missing");
+            return support::plan_error("griffin_visual_component_assembly", joint_path + ": physical suspension joint is missing");
         }
 
         let visual_path = leg_path + "/LandingLegVisual";
         let visual_prim = assembly_builder::composed_query(doc,
             #{path: visual_path, children: false});
-        if !query_ok(visual_prim) || visual_prim.type_name != "Xform" {
-            return plan_error(visual_path + ": compose the source visual component before deriving its contact geometry");
+        if !support::query_ok(visual_prim) || visual_prim.type_name != "Xform" {
+            return support::plan_error("griffin_visual_component_assembly", visual_path + ": compose the source visual component before deriving its contact geometry");
         }
         let source_path = visual_path + "/FootPad";
         let source_shape = assembly_builder::composed_query(doc,
             #{path: source_path, children: false,
               attrs: ["radius", "height", "axis", "xformOp:translate",
                 "xformOp:rotateXYZ", "xformOp:scale", "physics:collisionEnabled"]});
-        if !query_ok(source_shape) || source_shape.type_name != "Cylinder"
+        if !support::query_ok(source_shape) || source_shape.type_name != "Cylinder"
             || source_shape.attrs == () {
-            return plan_error(source_path + ": source FootPad must compose as a typed Cylinder before collider derivation");
+            return support::plan_error("griffin_visual_component_assembly", source_path + ": source FootPad must compose as a typed Cylinder before collider derivation");
         }
         let source_radius = source_shape.attrs["radius"];
         let source_height = source_shape.attrs["height"];
@@ -2156,14 +1644,14 @@ fn physical_landing_leg_pad_plan(doc, edit_target, root) {
         if source_radius == () || source_height == () || source_axis != "Y"
             || source_translation == () || source_translation.len() != 3
             || source_shape.attrs["physics:collisionEnabled"] != false {
-            return plan_error(source_path + ": source FootPad dimensions, Y axis, transform, and render-only ownership are required");
+            return support::plan_error("griffin_visual_component_assembly", source_path + ": source FootPad dimensions, Y axis, transform, and render-only ownership are required");
         }
         if (source_radius - geometry.radius_m).abs() > geometry.tolerance_m
             || (source_height - geometry.height_m).abs() > geometry.tolerance_m
             || (source_translation[1] - geometry.center_y_m).abs() > geometry.tolerance_m
             || source_translation[0].abs() > geometry.tolerance_m
             || source_translation[2].abs() > geometry.tolerance_m {
-            return plan_error(source_path + ": composed visual pad no longer matches its SysML geometry datums");
+            return support::plan_error("griffin_visual_component_assembly", source_path + ": composed visual pad no longer matches its SysML geometry datums");
         }
         let proxy=assembly_builder::collision_proxy_plan(doc,edit_target,
             source_path,visual_path+"/FootPadCollider");
@@ -2300,7 +1788,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
     let bus_frame = assembly_builder::composed_query(doc,
         #{path: root + "/Bus/PerimeterFrame", children: false,
           geometry_bounds: true});
-    if !query_ok(bus_frame) {
+    if !support::query_ok(bus_frame) {
         let reason = if bus_frame.error == () {
             "composed bus-frame prim query failed"
         } else { bus_frame.error };
@@ -2326,7 +1814,7 @@ fn physical_landing_leg_pad_observation(doc, root) {
         geometry_bounds: true, collision_geometry: true};
     if doc != () { pad_request.doc_id = doc; }
     let pad_batch = query("QueryUsdPrims", pad_request);
-    if !query_ok(pad_batch) || pad_batch.records == ()
+    if !support::query_ok(pad_batch) || pad_batch.records == ()
         || pad_batch.records.len() != pad_paths.len() {
         let reason = if pad_batch == () || pad_batch.error == () {
             "one-snapshot Avian pad geometry query did not return all visual/proxy pairs"
@@ -2383,9 +1871,9 @@ fn physical_landing_leg_pad_observation(doc, root) {
         let joint = assembly_builder::composed_query(doc, #{path: joint_path,
             children: false, attrs: ["physics:localPos0", "physics:localPos1"],
             rels: ["physics:body0", "physics:body1"]});
-        if !query_ok(collider) || !query_ok(visual)
-            || !query_ok(mount_arm) || !query_ok(mount_axle)
-            || !query_ok(leg_pose) || !query_ok(joint)
+        if !support::query_ok(collider) || !support::query_ok(visual)
+            || !support::query_ok(mount_arm) || !support::query_ok(mount_axle)
+            || !support::query_ok(leg_pose) || !support::query_ok(joint)
             || mount_arm.geometry_bounds == () || mount_axle.geometry_bounds == ()
             || collider.attrs == () || visual.attrs == ()
             || leg_pose.attrs == () || leg_pose.children == () {
@@ -2727,7 +2215,7 @@ fn apply_landing_gear_colliders(doc, edit_target, root, parent_gen) {
 fn _tank_support_annulus_geometry(center, inner_radius, outer_radius, thickness, segments) {
     if center == () || !vec3_is_native(center) || inner_radius <= 0.0
         || outer_radius <= inner_radius || thickness <= 0.0 || segments < 8 {
-        return plan_error("tank-support annulus needs a typed center, ordered radii, positive stock, and at least eight segments");
+        return support::plan_error("griffin_visual_component_assembly", "tank-support annulus needs a typed center, ordered radii, positive stock, and at least eight segments");
     }
     let points = [];
     let half = thickness / 2.0;
@@ -2771,9 +2259,9 @@ fn _tank_support_annulus_mesh_plan(doc, edit_target, parent, name, center,
         outer_radius, thickness, segments);
     if geometry.ok == false { return geometry; }
     let ops = [];
-    if query_ok(current) {
+    if support::query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": tank opening collar must resolve to Mesh");
+            return support::plan_error("griffin_visual_component_assembly", path + ": tank opening collar must resolve to Mesh");
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
@@ -2804,8 +2292,8 @@ fn _tank_support_annulus_mesh_plan(doc, edit_target, parent, name, center,
 }
 
 fn tank_support_perimeter_plan(doc, edit_target, root, plane_index) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("tank_support_perimeter_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "tank_support_perimeter_plan requires a document, edit target, and absolute root");
     }
     let profile = griffin_spec::visual_outer_body_profile_coordinates();
     let radius = griffin_spec::visual_tank_support_perimeter_radius_m();
@@ -2813,17 +2301,17 @@ fn tank_support_perimeter_plan(doc, edit_target, root, plane_index) {
     let planes = griffin_spec::visual_tank_support_planes_m();
     if profile.len() != 8 || radius <= 0.0 || section <= 0.0
         || planes.len() != 3 || plane_index < 0 || plane_index >= planes.len() {
-        return plan_error("typed Griffin tank-support perimeter datums or plane index are invalid");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin tank-support perimeter datums or plane index are invalid");
     }
     for plane_y in planes {
         if !griffin_geometry::scalar_is_finite(plane_y) {
-            return plan_error("tank-support ring planes must be finite SysML scalars");
+            return support::plan_error("griffin_visual_component_assembly", "tank-support ring planes must be finite SysML scalars");
         }
     }
     let parent = root + "/TankSupportPlate";
     let assembly = assembly_builder::composed_query(doc, #{path: parent, children: false});
-    if !query_ok(assembly) || assembly.type_name != "Xform" {
-        return plan_error(parent + ": source-owned support assembly must be an Xform");
+    if !support::query_ok(assembly) || assembly.type_name != "Xform" {
+        return support::plan_error("griffin_visual_component_assembly", parent + ": source-owned support assembly must be an Xform");
     }
     let names = ["TankSupportPerimeterUpper", "TankSupportPerimeter",
         "TankSupportPerimeterLower"];
@@ -2833,8 +2321,8 @@ fn tank_support_perimeter_plan(doc, edit_target, root, plane_index) {
 }
 
 fn tank_support_opening_plan(doc, edit_target, root, tank_index, plane_index) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("tank_support_opening_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "tank_support_opening_plan requires a document, edit target, and absolute root");
     }
     let tanks = griffin_spec::component_tank_stations();
     let names = griffin_spec::propellant_tank_names();
@@ -2847,7 +2335,7 @@ fn tank_support_opening_plan(doc, edit_target, root, tank_index, plane_index) {
         || tank_index < 0 || tank_index >= tanks.len()
         || plane_index < 0 || plane_index >= planes.len()
         || inner <= 0.0 || outer <= inner || section <= 0.0 || segments < 8 {
-        return plan_error("typed Griffin annular-opening datums or indices are invalid");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin annular-opening datums or indices are invalid");
     }
     let suffix = if plane_index == 0 { "Upper" }
         else if plane_index == 1 { "" } else { "Lower" };
@@ -2867,13 +2355,13 @@ fn griffin_tank_frame_links_plan(doc, edit_target, root, plane_index) {
     let section=griffin_spec::visual_tank_support_perimeter_section_m();
     let planes=griffin_spec::visual_tank_support_planes_m();
     if profile.len()!=8 || stations.len()!=8 || planes.len()!=3 || plane_index<0 || plane_index>=3
-        || radius<=0.0 || section<=0.0 {return plan_error("tank-to-frame link datums incomplete");}
+        || radius<=0.0 || section<=0.0 {return support::plan_error("griffin_visual_component_assembly", "tank-to-frame link datums incomplete");}
     let ops=[];let color=griffin_spec::visual_tank_support_display_color();
     for i in 0..8 {
         let a=vec3(profile[i].x*radius,planes[plane_index],-profile[i].y*radius);
         let b=vec3(stations[i].x,planes[plane_index],stations[i].z);
         let delta=b-a;let length=vlen(delta);let center=(a+b)*0.5;
-        if length<=section || delta.x==0.0 {return plan_error("tank-to-frame link has no radial span");}
+        if length<=section || delta.x==0.0 {return support::plan_error("griffin_visual_component_assembly", "tank-to-frame link has no radial span");}
         let angle=-atan(delta.z/delta.x)*180.0/acos(-1.0);
         let p=_component_cube_visual_ops(doc,edit_target,root+"/TankSupportPlate",
             "FrameLink"+plane_index+"_"+i,vec3_array(center),[0.0,angle,0.0],
@@ -2887,11 +2375,11 @@ fn _octagonal_open_frame_mesh_plan(doc, edit_target, root, name, stations, ring_
     let path = root + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let geometry = griffin_geometry::perimeter_beam_geometry(stations, ring_y, section);
-    if geometry.ok == false { return plan_error(geometry.error); }
+    if geometry.ok == false { return support::plan_error("griffin_visual_component_assembly", geometry.error); }
     let ops = [];
-    if query_ok(current) {
+    if support::query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": open octagonal frame must resolve to a Mesh");
+            return support::plan_error("griffin_visual_component_assembly", path + ": open octagonal frame must resolve to a Mesh");
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
@@ -2933,11 +2421,11 @@ fn _octagonal_perimeter_mesh_plan(doc, edit_target, root, name,
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let geometry = griffin_geometry::tank_support_perimeter_geometry(
         profile, radius, center_y, section);
-    if geometry.ok == false { return plan_error(geometry.error); }
+    if geometry.ok == false { return support::plan_error("griffin_visual_component_assembly", geometry.error); }
     let ops = [];
-    if query_ok(current) {
+    if support::query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": octagonal perimeter must resolve to Mesh");
+            return support::plan_error("griffin_visual_component_assembly", path + ": octagonal perimeter must resolve to Mesh");
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
@@ -2975,9 +2463,9 @@ fn _central_bucket_mesh_plan(doc, edit_target, root, name, profile, segments, co
     let path = root + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let ops = [];
-    if query_ok(current) {
+    if support::query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": central bucket must resolve to Mesh");
+            return support::plan_error("griffin_visual_component_assembly", path + ": central bucket must resolve to Mesh");
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
@@ -3007,7 +2495,7 @@ fn refine_griffin_bus_component_plan(doc, edit_target, root) {
 // referenced children remain owned by their component document, so callers
 // must open that document and submit refine_griffin_bus_component_plan there.
 fn refine_griffin_bus_plan(doc, edit_target, root) {
-    if !absolute_root(root) { return plan_error("refine_griffin_bus_plan requires an absolute root"); }
+    if !support::absolute_root(root) { return support::plan_error("griffin_visual_component_assembly", "refine_griffin_bus_plan requires an absolute root"); }
     refine_griffin_bus_component_plan(doc, edit_target, root + "/Bus")
 }
 
@@ -3026,9 +2514,9 @@ fn _bus_detail_cube_plan(doc, edit_target, parent, name, size, scale, translatio
     let path = parent + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let ops = [];
-    if query_ok(current) {
+    if support::query_ok(current) {
         if current.type_name != "Cube" {
-            return plan_error(path + ": bus equipment detail must resolve to Cube, got " + current.type_name);
+            return support::plan_error("griffin_visual_component_assembly", path + ": bus equipment detail must resolve to Cube, got " + current.type_name);
         }
         let placement = assembly_builder::place_plan(edit_target, path,
             translation, (), scale);
@@ -3061,9 +2549,9 @@ fn _outer_body_component_mesh_plan(doc, edit_target, parent, name, width, depth,
     let geometry = _outer_body_prism_geometry(width, depth, height);
     if !geometry.ok { return geometry; }
     let ops = [];
-    if query_ok(current) {
+    if support::query_ok(current) {
         if current.type_name != "Mesh" {
-            return plan_error(path + ": typed outer-body profile must resolve to Mesh, got " + current.type_name);
+            return support::plan_error("griffin_visual_component_assembly", path + ": typed outer-body profile must resolve to Mesh, got " + current.type_name);
         }
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
     } else {
@@ -3096,8 +2584,8 @@ fn _outer_body_component_mesh_plan(doc, edit_target, parent, name, width, depth,
 }
 
 fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("octagonal_griffin_bus_component_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "octagonal_griffin_bus_component_plan requires a document, edit target, and absolute root");
     }
     // Fetch one revision-pinned model and pass typed values through the plan.
     // Calling the convenience getters below repeatedly re-opened the complete
@@ -3128,7 +2616,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         || deck_depth == () || deck_thickness == () || deck_y == () || skirt_width == ()
         || skirt_depth == () || skirt_height == () || skirt_y == ()
         || ring_section == () || frame_color.len() != 3 {
-        return plan_error("typed Griffin octagonal body datums are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin octagonal body datums are incomplete");
     }
     let ops = [];
     let rail_names = _griffin_model_enum_names(model, "frameRails");
@@ -3140,10 +2628,10 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
     if rail_names.len() != 8 || rail_stations.len() != rail_names.len()
         || ring_y.len() != 2
         || ring_section <= 0.0 || rail_width == () || rail_length == () || rail_depth == () {
-        return plan_error("typed Griffin open-frame station vectors or member dimensions are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin open-frame station vectors or member dimensions are incomplete");
     }
     let rail_color = _griffin_model_number_list(model, "silverDisplayColor");
-    if rail_color.len() != 3 { return plan_error("typed Griffin rail color is incomplete"); }
+    if rail_color.len() != 3 { return support::plan_error("griffin_visual_component_assembly", "typed Griffin rail color is incomplete"); }
     let frame = _octagonal_open_frame_mesh_plan(doc, edit_target, root,
         body_name, rail_stations, ring_y, ring_section,
         frame_color);
@@ -3151,13 +2639,13 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
     for op in frame.ops { ops.push(op); }
     if (deck_width - deck_depth).abs() > 1.0e-6
         || (skirt_width - skirt_depth).abs() > 1.0e-6 {
-        return plan_error("Griffin deck and service-skirt plan profiles must remain octagonal and square");
+        return support::plan_error("griffin_visual_component_assembly", "Griffin deck and service-skirt plan profiles must remain octagonal and square");
     }
     let profile = _griffin_model_value(model, "outerBodyProfileCoordinates");
     let deck_color = _griffin_model_number_list(model, "silverDisplayColor");
     let skirt_color = _griffin_model_number_list(model, "silverDisplayColor");
     if profile == () || profile.len() != 8 || deck_color.len() != 3 || skirt_color.len() != 3 {
-        return plan_error("typed Griffin octagonal profile or display colors are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin octagonal profile or display colors are incomplete");
     }
     // Profile geometry expands from its centerline by half the member
     // section. SysML dimensions describe the outer envelope, so subtract that
@@ -3205,7 +2693,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         || lower_outer_top <= lower_inner_top || lower_inner_bottom <= 0.0
         || lower_outer_bottom <= lower_inner_bottom || lower_bottom_y >= lower_top_y
         || tank_support_color.len() != 3 {
-        return plan_error("typed Griffin upper/lower bucket profile datums are incomplete or invalid");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin upper/lower bucket profile datums are incomplete or invalid");
     }
     for bucket in [
         #{name: "UpperCentralBucket",
@@ -3239,7 +2727,7 @@ fn octagonal_griffin_bus_component_plan(doc, edit_target, root) {
         || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_thickness <= 0.0
         || adapter_center_y - bus_mount_y - adapter_thickness / 2.0
             < upper_top_y - 1.0e-6 {
-        return plan_error("FLIP payload-adapter footprint or upper-bucket contact datum is invalid");
+        return support::plan_error("griffin_visual_component_assembly", "FLIP payload-adapter footprint or upper-bucket contact datum is invalid");
     }
     let adapter = _griffin_payload_frame_component_plan(doc, edit_target, root, model);
     if !adapter.ok { return adapter; }
@@ -3264,7 +2752,7 @@ fn _native_vec3_axis(value, axis) {
 // wheel footprint from SysML wheel stations, so a matching scene transform
 // alone cannot pass when the adapter geometry or source wheel envelope drifts.
 fn flip_payload_interface_observation(doc, root) {
-    if doc == () || !absolute_root(root) {
+    if doc == () || !support::absolute_root(root) {
         return #{ok: false, state: "invalid", error: "payload observation requires a document and absolute scene root"};
     }
     let source = sysml_requirements::source();
@@ -3280,9 +2768,9 @@ fn flip_payload_interface_observation(doc, root) {
     let rover = assembly_builder::composed_query(doc, #{
         path: root + "/FLIP", children: false,
         attrs: ["xformOp:translate"]});
-    if !query_ok(adapter) || adapter.type_name != "Mesh" || adapter.attrs == ()
-        || !query_ok(bus) || bus.attrs == () || !query_ok(lander) || lander.attrs == ()
-        || !query_ok(rover) || rover.attrs == () {
+    if !support::query_ok(adapter) || adapter.type_name != "Mesh" || adapter.attrs == ()
+        || !support::query_ok(bus) || bus.attrs == () || !support::query_ok(lander) || lander.attrs == ()
+        || !support::query_ok(rover) || rover.attrs == () {
         return #{ok: false, state: "unavailable", error: "composed payload adapter or linked vehicle transforms are unavailable"};
     }
     let points = adapter.attrs["points"];
@@ -3368,19 +2856,19 @@ fn hosted_flip_interface_plan(doc, edit_target, lander, rover, joint) {
     let dimensions=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::payloadAdapterDimensions");
     let y=griffin_spec::_sysml_attribute("payloadAdapterCenterYM");
     let ys=griffin_spec::rover_wheel_station_y();let radius=griffin_spec::rover_wheel_radius_m();
-    if !query_ok(l) || !query_ok(r) || !vec3_is_native(dimensions) || y==() || ys.len()!=4 || radius==() {
-        return plan_error("hosted FLIP interface datums unavailable");
+    if !support::query_ok(l) || !support::query_ok(r) || !vec3_is_native(dimensions) || y==() || ys.len()!=4 || radius==() {
+        return support::plan_error("griffin_visual_component_assembly", "hosted FLIP interface datums unavailable");
     }
     let lt=l.attrs["xformOp:translate"];let rt=r.attrs["xformOp:translate"];
     if !array_is(lt) || !array_is(rt) || lt.len()!=3 || rt.len()!=3 || lt[0]!=rt[0] || lt[2]!=rt[2] {
-        return plan_error("hosted FLIP roots must share their horizontal station");
+        return support::plan_error("griffin_visual_component_assembly", "hosted FLIP roots must share their horizontal station");
     }
     let lowest=ys[0];for v in ys {lowest=min(lowest,v);}
     let deck=y+dimensions.y/2.0;let bottom=lowest-radius;
     let ops=[#{SetTranslate:#{edit_target:edit_target,path:rover,value:[rt[0],lt[1]+deck-bottom,rt[2]]}}];
     if joint!="" {
-        let j=_component_query(doc,joint);
-        if !j.ok || j.type_name!="PhysicsFixedJoint" {return plan_error("hosted FLIP dock unavailable");}
+        let j=support::component_query(doc,joint);
+        if !j.ok || j.type_name!="PhysicsFixedJoint" {return support::plan_error("griffin_visual_component_assembly", "hosted FLIP dock unavailable");}
         for a in [#{name:"physics:localPos0",v:[0.0,deck,0.0]},#{name:"physics:localPos1",v:[0.0,bottom,0.0]}] {
             ops.push(#{SetAttribute:#{edit_target:edit_target,path:joint,name:a.name,type_name:"point3f",value:assembly_edit::tuple3_literal(a.v)}});
         }
@@ -3393,8 +2881,8 @@ fn hosted_flip_interface_plan(doc, edit_target, lander, rover, joint) {
 // authored in the vehicle document, so their metric contract must be applied
 // against the same document through the typed Editor journal.
 fn refine_griffin_bus_assembly_rails_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_bus_assembly_rails_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "refine_griffin_bus_assembly_rails_plan requires a document, edit target, and absolute root");
     }
     let names = griffin_spec::visual_rail_names();
     let xs = griffin_spec::visual_rail_station_x();
@@ -3405,15 +2893,15 @@ fn refine_griffin_bus_assembly_rails_plan(doc, edit_target, root) {
     let depth = griffin_spec::visual_rail_depth_m();
     if names.len() == 0 || xs.len() != names.len() || ys.len() != names.len()
         || zs.len() != names.len() || width == () || length == () || depth == () {
-        return plan_error("bus assembly rail SysML arrays or dimensions are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "bus assembly rail SysML arrays or dimensions are incomplete");
     }
     let ops = [];
     let paths = [];
     for index in 0..names.len() {
         let path = root + "/" + names[index];
         let prim = assembly_builder::composed_query(doc, #{path: path, children: false});
-        if !query_ok(prim) || prim.type_name != "Cube" {
-            return plan_error(path + ": assembly rail must already be an existing Cube");
+        if !support::query_ok(prim) || prim.type_name != "Cube" {
+            return support::plan_error("griffin_visual_component_assembly", path + ": assembly rail must already be an existing Cube");
         }
         let placement = assembly_builder::place_plan(edit_target, path,
             [xs[index], ys[index], zs[index]], (), [width, length, depth]);
@@ -3444,7 +2932,7 @@ fn apply_refined_griffin_bus_assembly_rails(doc, edit_target, root, parent_gen) 
 fn _component_cube_visual_ops(doc, edit_target, parent, name,
     translation, rotation, scale, color) {
     let path = parent + "/" + name;
-    let existing = _component_query(doc, path);
+    let existing = support::component_query(doc, path);
     let ops = [];
     if !existing.ok {
         let shape = assembly_builder::cube_shape_plan(edit_target, parent,
@@ -3459,7 +2947,7 @@ fn _component_cube_visual_ops(doc, edit_target, parent, name,
         }
     } else {
         if existing.type_name != "Cube" {
-            return plan_error(path + ": expected Cube, got " + existing.type_name);
+            return support::plan_error("griffin_visual_component_assembly", path + ": expected Cube, got " + existing.type_name);
         }
         let placement = assembly_builder::place_plan(edit_target, path,
             translation, rotation, scale);
@@ -3487,7 +2975,7 @@ fn _component_cylinder_visual_ops(doc, edit_target, parent, name,
     let path = parent + "/" + name;
     let existing = assembly_builder::composed_query(doc,
         #{path: path, children: false, attrs: ["radius", "height", "extent"]});
-    let exists = query_ok(existing);
+    let exists = support::query_ok(existing);
     let ops = [];
     let scalar_type = "double";
     if exists {
@@ -3500,7 +2988,7 @@ fn _component_cylinder_visual_ops(doc, edit_target, parent, name,
         }
     }
     if exists && existing.type_name != "Cylinder" {
-        return plan_error(path + ": expected Cylinder, got " + existing.type_name);
+        return support::plan_error("griffin_visual_component_assembly", path + ": expected Cylinder, got " + existing.type_name);
     }
     if !exists {
         let shape = assembly_builder::cylinder_shape_plan_axis(edit_target,
@@ -3532,30 +3020,30 @@ fn _component_cylinder_visual_ops(doc, edit_target, parent, name,
 
 // Endpoint-owned three-member leg; source datums are the only geometry table.
 fn _leg_member_pose(upper, lower) {
-    if !vec3_is_native(upper) || !vec3_is_native(lower) {return plan_error("leg endpoints must be native Positions");}
+    if !vec3_is_native(upper) || !vec3_is_native(lower) {return support::plan_error("griffin_visual_component_assembly", "leg endpoints must be native Positions");}
     let dx=upper.x-lower.x;let dy=upper.y-lower.y;let dz=upper.z-lower.z;
     let h=(dx*dx+dy*dy+dz*dz).sqrt();
-    if !h.is_finite() || h<=0.0 || dy<=0.0 {return plan_error("leg member must rise from foot to mount");}
+    if !h.is_finite() || h<=0.0 || dy<=0.0 {return support::plan_error("griffin_visual_component_assembly", "leg member must rise from foot to mount");}
     let x=atan(dz/(dx*dx+dy*dy).sqrt())*180.0/acos(-1.0);
     let z=atan(-dx/dy)*180.0/acos(-1.0);
     #{ok:true,height:h,center:[(upper.x+lower.x)/2.0,(upper.y+lower.y)/2.0,(upper.z+lower.z)/2.0],rotation:[x,0.0,z]}
 }
 
 fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
-    if doc==() || edit_target==() || !absolute_root(root) {return plan_error("landing-leg refinement requires a document and absolute root");}
-    let component=_component_query(doc,root);
-    if !component.ok || component.type_name!="Xform" {return plan_error("landing-leg component root is missing");}
+    if doc==() || edit_target==() || !support::absolute_root(root) {return support::plan_error("griffin_visual_component_assembly", "landing-leg refinement requires a document and absolute root");}
+    let component=support::component_query(doc,root);
+    if !component.ok || component.type_name!="Xform" {return support::plan_error("griffin_visual_component_assembly", "landing-leg component root is missing");}
     let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("landing-leg source is not ready: "+model);}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "landing-leg source is not ready: "+model);}
     let own="GriffinLandingLegRequirements::GriffinLandingLegAssembly::";
     let visual="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let members=model.value(own+"loadMembers");
     let upper=model.value(own+"memberUpperAnchors");
     let lower=model.value(own+"memberLowerAnchor");
-    if !array_is(members) || !array_is(upper) || members.len()!=3 || upper.len()!=3 {return plan_error("landing leg needs exactly three source-owned load paths");}
+    if !array_is(members) || !array_is(upper) || members.len()!=3 || upper.len()!=3 {return support::plan_error("griffin_visual_component_assembly", "landing leg needs exactly three source-owned load paths");}
     let axle_axis=model.value(own+"mountAxleAxis");
     if !vec3_is_native(axle_axis) || axle_axis.x!=1.0 || axle_axis.y!=0.0 || axle_axis.z!=0.0 {
-        return plan_error("bus mount sleeve must follow the radial arm");
+        return support::plan_error("griffin_visual_component_assembly", "bus mount sleeve must follow the radial arm");
     }
     let clevis_width=f64_from(model.value(own+"mountClevisWidthM"));
     let clevis_height=f64_from(model.value(own+"mountClevisHeightM"));
@@ -3568,29 +3056,29 @@ fn refine_griffin_landing_leg_component_plan(doc, edit_target, root) {
     let bus_mount=model.value(visual+"bodyMount");
     let rings=model.value(visual+"frameRingCenterY");
     if !vec3_is_native(bus_mount) || !array_is(rings) || rings.len()!=2 {
-        return plan_error("leg lower-frame connection datums incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "leg lower-frame connection datums incomplete");
     }
     let frame_y=bus_mount.y+f64_from(rings[1])-stations[0].y;
     let arm_y=(frame_y+clevis_y)/2.0;
     let arm_height=(frame_y-clevis_y).abs()+clevis_height;
     if clevis_width==() || clevis_height==() || clevis_depth==() || clevis_y==() || section==() || overlap==()
-        || !vec3_is_native(body) || !array_is(stations) || stations.len()!=4 {return plan_error("leg mounting datums incomplete");}
+        || !vec3_is_native(body) || !array_is(stations) || stations.len()!=4 {return support::plan_error("griffin_visual_component_assembly", "leg mounting datums incomplete");}
     let radial=(stations[0].x*stations[0].x+stations[0].z*stations[0].z).sqrt();
     let profile=model.value(visual+"outerBodyProfileCoordinates");
-    if !array_is(profile) || profile.len()!=8 {return plan_error("octagonal leg mount profile missing");}
+    if !array_is(profile) || profile.len()!=8 {return support::plan_error("griffin_visual_component_assembly", "octagonal leg mount profile missing");}
     // Midpoint of the +X broad face. The reusable bracket seats at this
     // outer-frame datum rather than extending out to the foot/root radius.
     let bus_edge=body.x/2.0-section/2.0-overlap;
     let arm_end=radial+upper[0].x-clevis_width/2.0+overlap;
-    if arm_end<=bus_edge {return plan_error("leg mount cannot reach outer frame");}
+    if arm_end<=bus_edge {return support::plan_error("griffin_visual_component_assembly", "leg mount cannot reach outer frame");}
     let ops=[];
     for i in 0..members.len() {
-        if !sysml_enum_is(members[i]) {return plan_error("load member identity is not an enum");}
+        if !sysml_enum_is(members[i]) {return support::plan_error("griffin_visual_component_assembly", "load member identity is not an enum");}
         let name=members[i].literal;
         let pose=_leg_member_pose(upper[i],lower);
         if !pose.ok {return pose;}
         let radius=f64_from(model.value(own+if i==0 {"shockPistonRadiusM"} else {"strutRadiusM"}));
-        if radius==() || radius<=0.0 {return plan_error("leg tube radius missing");}
+        if radius==() || radius<=0.0 {return support::plan_error("griffin_visual_component_assembly", "leg tube radius missing");}
         let part=_component_cylinder_visual_ops(doc,edit_target,root,name,pose.center,pose.rotation,radius,pose.height,"Y",[0.62,0.65,0.69]);
         if !part.ok {return part;}
         for op in part.ops {ops.push(op);}
@@ -3633,18 +3121,18 @@ fn _solar_number(name) {
 fn _component_mesh_visual_ops(doc, edit_target, parent, name, geometry, color) {
     if geometry == () || geometry.ok != true || geometry.points == ()
         || geometry.face_counts == () || geometry.face_indices == () {
-        return plan_error("component mesh geometry is incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "component mesh geometry is incomplete");
     }
     let path = parent + "/" + name;
     let current = assembly_builder::composed_query(doc, #{path: path, children: false});
     let ops = [];
     let shape = ();
-    if query_ok(current) && current.type_name == "Mesh" {
+    if support::query_ok(current) && current.type_name == "Mesh" {
         ops.push(#{SetActive: #{edit_target: edit_target, path: path, active: true}});
         shape = assembly_builder::mesh_shape_update_plan(edit_target, path,
             geometry.points, geometry.face_counts, geometry.face_indices, color, false, ());
     } else {
-        if query_ok(current) {ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});}
+        if support::query_ok(current) {ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});}
         shape = assembly_builder::mesh_shape_plan(edit_target, parent, name,
             geometry.points, geometry.face_counts, geometry.face_indices, color, false);
     }
@@ -3806,12 +3294,12 @@ fn _tank_schema_prim_ready(doc, path, type_name) {
 }
 
 fn refine_griffin_tank_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_tank_component_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "refine_griffin_tank_component_plan requires a document, edit target, and absolute root");
     }
     let component = assembly_builder::composed_query(doc, #{path: root, children: false});
-    if !query_ok(component) || component.type_name != "Xform" {
-        return plan_error(root + ": propellant tank component root is missing or not Xform");
+    if !support::query_ok(component) || component.type_name != "Xform" {
+        return support::plan_error("griffin_visual_component_assembly", root + ": propellant tank component root is missing or not Xform");
     }
     let tank = "GriffinTankRequirements::GriffinPropellantTankAssembly::";
     let visual = "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
@@ -3838,7 +3326,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         visual + "lowerSkirtDimensions", visual + "tankStations", visual + "tankScale",
     ]);
     if source == () || source.ok != true {
-        return plan_error("tank authoring requires the mounted, selected SysML source facts");
+        return support::plan_error("griffin_visual_component_assembly", "tank authoring requires the mounted, selected SysML source facts");
     }
     let body_name = _tank_enum_name(source, "bodyName");
     let body_shape = _tank_enum_name(source, "bodyShape");
@@ -3925,20 +3413,20 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         || bracket_depth == () || bracket_offset == () || bracket_tilt == ();
     if missing_body || missing_end || missing_transitions || missing_interface_a
         || missing_interface_b || missing_interface_c || missing_brackets {
-        return plan_error("tank SysML double dimensions or axial datums are missing");
+        return support::plan_error("griffin_visual_component_assembly", "tank SysML double dimensions or axial datums are missing");
     }
     if tank_stations.len() != 4 || tank_scales.len() != 4 {
-        return plan_error("tank station and scale arrays must each contain four typed entries");
+        return support::plan_error("griffin_visual_component_assembly", "tank station and scale arrays must each contain four typed entries");
     }
     for index in 0..tank_stations.len() {
         if !vec3_is_native(tank_stations[index]) || !vec3_is_finite(tank_stations[index])
             || (tank_stations[index].y - tank_stations[0].y).abs() > 0.000001
             || (tank_scales[index] - tank_scales[0]).abs() > 0.000001 {
-            return plan_error("tank component instances must share one Y datum and uniform scale for a common authored cradle");
+            return support::plan_error("griffin_visual_component_assembly", "tank component instances must share one Y datum and uniform scale for a common authored cradle");
         }
     }
     if tank_scales[0] <= 0.0 {
-        return plan_error("tank mounting datum requires a positive uniform scale");
+        return support::plan_error("griffin_visual_component_assembly", "tank mounting datum requires a positive uniform scale");
     }
     let skirt_seat_y = body_mount.y + skirt_center.y - skirt_dimensions.y / 2.0;
     let cradle_top_local_y = (skirt_seat_y + minimum_skirt_clearance
@@ -3954,7 +3442,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let bracket_y = brace.center[1];
     let bracket_z = brace.center[2];
     if support_height <= 0.0 || !griffin_geometry::scalar_is_finite(support_height) {
-        return plan_error("derived tank support span does not connect the cradle pad to the lower neck");
+        return support::plan_error("griffin_visual_component_assembly", "derived tank support span does not connect the cradle pad to the lower neck");
     }
     let desired = [
         #{path: root + "/" + body_name, type_name: body_shape},
@@ -3977,7 +3465,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let existing_invalid = [];
     for item in desired {
         if !_tank_schema_prim_ready(doc, item.path, item.type_name) {
-            if query_ok(assembly_builder::composed_query(doc, #{path: item.path, children: false})) {
+            if support::query_ok(assembly_builder::composed_query(doc, #{path: item.path, children: false})) {
                 existing_invalid.push(item.path);
             }
         }
@@ -4000,7 +3488,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     let body_path = root + "/" + body_name;
     let body = _tank_sphere_schema_ops(edit_target, root, body_name, radius,
         body_center, [0.58, 0.43, 0.24],
-        !query_ok(assembly_builder::composed_query(doc, #{path: body_path, children: false})));
+        !support::query_ok(assembly_builder::composed_query(doc, #{path: body_path, children: false})));
     if !body.ok { return body; }
     for op in body.ops { ops.push(op); }
     for band in 0..band_names.len() {
@@ -4008,7 +3496,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         let ring = _tank_cylinder_schema_ops(edit_target, root, band_name,
             band_radii[band], band_height,
             [0.0, band_centers[band], 0.0], axis, [0.10, 0.12, 0.15],
-            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + band_name, children: false})));
+            !support::query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + band_name, children: false})));
         if !ring.ok { return ring; }
         for op in ring.ops { ops.push(op); }
     }
@@ -4027,7 +3515,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     for item in cylinders {
         let part = _tank_cylinder_schema_ops(edit_target, root, item.name,
             item.radius, item.height, [0.0, item.y, 0.0], axis, item.color,
-            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + item.name, children: false})));
+            !support::query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + item.name, children: false})));
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
     }
@@ -4038,7 +3526,7 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
         let part = _tank_cone_schema_ops(edit_target, root, cone.name,
             cone.radius1, cone.radius2, transition_height,
             [0.0, cone.y, 0.0], axis, [0.28, 0.18, 0.08],
-            !query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + cone.name, children: false})));
+            !support::query_ok(assembly_builder::composed_query(doc, #{path: root + "/" + cone.name, children: false})));
         if !part.ok { return part; }
         for op in part.ops { ops.push(op); }
         ops.push(#{SetAttribute: #{edit_target: edit_target, path: part.path,
@@ -4049,10 +3537,10 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     // from SysML so a tank can be reviewed in isolation and in the vehicle.
     let pad_path = root + "/" + cradle_pad_name;
     let pad = assembly_builder::composed_query(doc, #{path: pad_path, children: false});
-    if query_ok(pad) && pad.type_name != "Cube" {
-        return plan_error(pad_path + ": expected Cube, got " + pad.type_name);
+    if support::query_ok(pad) && pad.type_name != "Cube" {
+        return support::plan_error("griffin_visual_component_assembly", pad_path + ": expected Cube, got " + pad.type_name);
     }
-    if !query_ok(pad) {
+    if !support::query_ok(pad) {
         let shape = assembly_builder::cube_shape_plan(edit_target, root, cradle_pad_name, 1.0,
             [cradle_pad_width, cradle_pad_height, cradle_pad_depth], false);
         if !shape.ok { return shape; }
@@ -4064,8 +3552,8 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     for op in pad_placement.ops { ops.push(op); }
     let bracket_group = root + "/" + bracket_group_name;
     let group = assembly_builder::composed_query(doc, #{path: bracket_group, children: false});
-    if !query_ok(group) || group.type_name != "Xform" {
-        return plan_error(bracket_group + ": tank bracket group is missing or not Xform");
+    if !support::query_ok(group) || group.type_name != "Xform" {
+        return support::plan_error("griffin_visual_component_assembly", bracket_group + ": tank bracket group is missing or not Xform");
     }
     let bracket_specs = [
         #{name: bracket_names[0], translation: [bracket_x, bracket_y, bracket_z], rotation: [-bracket_tilt, 0.0, -bracket_tilt]},
@@ -4076,10 +3564,10 @@ fn refine_griffin_tank_component_plan(doc, edit_target, root) {
     for bracket in bracket_specs {
         let bracket_path = bracket_group + "/" + bracket.name;
         let existing = assembly_builder::composed_query(doc, #{path: bracket_path, children: false});
-        if query_ok(existing) && existing.type_name != "Cube" {
-            return plan_error(bracket_path + ": expected Cube, got " + existing.type_name);
+        if support::query_ok(existing) && existing.type_name != "Cube" {
+            return support::plan_error("griffin_visual_component_assembly", bracket_path + ": expected Cube, got " + existing.type_name);
         }
-        if !query_ok(existing) {
+        if !support::query_ok(existing) {
             let shape = assembly_builder::cube_shape_plan(edit_target, bracket_group, bracket.name, 1.0,
                 [bracket_width, bracket_length, bracket_depth], false);
             if !shape.ok { return shape; }
@@ -4112,8 +3600,8 @@ fn apply_refined_griffin_tank(doc, edit_target, root, parent_gen) {
 // profile.  All dimensions and the adapter datum come from the lander SysML
 // source, so this helper contains no second placement table.
 fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "refine_griffin_engine_skirt_plan requires a document, edit target, and absolute root");
     }
     let selected=[];
     for name in ["perimeterRailName","railLengthM","railHeightM","railWidthM","shellDepthM","shellBottomInsetM","adapterPlateName","adapterPlateWidthM","adapterPlateDepthM","adapterPlateHeightM","componentLocalCenterYM","adapterPlateCenterYM","thermalOpeningApothemM","thermalApronThicknessM","shellWallAllowanceM"] {
@@ -4121,7 +3609,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     }
     let source = sysml_requirements::source_with_attributes(selected);
     let name=griffin_spec::engine_skirt_identity("perimeterRailName");
-    if name==() || name=="" {return plan_error("engine-skirt requires a continuous rail identity");}
+    if name==() || name=="" {return support::plan_error("griffin_visual_component_assembly", "engine-skirt requires a continuous rail identity");}
     // The component owns its typed rail envelope. Avoid duplicated lander
     // geometry fields and source-path indirection.
     let width = _skirt_number(source, "railLengthM");
@@ -4144,36 +3632,36 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         || shell_depth <= 0.0 || shell_inset <= 0.0
         || shell_inset >= width / 2.0 || shell_inset >= depth / 2.0
         || adapter_width <= 0.0 || adapter_depth <= 0.0 || adapter_height <= 0.0 {
-        return plan_error("engine-skirt SysML metric dimensions are missing or invalid: "+[width,depth,height,section,shell_depth,shell_inset,local_center_y,adapter_name,adapter_width,adapter_depth,adapter_height,adapter_center_y].to_string());
+        return support::plan_error("griffin_visual_component_assembly", "engine-skirt SysML metric dimensions are missing or invalid: "+[width,depth,height,section,shell_depth,shell_inset,local_center_y,adapter_name,adapter_width,adapter_depth,adapter_height,adapter_center_y].to_string());
     }
     let opening = _skirt_number(source, "thermalOpeningApothemM");
     let apron_thickness = _skirt_number(source, "thermalApronThicknessM");
     let wall_allowance = _skirt_number(source, "shellWallAllowanceM");
     if opening==() || apron_thickness==() || wall_allowance==() || opening<=0.0
         || opening>=width/2.0-shell_inset-wall_allowance || apron_thickness<=0.0 || wall_allowance<=0.0 {
-        return plan_error("thermal opening and apron thickness must fit the engine bay");
+        return support::plan_error("griffin_visual_component_assembly", "thermal opening and apron thickness must fit the engine bay");
     }
     let profile=griffin_spec::visual_outer_body_profile_coordinates();
     let ring=griffin_geometry::octagonal_ring_geometry(profile,width/2.0,
         local_center_y,section,height);
-    if !ring.ok {return plan_error(ring.error);}
+    if !ring.ok {return support::plan_error("griffin_visual_component_assembly", ring.error);}
     let paths=[root+"/"+name];
     let ops=[];
     // Retire the square-frame topology through the document owner.
     for name in ["RailFront","RailRear","RailPort","RailStarboard"] {
         let path=root+"/"+name;
-        if query_ok(_component_query(doc,path)) {
+        if support::query_ok(support::component_query(doc,path)) {
             ops.push(#{RemovePrim:#{edit_target:edit_target,path:path}});
         }
     }
-    let existing=_component_query(doc,paths[0]);
-    if query_ok(existing) && existing.type_name!="Mesh" {
-        return plan_error(paths[0]+": expected Mesh");
+    let existing=support::component_query(doc,paths[0]);
+    if support::query_ok(existing) && existing.type_name!="Mesh" {
+        return support::plan_error("griffin_visual_component_assembly", paths[0]+": expected Mesh");
     }
     let rail=assembly_builder::mesh_shape_plan(edit_target,root,name,
         ring.points,ring.face_counts,ring.face_indices,[0.07,0.09,0.12],false);
     if !rail.ok {return rail;}
-    for op in rail.ops {if query_ok(existing) && op.AddPrim!=() {continue;} ops.push(op);}
+    for op in rail.ops {if support::query_ok(existing) && op.AddPrim!=() {continue;} ops.push(op);}
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:paths[0],
         name:"purpose",type_name:"token",value:"\"render\""}});
     let adapter_path = root + "/" + adapter_name;
@@ -4192,21 +3680,21 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     // The exhaust remains open. Outer/inner walls and real lip faces replace
     // the former zero-thickness sheet and double-sided rendering workaround.
     let shell_path = root + "/EngineSkirtShell";
-    let shell = _component_query(doc, shell_path);
-    if query_ok(shell) && shell.type_name != "Mesh" {
-        return plan_error(shell_path + ": existing skirt shell must be Mesh, got " + shell.type_name);
+    let shell = support::component_query(doc, shell_path);
+    if support::query_ok(shell) && shell.type_name != "Mesh" {
+        return support::plan_error("griffin_visual_component_assembly", shell_path + ": existing skirt shell must be Mesh, got " + shell.type_name);
     }
     {
         let y_top = local_center_y + height / 2.0;
         let y_bottom = y_top - shell_depth;
         let geometry=griffin_geometry::tapered_octagonal_sleeve_geometry(profile,
             width/2.0,width/2.0-shell_inset,y_top,y_bottom,wall_allowance);
-        if !geometry.ok {return plan_error(geometry.error);}
+        if !geometry.ok {return support::plan_error("griffin_visual_component_assembly", geometry.error);}
         let mesh = assembly_builder::mesh_shape_plan(edit_target, root,
             "EngineSkirtShell", geometry.points,geometry.face_counts,geometry.face_indices,
             [0.07, 0.09, 0.12], false);
         if !mesh.ok { return mesh; }
-        for op in mesh.ops { if query_ok(shell) && op.AddPrim != () {continue;} ops.push(op); }
+        for op in mesh.ops { if support::query_ok(shell) && op.AddPrim != () {continue;} ops.push(op); }
     }
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: shell_path,
         name: "doubleSided", type_name: "bool", value: "false"}});
@@ -4216,10 +3704,10 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         name: "physics:collisionEnabled", type_name: "bool", value: "false"}});
     // Reference the bus blanket network rather than copying its shader palette.
     let looks=root+"/Looks"; let blanket=looks+"/BayBlanket";
-    if !query_ok(_component_query(doc,looks)) {
+    if !support::query_ok(support::component_query(doc,looks)) {
         ops.push(#{AddPrim:#{edit_target:edit_target,path:looks,type_name:"Scope"}});
     }
-    if !query_ok(_component_query(doc,blanket)) {
+    if !support::query_ok(support::component_query(doc,blanket)) {
         ops.push(#{AddPrim:#{edit_target:edit_target,path:blanket,type_name:"Material"}});
     }
     ops.push(#{SetReferenceArcs:#{edit_target:edit_target,path:blanket,list_op:"Explicit",references:[
@@ -4235,16 +3723,16 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
     let apron_outer=width/2.0-shell_inset-wall_allowance;
     let apron=griffin_geometry::octagonal_ring_geometry(profile,apron_outer,
         lower+apron_thickness/2.0,apron_outer-opening,apron_thickness);
-    if !apron.ok {return plan_error(apron.error);}
+    if !apron.ok {return support::plan_error("griffin_visual_component_assembly", apron.error);}
     // Add liner stock outside the aperture, preserving its exhaust clearance.
     let liner=griffin_geometry::tapered_octagonal_sleeve_geometry(profile,
         opening+wall_allowance,opening+wall_allowance,
         local_center_y+height/2.0,lower+apron_thickness,wall_allowance);
-    if !liner.ok {return plan_error(liner.error);}
+    if !liner.ok {return support::plan_error("griffin_visual_component_assembly", liner.error);}
     for geometry in [#{name:"ThermalApron",points:apron.points,counts:apron.face_counts,indices:apron.face_indices},
         #{name:"ThermalLiner",points:liner.points,counts:liner.face_counts,indices:liner.face_indices}] {
         let path=root+"/"+geometry.name;
-        let exists=query_ok(_component_query(doc,path));
+        let exists=support::query_ok(support::component_query(doc,path));
         let mesh=assembly_builder::mesh_shape_plan(edit_target,root,geometry.name,
             geometry.points,geometry.counts,geometry.indices,[0.20,0.22,0.25],false);
         if !mesh.ok {return mesh;}
@@ -4270,7 +3758,7 @@ fn refine_griffin_engine_skirt_plan(doc, edit_target, root) {
         #{path: root, attrs: ["lunco:visual:component",
             "lunco:visual:datum", "lunco:visual:skirt_metric_envelope"],
           children: false});
-    if query_ok(component_record) && component_record.attrs != () {
+    if support::query_ok(component_record) && component_record.attrs != () {
         for name in ["lunco:visual:component", "lunco:visual:datum",
             "lunco:visual:skirt_metric_envelope"] {
             if component_record.attrs[name] != () {
@@ -4293,15 +3781,15 @@ fn apply_refined_griffin_engine_skirt(doc, edit_target, root, parent_gen) {
 }
 
 fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("refine_griffin_engine_bell_component_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "refine_griffin_engine_bell_component_plan requires a document, edit target, and absolute root");
     }
-    let component = _component_query(doc, root);
+    let component = support::component_query(doc, root);
     if !component.ok || component.type_name != "Xform" {
-        return plan_error(root + ": engine-bell component root is missing or not Xform");
+        return support::plan_error("griffin_visual_component_assembly", root + ": engine-bell component root is missing or not Xform");
     }
     let model = sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("engine source is not ready");}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "engine source is not ready");}
     let own = "GriffinPropulsionRequirements::GriffinMainPropulsionAssembly::";
     let contour = f64_from(model.value(own + "bellContourExponent"));
     let axial = model.value(own + "bellAxialSegments");
@@ -4309,13 +3797,13 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     let segments = model.value(own + "bellAngularSegments");
     let crease = f64_from(model.value(own + "bellNormalCreaseAngleDeg"));
     if contour==() || contour<=0.0 || contour>=1.0 || axial<8 || axial>64 || wall==() || wall<=0.0 || crease==() || crease<0.0 || crease>180.0 {
-        return plan_error("engine wall profile is incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "engine wall profile is incomplete");
     }
     let throat=f64_from(model.value(own+"throatRadiusM"));
     let exit=f64_from(model.value(own+"bellRadiusM"));
     let height=f64_from(model.value(own+"bellHeightM"));
     if throat==() || exit==() || height==() || throat<=wall || exit<=throat || height<=0.0 {
-        return plan_error("engine envelope is invalid");
+        return support::plan_error("griffin_visual_component_assembly", "engine envelope is invalid");
     }
     let profile=griffin_geometry::hollow_bell_profile(throat,exit,height,wall,contour,axial);
     let neck_height=f64_from(model.value(own+"throatHeightM"));
@@ -4324,7 +3812,7 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
     let convergence=f64_from(model.value(own+"convergentHeightFraction"));
     if neck_height==() || neck_height<=0.0 || neck_center==() || chamber==()
         || chamber<=throat || convergence==() || convergence<=0.0 || convergence>=1.0 {
-        return plan_error("engine chamber and convergent envelope is invalid");
+        return support::plan_error("griffin_visual_component_assembly", "engine chamber and convergent envelope is invalid");
     }
     let neck_lower=neck_center-neck_height/2.0;
     let neck_upper=neck_center+neck_height/2.0;
@@ -4364,10 +3852,10 @@ fn apply_refined_griffin_engine_bell(doc, edit_target, root, parent_gen) {
 }
 
 /// Source-owned engine references and placements. Existing instances move as
-/// well; `griffin_main_engines_plan` adds each bell's force actuator.
+/// well; `griffin_propulsion_builder::griffin_main_engine_plan` adds its force actuator.
 fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("Griffin engine cluster requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "Griffin engine cluster requires a document, edit target, and absolute root");
     }
     let names = griffin_spec::main_engine_names();
     let positions = griffin_spec::component_engine_stations();
@@ -4375,11 +3863,11 @@ fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
     let skirt_y = griffin_spec::visual_engine_skirt_mount_y();
     if count == () || count <= 0 || names.len() != count
         || positions.len() != count || skirt_y == () {
-        return plan_error("typed engine identities, count, stations or skirt mount are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "typed engine identities, count, stations or skirt mount are incomplete");
     }
     for position in positions {
         if !vec3_is_native(position) || !vec3_is_finite(position) {
-            return plan_error("engine station must be a finite native Vec3");
+            return support::plan_error("griffin_visual_component_assembly", "engine station must be a finite native Vec3");
         }
     }
     let nozzle = root + "/Nozzle";
@@ -4389,10 +3877,10 @@ fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
         #{path:cluster,parent:nozzle,name:"MainEngineCluster"}] {
         let record = assembly_builder::composed_query(doc,
             #{path:container.path,children:false});
-        if query_ok(record) && record.type_name != "Xform" {
-            return plan_error(container.path + ": expected Xform");
+        if support::query_ok(record) && record.type_name != "Xform" {
+            return support::plan_error("griffin_visual_component_assembly", container.path + ": expected Xform");
         }
-        if !query_ok(record) {
+        if !support::query_ok(record) {
             ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:container.parent,
                 name:container.name,type_name:"Xform",reference:(),reference_prim_path:""}});
         }
@@ -4401,10 +3889,10 @@ fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
     for i in 0..names.len() {
         let path = cluster + "/" + names[i];
         let engine = assembly_builder::composed_query(doc,#{path:path,children:false});
-        if query_ok(engine) && engine.type_name != "Xform" {
-            return plan_error(path + ": expected Xform");
+        if support::query_ok(engine) && engine.type_name != "Xform" {
+            return support::plan_error("griffin_visual_component_assembly", path + ": expected Xform");
         }
-        if !query_ok(engine) {
+        if !support::query_ok(engine) {
             ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:cluster,
                 name:names[i],type_name:"Xform",
                 reference:component_asset("lander/griffin_engine_bell_visual.usda"),
@@ -4416,10 +3904,10 @@ fn griffin_engine_cluster_visual_plan(doc, edit_target, root) {
     }
     let skirt_path = cluster + "/EngineSkirt";
     let skirt = assembly_builder::composed_query(doc,#{path:skirt_path,children:false});
-    if query_ok(skirt) && skirt.type_name != "Xform" {
-        return plan_error(skirt_path + ": expected Xform");
+    if support::query_ok(skirt) && skirt.type_name != "Xform" {
+        return support::plan_error("griffin_visual_component_assembly", skirt_path + ": expected Xform");
     }
-    if !query_ok(skirt) {
+    if !support::query_ok(skirt) {
         ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:cluster,
             name:"EngineSkirt",type_name:"Xform",
             reference:component_asset("lander/griffin_engine_skirt_visual.usda"),
@@ -4446,19 +3934,19 @@ fn apply_griffin_engine_cluster_visual(doc, edit_target, root, parent_gen) {
 fn griffin_engine_cluster_exhaust_plan(doc, edit_target, root) {
     let names = griffin_spec::main_engine_names();
     let count = griffin_spec::main_engine_count();
-    if doc == () || edit_target == () || !absolute_root(root)
+    if doc == () || edit_target == () || !support::absolute_root(root)
         || count == () || count <= 0 || names.len() != count {
-        return plan_error("engine exhaust plan requires complete typed engine identities");
+        return support::plan_error("griffin_visual_component_assembly", "engine exhaust plan requires complete typed engine identities");
     }
     let cluster = root + "/Nozzle/MainEngineCluster";
     let ops = [];
     for name in names {
         let path = cluster + "/" + name;
-        let plume = main_engine_plume_path(root, name);
-        if !_exists(doc, plume) { return plan_error(plume+": engine plume Modelica component is missing"); }
+        let plume = griffin_propulsion_builder::main_engine_plume_path(root, name);
+        if !support::exists(doc, plume) { return support::plan_error("griffin_visual_component_assembly", plume+": engine plume Modelica component is missing"); }
         let visual = assembly_builder::composed_query(doc,
             #{path:path+"/Exhaust/Flame",children:false});
-        if !query_ok(visual) { return plan_error(path+": shared exhaust has not composed"); }
+        if !support::query_ok(visual) { return support::plan_error("griffin_visual_component_assembly", path+": shared exhaust has not composed"); }
         for op in engine_exhaust::connection_ops(edit_target,path,plume,#{}) {
             ops.push(op);
         }
@@ -4483,12 +3971,12 @@ fn _isolated_ramp_spec(root, side) {
     }
     if side == "port" {
         return #{parent: root, name: "EgressRampPort", type_name: "Xform",
-            asset: component_asset("lander/griffin_ramp_visual.usda"),
+            asset: support::component_asset("lander/griffin_ramp_visual.usda"),
             translation: [mount_x, mount_y, mount_z], rotation: [0.0, 0.0, angle_deg], scale: ()};
     }
     if side == "starboard" {
         return #{parent: root, name: "EgressRampStarboard", type_name: "Xform",
-            asset: component_asset("lander/griffin_ramp_visual.usda"),
+            asset: support::component_asset("lander/griffin_ramp_visual.usda"),
             translation: [mount_x, mount_y, mount_z], rotation: [0.0, 180.0, angle_deg], scale: ()};
     }
     ()
@@ -4512,7 +4000,7 @@ fn _isolated_ramp_contract_ops(edit_target, path, side) {
     if limit == () || length == () || width == () || angle == ()
         || section_count == () || section_length == ()
         || !sysml_enum_is(hinge_axis) || hinge_axis.literal != "Z" {
-        return plan_error("ramp SysML dimensions, placement, or deployment values are missing");
+        return support::plan_error("griffin_visual_component_assembly", "ramp SysML dimensions, placement, or deployment values are missing");
     }
     [
         #{SetAttribute: #{edit_target: edit_target, path: path,
@@ -4574,7 +4062,7 @@ fn _ramp_round_plate_visual_ops(doc, edit_target, section_path, name,
     let radius = width / 2.0;
     let height = top - bottom;
     if radius <= 0.0 || thickness <= 0.0 || height < width {
-        return plan_error("ramp rounded plate profile dimensions are invalid");
+        return support::plan_error("griffin_visual_component_assembly", "ramp rounded plate profile dimensions are invalid");
     }
     let profile = [];
     let half_straight = height / 2.0 - radius;
@@ -4628,14 +4116,14 @@ fn griffin_ramp_pivot_plan(doc, edit_target, root, joint_name, guide_index) {
     let joint=assembly_builder::composed_query(doc,#{path:root+"/"+joint_name,
         attrs:["physics:localPos0","physics:localPos1","physics:axis"],
         rels:["physics:body0","physics:body1"]});
-    if !query_ok(joint) || joint.type_name!="PhysicsRevoluteJoint"
+    if !support::query_ok(joint) || joint.type_name!="PhysicsRevoluteJoint"
         || joint.attrs==() || joint.attrs["physics:axis"]!="Z"
         || joint.relationships==()
         || joint.relationships["physics:body0"]==()
         || joint.relationships["physics:body1"]==()
         || joint.relationships["physics:body0"].len()!=1
         || joint.relationships["physics:body1"].len()!=1 {
-        return plan_error("ramp pivot requires a complete Z-axis section joint");
+        return support::plan_error("griffin_visual_component_assembly", "ramp pivot requires a complete Z-axis section joint");
     }
     let parent=joint.relationships["physics:body0"][0];
     let child=joint.relationships["physics:body1"][0];
@@ -4648,11 +4136,11 @@ fn griffin_ramp_pivot_plan(doc, edit_target, root, joint_name, guide_index) {
     let tongue=_ramp_number("rampPivotLugThicknessM");
     let cheek=_ramp_number("rampRailWidthM");
     if !vec3_is_finite(a) || !vec3_is_finite(b) || diameter<=0.0
-        || tongue<=0.0 || cheek<=0.0 {return plan_error("ramp pivot stock or anchors unavailable");}
+        || tongue<=0.0 || cheek<=0.0 {return support::plan_error("griffin_visual_component_assembly", "ramp pivot stock or anchors unavailable");}
     let color=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor");
     let ops=[];
     let guides=griffin_spec::ramp_guide_stations();
-    if guide_index<0 || guide_index>=guides.len() {return plan_error("ramp pivot guide index is unavailable");}
+    if guide_index<0 || guide_index>=guides.len() {return support::plan_error("griffin_visual_component_assembly", "ramp pivot guide index is unavailable");}
     for guide in [guides[guide_index]] {
         let specs=[#{parent:child,name:guide.pin+"Lug",anchor:b,z:guide.z,stock:tongue}];
         for side in [#{suffix:"Negative",sign:-1.0},#{suffix:"Positive",sign:1.0}] {
@@ -4676,7 +4164,7 @@ fn griffin_ramp_pivot_plan(doc, edit_target, root, joint_name, guide_index) {
 
 fn griffin_ramp_component_pivot_plan(doc, edit_target, root, section_index, guide_index) {
     let guides=griffin_spec::ramp_guide_stations();
-    if guide_index<0 || guide_index>=guides.len() {return plan_error("ramp pivot guide unavailable");}
+    if guide_index<0 || guide_index>=guides.len() {return support::plan_error("griffin_visual_component_assembly", "ramp pivot guide unavailable");}
     let guide=guides[guide_index];
     let width=_ramp_number("rampPivotLugWidthM");
     let color=sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor");
@@ -4697,7 +4185,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
 fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
     section_name, section_length, section_index, deployment_angle, member_group) {
     if !["base","Port","Starboard","PortCenter","StarboardCenter"].contains(member_group) {
-        return plan_error("unknown ramp member group: "+member_group);
+        return support::plan_error("griffin_visual_component_assembly", "unknown ramp member group: "+member_group);
     }
     // All required values are revision-pinned typed reads through griffin_spec.
     let source = ();
@@ -4763,24 +4251,24 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         || truss_chord_height == () || truss_lower_chord_y == ()
         || truss_brace_thickness == () || truss_brace_count <= 1;
     if invalid_basic || invalid_repeated || invalid_support || invalid_hinge {
-        return plan_error(section_path + ": ramp section geometry source values are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", section_path + ": ramp section geometry source values are incomplete");
     }
     let tolerance = _sysml_number(source, "rampSectionGeometryToleranceM");
     if tolerance == () || section_length > total_length + tolerance
         || tread_count * section_count != griffin_spec::_sysml_integer("assemblyTreadCount") {
-        return plan_error(section_path + ": ramp section length or tread count does not match the SysML assembly");
+        return support::plan_error("griffin_visual_component_assembly", section_path + ": ramp section length or tread count does not match the SysML assembly");
     }
     let walking_surface_top_y = surface_y + thickness / 2.0;
     let rail_bottom_y = rail_y - rail_height / 2.0;
     if rail_bottom_y < walking_surface_top_y - tolerance {
-        return plan_error(section_path + ": upper rail falls below the walking-surface top");
+        return support::plan_error("griffin_visual_component_assembly", section_path + ": upper rail falls below the walking-surface top");
     }
     let post_bottom_y = walking_surface_top_y - post_embed;
     let post_top_y = rail_y + rail_height / 2.0;
     let post_height = post_top_y - post_bottom_y;
     let post_y = (post_top_y + post_bottom_y) / 2.0;
     if post_embed <= 0.0 || post_height <= 0.0 {
-        return plan_error(section_path + ": rail support embedment produces an invalid post extent");
+        return support::plan_error("griffin_visual_component_assembly", section_path + ": rail support embedment produces an invalid post extent");
     }
     let half_track = 0.0;
     for station in track_centers {
@@ -4790,7 +4278,7 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
         mechanical_relations::planar_horizontal_face_bevel_run(thickness, deployment_angle)
     } else { 0.0 };
     if toe_bevel == () || toe_bevel < 0.0 || toe_bevel >= section_length {
-        return plan_error(section_path + ": source deployment angle yields an invalid ramp toe bevel");
+        return support::plan_error("griffin_visual_component_assembly", section_path + ": source deployment angle yields an invalid ramp toe bevel");
     }
     let points = _ramp_section_track_points(section_length, thickness, track_width, toe_bevel);
     let topology = _ramp_section_track_topology();
@@ -4807,8 +4295,8 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let track_path = section_path + "/" + track.name;
             let member = assembly_builder::composed_query(doc,
                 #{path: track_path, children: false});
-            if !query_ok(member) || member.type_name != "Mesh" {
-                return plan_error(track_path + ": section contact-track mesh is missing");
+            if !support::query_ok(member) || member.type_name != "Mesh" {
+                return support::plan_error("griffin_visual_component_assembly", track_path + ": section contact-track mesh is missing");
             }
             let geometry = assembly_builder::mesh_geometry_update_plan(
                 edit_target, track_path, points,
@@ -4845,10 +4333,10 @@ fn _isolated_ramp_section_geometry_ops(doc, edit_target, section_path,
             let pin_path = section_path + "/" + pin_name;
             let pin = assembly_builder::composed_query(doc,
                 #{path: pin_path, children: false});
-            if query_ok(pin) && pin.type_name != "Cylinder" {
-                return plan_error(pin_path + ": upper-rail pivot fitting must be a Cylinder");
+            if support::query_ok(pin) && pin.type_name != "Cylinder" {
+                return support::plan_error("griffin_visual_component_assembly", pin_path + ": upper-rail pivot fitting must be a Cylinder");
             }
-            if !query_ok(pin) {
+            if !support::query_ok(pin) {
                 ops.push(#{AddPrim: #{edit_target: edit_target,
                     parent_path: section_path, name: pin_name,
                     type_name: "Cylinder", reference: (),
@@ -5032,10 +4520,10 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path, side) {
     if section_count != 3 || section_length == () || section_length <= 0.0
         || section_names.len() != section_count || tolerance == () || tolerance <= 0.0
         || total_length == () || angle == () {
-        return plan_error("articulated ramp section datums are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "articulated ramp section datums are incomplete");
     }
     if (section_count*section_length-total_length).abs()>tolerance {
-        return plan_error("visual ramp section lengths do not close the assembly span");
+        return support::plan_error("griffin_visual_component_assembly", "visual ramp section lengths do not close the assembly span");
     }
     let ops = [];
     for index in 0..section_count {
@@ -5043,20 +4531,20 @@ fn _isolated_ramp_visual_geometry_ops(doc, edit_target, path, side) {
         let section_path = path + "/" + name;
         let section = assembly_builder::composed_query(doc,
             #{path: section_path, children: false});
-        if !query_ok(section) || section.type_name != "Xform" {
-            return plan_error(section_path + ": referenced ramp section is missing");
+        if !support::query_ok(section) || section.type_name != "Xform" {
+            return support::plan_error("griffin_visual_component_assembly", section_path + ": referenced ramp section is missing");
         }
         for child in ["RampTrackPort", "RampTrackStarboard", "OuterRail", "InnerRail"] {
             let member = assembly_builder::composed_query(doc,
                 #{path: section_path + "/" + child, children: false,
                   attrs: ["physics:collisionEnabled"]});
-            if !query_ok(member) {
-                return plan_error(section_path + "/" + child + ": section geometry is missing");
+            if !support::query_ok(member) {
+                return support::plan_error("griffin_visual_component_assembly", section_path + "/" + child + ": section geometry is missing");
             }
             if child == "RampTrackPort" || child == "RampTrackStarboard"
                 || child == "OuterRail" || child == "InnerRail" {
                 if member.attrs == () || member.attrs["physics:collisionEnabled"] != true {
-                    return plan_error(section_path + "/" + child + ": composed contact/guard geometry must own collision");
+                    return support::plan_error("griffin_visual_component_assembly", section_path + "/" + child + ": composed contact/guard geometry must own collision");
                 }
             }
         }
@@ -5094,20 +4582,20 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
         || joint_name == () || joint_name == ""
         || mount_z == ()
         || transition_outboard_x == () || transition_center_y == () {
-        return plan_error("physical ramp transition identity, frame, or mass datums are incomplete in SysML");
+        return support::plan_error("griffin_visual_component_assembly", "physical ramp transition identity, frame, or mass datums are incomplete in SysML");
     }
 
     let path = lander_root + "/" + name;
     let legacy_path = ramp_root + "/" + legacy_name;
     let contact_name = griffin_spec::physical_ramp_transition_contact_child_name();
     if contact_name == () || contact_name == "" {
-        return plan_error("physical ramp transition contact child name is missing from SysML");
+        return support::plan_error("griffin_visual_component_assembly", "physical ramp transition contact child name is missing from SysML");
     }
     let contact_path = path + "/" + contact_name;
     let existing = assembly_builder::composed_query(doc, #{path: path, children: false});
-    let migrate_scaled_body = query_ok(existing) && existing.type_name == "Cube";
-    if query_ok(existing) && existing.type_name != "Xform" && !migrate_scaled_body {
-        return plan_error(path + ": physical ramp transition must be an Xform rigid-body frame");
+    let migrate_scaled_body = support::query_ok(existing) && existing.type_name == "Cube";
+    if support::query_ok(existing) && existing.type_name != "Xform" && !migrate_scaled_body {
+        return support::plan_error("griffin_visual_component_assembly", path + ": physical ramp transition must be an Xform rigid-body frame");
     }
 
     let legacy_joint_path = ramp_root + "/" + joint_name;
@@ -5118,22 +4606,22 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
     let joint_path = lander_root + "/" + joint_name;
     let existing_joint = assembly_builder::composed_query(doc,
         #{path: joint_path, children: false});
-    if query_ok(existing_joint) && existing_joint.type_name != "PhysicsFixedJoint" {
-        return plan_error(joint_path + ": transition joint must be PhysicsFixedJoint");
+    if support::query_ok(existing_joint) && existing_joint.type_name != "PhysicsFixedJoint" {
+        return support::plan_error("griffin_visual_component_assembly", joint_path + ": transition joint must be PhysicsFixedJoint");
     }
 
     let ops = [];
-    if query_ok(legacy_body) {
+    if support::query_ok(legacy_body) {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
     }
-    if query_ok(legacy_joint) {
+    if support::query_ok(legacy_joint) {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_joint_path}});
     }
     if migrate_scaled_body {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
         ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: lander_root,
             name: name, type_name: "Xform", reference: (), reference_prim_path: ""}});
-    } else if !query_ok(existing) {
+    } else if !support::query_ok(existing) {
         ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: lander_root,
             name: name, type_name: "Xform", reference: (), reference_prim_path: ""}});
     }
@@ -5162,10 +4650,10 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
 
     let existing_contact = assembly_builder::composed_query(doc,
         #{path: contact_path, children: false});
-    if query_ok(existing_contact) && existing_contact.type_name != "Cube" {
-        return plan_error(contact_path + ": transition contact child must be a Cube");
+    if support::query_ok(existing_contact) && existing_contact.type_name != "Cube" {
+        return support::plan_error("griffin_visual_component_assembly", contact_path + ": transition contact child must be a Cube");
     }
-    if !query_ok(existing_contact) || migrate_scaled_body {
+    if !support::query_ok(existing_contact) || migrate_scaled_body {
         ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: path,
             name: contact_name, type_name: "Cube", reference: (),
             reference_prim_path: ""}});
@@ -5191,8 +4679,8 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
         ops.push(op);
     }
 
-    if !query_ok(existing_joint) || migrate_scaled_body {
-        if query_ok(existing_joint) {
+    if !support::query_ok(existing_joint) || migrate_scaled_body {
+        if support::query_ok(existing_joint) {
             ops.push(#{RemovePrim: #{edit_target: edit_target, path: joint_path}});
         }
         ops.push(#{AddPrim: #{edit_target: edit_target, parent_path: lander_root,
@@ -5233,16 +4721,16 @@ fn _physical_ramp_transition_ops(doc, edit_target, lander_root, ramp_root, side,
 // belong to the bus body and introduce no independent dynamics or collider.
 // Adjust only the installation interface; retain section geometry and poses.
 fn griffin_ramp_installation_plan(doc, edit_target, lander_root, side) {
-    if side != "port" && side != "starboard" { return plan_error("unknown ramp side"); }
+    if side != "port" && side != "starboard" { return support::plan_error("griffin_visual_component_assembly", "unknown ramp side"); }
     let index = if side == "port" { 0 } else { 1 };
     let path = lander_root + "/" + griffin_spec::ramp_names()[index];
     let joint = lander_root + "/" + griffin_spec::ramp_root_joint_names()[index];
     let x = _ramp_number(if side == "port" { "physicalRampPortMountX" } else { "physicalRampStarboardMountX" });
     let position = [x, _ramp_number("physicalRampMountY"), _ramp_number("physicalRampMountZ")];
-    let root = _component_query(doc, path);
-    let bearing = _component_query(doc, joint);
-    if !query_ok(root) || !query_ok(bearing) || bearing.type_name != "PhysicsRevoluteJoint" {
-        return plan_error("physical ramp installation owner or bearing is unavailable");
+    let root = support::component_query(doc, path);
+    let bearing = support::component_query(doc, joint);
+    if !support::query_ok(root) || !support::query_ok(bearing) || bearing.type_name != "PhysicsRevoluteJoint" {
+        return support::plan_error("griffin_visual_component_assembly", "physical ramp installation owner or bearing is unavailable");
     }
     let transition = _physical_ramp_transition_ops(doc, edit_target, lander_root, path, side,
         griffin_spec::physical_ramp_deck_transition_length_m(),
@@ -5265,7 +4753,7 @@ fn griffin_ramp_toe_miter_plan(doc,edit_target,root) {
     let angle = _ramp_number("physicalRampPortDeploymentAngleRad");
     let thickness = _ramp_number("rampSurfaceThicknessM");
     let bevel = mechanical_relations::planar_horizontal_face_bevel_run(thickness, angle);
-    if bevel == () { return plan_error("nominal deployment toe miter is unavailable"); }
+    if bevel == () { return support::plan_error("griffin_visual_component_assembly", "nominal deployment toe miter is unavailable"); }
     let points = _ramp_section_track_points(_ramp_number("rampSectionLengthM"), thickness,
         _ramp_number("assemblyTrackWidthM"), bevel);
     let ops=[];
@@ -5278,7 +4766,7 @@ fn griffin_ramp_toe_miter_plan(doc,edit_target,root) {
 }
 
 fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
-    if side != "port" && side != "starboard" { return plan_error("unknown ramp side"); }
+    if side != "port" && side != "starboard" { return support::plan_error("griffin_visual_component_assembly", "unknown ramp side"); }
     let suffix=if side=="port"{"Port"}else{"Starboard"};
     _griffin_ramp_mount_at_plan(doc,edit_target,lander_root,side,
         [_ramp_number(if side=="port"{"physicalRampPortMountX"}else{"physicalRampStarboardMountX"}),
@@ -5289,8 +4777,8 @@ fn griffin_ramp_mount_plan(doc, edit_target, lander_root, side) {
 // The installed bank and a detached integration study use the same shoe and
 // pedestal geometry, with an explicit mount and standard material target.
 fn _griffin_ramp_mount_at_plan(doc,edit_target,lander_root,side,position,material){
-    if side!="port" && side!="starboard"{return plan_error("unknown ramp side");}
-    if position==() || position.len()!=3 || material==(){return plan_error("ramp bearing interface is incomplete");}
+    if side!="port" && side!="starboard"{return support::plan_error("griffin_visual_component_assembly", "unknown ramp side");}
+    if position==() || position.len()!=3 || material==(){return support::plan_error("griffin_visual_component_assembly", "ramp bearing interface is incomplete");}
     let x=position[0];let y=position[1];let z=position[2];
     let inner = _ramp_number("rampCenterRailOffsetZM");
     let stock = _ramp_number("rampPivotLugWidthM");
@@ -5298,7 +4786,7 @@ fn _griffin_ramp_mount_at_plan(doc,edit_target,lander_root,side,position,materia
     let bottom = griffin_spec::component_bus_mount_y()
         + griffin_spec::visual_deck_center_y_m() + griffin_spec::visual_deck_thickness_m()/2.0;
     if x == () || y == () || z == () || inner == () || stock == () || bearing == ()
-        || stock <= 0.0 || y <= bottom { return plan_error("ramp mount datums incomplete"); }
+        || stock <= 0.0 || y <= bottom { return support::plan_error("griffin_visual_component_assembly", "ramp mount datums incomplete"); }
     let top = y + bearing;
     let color = griffin_spec::visual_deck_display_color();
     let suffix = if side == "port" { "Port" } else { "Starboard" };
@@ -5332,7 +4820,7 @@ fn _griffin_ramp_mount_at_plan(doc,edit_target,lander_root,side,position,materia
 // Reconcile a transport-angle change without rebuilding the section meshes.
 // Both the hinge drive and its fixed flight latch must describe the body pose.
 fn griffin_ramp_transport_plan(doc, edit_target, lander_root, side) {
-    if side!="port" && side!="starboard" {return plan_error("unknown ramp side");}
+    if side!="port" && side!="starboard" {return support::plan_error("griffin_visual_component_assembly", "unknown ramp side");}
     let i=if side=="port" {0}else{1};
     let angle=griffin_spec::physical_ramp_port_root_stowed_angle_rad();
     let limit=if i==0 {griffin_spec::physical_ramp_port_root_stow_limit_rad()}
@@ -5340,14 +4828,14 @@ fn griffin_ramp_transport_plan(doc, edit_target, lander_root, side) {
     let deploy=_ramp_number("rampMaxDeploymentAngleRad");
     let pi=acos(-1.0);
     if angle==() || limit==() || deploy==() || angle<=0.0 || angle>limit || limit>=pi {
-        return plan_error("ramp transport pose is outside its source travel");
+        return support::plan_error("griffin_visual_component_assembly", "ramp transport pose is outside its source travel");
     }
     let body=lander_root+"/"+griffin_spec::ramp_names()[i];
     let binding=griffin_spec::ramp_flight_latch_bindings()[i];
     let hinge=lander_root+"/"+binding.hinge;let latch=lander_root+"/"+binding.latch;
     for p in [#{path:body,kind:"Xform"},#{path:hinge,kind:"PhysicsRevoluteJoint"},#{path:latch,kind:"PhysicsFixedJoint"}] {
-        let r=_component_query(doc,p.path);
-        if !r.ok || r.type_name!=p.kind {return plan_error("ramp transport owner missing: "+p.path);}
+        let r=support::component_query(doc,p.path);
+        if !r.ok || r.type_name!=p.kind {return support::plan_error("griffin_visual_component_assembly", "ramp transport owner missing: "+p.path);}
     }
     let degrees=angle*180.0/pi;let sign=if i==0 {1.0}else{-1.0};
     let rotation=vec3(0.0,if i==0 {0.0}else{180.0},sign*degrees);
@@ -5374,12 +4862,12 @@ fn griffin_ramp_transport_plan(doc, edit_target, lander_root, side) {
 // Retired equal-span writer. The component-aware mechanism authoring tool
 // preserves named datums and qualifies one bank/interface at a time.
 fn isolated_griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root, side) {
-    plan_error("Use griffin_ramp_mechanism::bank_plan with the root, middle and toe source documents; the equal-span physical ramp writer is retired")
+    support::plan_error("griffin_visual_component_assembly", "Use griffin_ramp_mechanism::bank_plan with the root, middle and toe source documents; the equal-span physical ramp writer is retired")
 }
 
 fn griffin_physical_ramp_geometry_plan(doc, edit_target, lander_root) {
-    if doc == () || edit_target == () || !absolute_root(lander_root) {
-        return plan_error("bilateral physical-ramp planning requires a document, edit target, and absolute lander root");
+    if doc == () || edit_target == () || !support::absolute_root(lander_root) {
+        return support::plan_error("griffin_visual_component_assembly", "bilateral physical-ramp planning requires a document, edit target, and absolute lander root");
     }
     let port = isolated_griffin_physical_ramp_geometry_plan(
         doc, edit_target, lander_root, "port");
@@ -5429,14 +4917,14 @@ fn apply_isolated_griffin_physical_ramp_geometry(doc, edit_target,
 /// operations.   is deliberately explicit so port/starboard cannot be
 /// accidentally edited together.
 fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("isolated_griffin_ramp_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "isolated_griffin_ramp_plan requires a document, edit target, and absolute root");
     }
     let spec = _isolated_ramp_spec(root, side);
-    if spec == () { return plan_error("ramp side must be port or starboard"); }
+    if spec == () { return support::plan_error("griffin_visual_component_assembly", "ramp side must be port or starboard"); }
     let existing = query("QueryUsdPrim", #{doc_id:doc,path:spec.parent+"/"+spec.name,attrs:[],schemas:true});
     if existing.api_schemas != () && existing.api_schemas.contains("PhysicsRigidBodyAPI") {
-        return plan_error("An articulated ramp requires griffin_ramp_mechanism; visual-only replacement would retire its rigid-body interfaces");
+        return support::plan_error("griffin_visual_component_assembly", "An articulated ramp requires griffin_ramp_mechanism; visual-only replacement would retire its rigid-body interfaces");
     }
     let component = _isolated_component_plan(doc, edit_target, spec);
     if !component.ok { return component; }
@@ -5447,7 +4935,7 @@ fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
     for detail in details {
         if detail.parent != path { continue; }
         let detail_path = detail.parent + "/" + detail.name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: detail_path, children: false})) { continue; }
+        if support::query_ok(assembly_builder::composed_query(doc, #{path: detail_path, children: false})) { continue; }
         let detail_plan = _detail_ops(edit_target, detail);
         if !detail_plan.ok { return detail_plan; }
         for op in detail_plan.ops { ops.push(op); }
@@ -5463,7 +4951,7 @@ fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
     let hinge_z = _ramp_number("rampHingeOffsetZ");
     let angle_deg = _ramp_angle_deg(side);
     if hinge_x == () || hinge_y == () || hinge_z == () || angle_deg == () {
-        return plan_error("ramp SysML hinge datum is missing");
+        return support::plan_error("griffin_visual_component_assembly", "ramp SysML hinge datum is missing");
     }
     let frame_spec = #{parent: path, name: "MountFrame", translation: [hinge_x, hinge_y, hinge_z],
         rotation: if side == "port" { [0.0, 0.0, angle_deg] } else { [0.0, 180.0, angle_deg] }, socket: false};
@@ -5475,7 +4963,7 @@ fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
     ops.push(#{SetAttribute: #{edit_target: edit_target, path: path,
         name: "lunco:mount:plug", type_name: "token", value: "\"egress_ramp\""}});
     let socket_exists = assembly_builder::composed_query(doc, #{path: socket, children: false});
-    if query_ok(socket_exists) {
+    if support::query_ok(socket_exists) {
         // Keep the existing socket transform synchronized with the current
         // SysML datum.  The older visual source carried the pre-refinement
         // 2.60 m / -1.10 m opinion; updating only the ramp root left a stale
@@ -5486,7 +4974,7 @@ fn isolated_griffin_ramp_plan(doc, edit_target, root, side) {
         let socket_y = _ramp_number("rampSocketY");
         let socket_z = _ramp_number("rampSocketZ");
         if socket_x == () || socket_y == () || socket_z == () {
-            return plan_error("ramp SysML socket datum is missing");
+            return support::plan_error("griffin_visual_component_assembly", "ramp SysML socket datum is missing");
         }
         let socket_place = assembly_builder::place_plan(edit_target, socket,
             [if side == "port" { socket_x } else { -socket_x }, socket_y, socket_z], (), ());
@@ -5525,15 +5013,15 @@ fn apply_isolated_griffin_ramp(doc, edit_target, root, side, parent_gen) {
 // scale is included in xformOpOrder rather than sitting as an inert custom
 // attribute.
 fn normalize_griffin_visual_ramp_plan(doc, edit_target, root, side) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("normalize_griffin_visual_ramp_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "normalize_griffin_visual_ramp_plan requires a document, edit target, and absolute root");
     }
     if side != "port" && side != "starboard" {
-        return plan_error("ramp side must be port or starboard");
+        return support::plan_error("griffin_visual_component_assembly", "ramp side must be port or starboard");
     }
     let ramp_state = griffin_spec::visual_ramp_state();
     if !sysml_enum_is(ramp_state) || ramp_state.literal != "Stowed" {
-        return plan_error("visual ramp review state must be SysML stowed");
+        return support::plan_error("griffin_visual_component_assembly", "visual ramp review state must be SysML stowed");
     }
     let mount_xs = griffin_spec::visual_ramp_mount_x();
     let mount_y = griffin_spec::visual_ramp_mount_y();
@@ -5543,7 +5031,7 @@ fn normalize_griffin_visual_ramp_plan(doc, edit_target, root, side) {
     let child_names = griffin_spec::visual_ramp_child_names();
     if mount_xs.len() != 2 || mount_y == () || mount_z == () || scale == ()
         || scale <= 0.0 || rotation.len() != 3 || child_names.len() == 0 {
-        return plan_error("stowed ramp transform or component child contract is incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "stowed ramp transform or component child contract is incomplete");
     }
     let instance_x = if side == "port" { mount_xs[0] } else { mount_xs[1] };
     let ops = [];
@@ -5552,7 +5040,7 @@ fn normalize_griffin_visual_ramp_plan(doc, edit_target, root, side) {
     // component remains composed at the same path and becomes authoritative.
     for name in child_names {
         let path = root + "/" + name;
-        if query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) {
+        if support::query_ok(assembly_builder::composed_query(doc, #{path: path, children: false})) {
             ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
         }
     }
@@ -5597,7 +5085,7 @@ fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
     let path = parent + "/" + name;
     let existing = assembly_builder::composed_query(doc,
         #{path: path, children: true});
-    if query_ok(existing) && existing.type_name == "Xform"
+    if support::query_ok(existing) && existing.type_name == "Xform"
         && existing.children != () {
         let complete = true;
         for child in required_children {
@@ -5615,14 +5103,14 @@ fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
     }
 
     let ops = [];
-    if query_ok(existing) {
+    if support::query_ok(existing) {
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: path}});
     }
     let temporary_name = "__GriffinComponentMigration_" + name;
     let temporary_path = parent + "/" + temporary_name;
     let temporary = assembly_builder::composed_query(doc,
         #{path: temporary_path, children: false});
-    if query_ok(temporary) {
+    if support::query_ok(temporary) {
         ops.push(#{RemovePrim: #{edit_target: edit_target,
             path: temporary_path}});
     }
@@ -5637,8 +5125,8 @@ fn _migrate_griffin_component_reference(doc, edit_target, parent, name,
 }
 
 fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("migrate_griffin_physical_visuals_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "migrate_griffin_physical_visuals_plan requires a document, edit target, and absolute root");
     }
     let solar_names = griffin_spec::solar_array_names();
     let solar_stations = griffin_spec::component_solar_stations();
@@ -5667,12 +5155,12 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         || engine_stations.len() != engine_names.len()
         || engine_members.len() != 2 || skirt_name == () || skirt_name == ""
         || skirt_members.len() != 3 || skirt_y == () {
-        return plan_error("typed Griffin leg, solar, or propulsion stations are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "typed Griffin leg, solar, or propulsion stations are incomplete");
     }
     let ops = [];
     let migrated = [];
     let solar_assets = griffin_spec::solar_component_assets();
-    if !array_is(solar_assets) || solar_assets.len()!=solar_names.len() {return plan_error("solar component identities are unavailable");}
+    if !array_is(solar_assets) || solar_assets.len()!=solar_names.len() {return support::plan_error("griffin_visual_component_assembly", "solar component identities are unavailable");}
     for index in 0..solar_names.len() {
         let result = _migrate_griffin_component_reference(doc, edit_target,
             root, solar_names[index], "twin://"+twin_source_identity()+"/"+solar_assets[index], "/SolarPanel",
@@ -5690,11 +5178,11 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         migrated.push(result.path);
     }
     let engine_parent = root + "/Nozzle/MainEngineCluster";
-    let engine_asset = component_asset("lander/griffin_engine_bell_visual.usda");
+    let engine_asset = support::component_asset("lander/griffin_engine_bell_visual.usda");
     let cluster_record = assembly_builder::composed_query(doc,
         #{path:engine_parent,children:true});
     let expected_paths=[];for name in engine_names {expected_paths.push(engine_parent+"/"+name);}
-    if query_ok(cluster_record) && cluster_record.children != () {
+    if support::query_ok(cluster_record) && cluster_record.children != () {
         for child in cluster_record.children {
             if child.starts_with(engine_parent+"/Engine") && child!=engine_parent+"/"+skirt_name
                 && !expected_paths.contains(child) {
@@ -5709,14 +5197,14 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
         if !result.ok { return result; }
         for op in result.ops { ops.push(op); }
         let engine_path = engine_parent + "/" + engine_names[index];
-        let plume_path = main_engine_plume_path(root, engine_names[index]);
+        let plume_path = griffin_propulsion_builder::main_engine_plume_path(root, engine_names[index]);
         for op in engine_exhaust::connection_ops(edit_target, engine_path, plume_path, #{}) {
             ops.push(op);
         }
         migrated.push(result.path);
     }
 
-    let skirt_asset = component_asset("lander/griffin_engine_skirt_visual.usda");
+    let skirt_asset = support::component_asset("lander/griffin_engine_skirt_visual.usda");
     let skirt_result = _migrate_griffin_component_reference(doc, edit_target,
         engine_parent, skirt_name, skirt_asset, "/World/EngineSkirt",
         [0.0, skirt_y, 0.0], (), (), skirt_members);
@@ -5728,7 +5216,7 @@ fn migrate_griffin_physical_visuals_plan(doc, edit_target, root) {
     let nozzle_record = assembly_builder::composed_query(doc,
         #{path: nozzle, attrs: ["lunco:parameter_status",
             "lunco:provenance:source"], children: false});
-    if query_ok(nozzle_record) && nozzle_record.attrs != () {
+    if support::query_ok(nozzle_record) && nozzle_record.attrs != () {
         for name in ["lunco:parameter_status", "lunco:provenance:source"] {
             if nozzle_record.attrs[name] != () {
                 ops.push(#{RemoveAttribute: #{edit_target: edit_target,
@@ -5765,27 +5253,27 @@ fn apply_isolated_griffin(doc, edit_target, root, parent_gen) {
 // the static review on a render-only flat datum. Dynamic contact is verified
 // in the live mission, never under a frozen review parent.
 fn standard_terrain_plan(doc, edit_target, root) {
-    if doc == () || edit_target == () || !absolute_root(root) {
-        return plan_error("standard_terrain_plan requires a document, edit target, and absolute root");
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_visual_component_assembly", "standard_terrain_plan requires a document, edit target, and absolute root");
     }
     let asset = griffin_spec::visual_terrain_asset();
     let shader = griffin_spec::visual_terrain_shader_asset();
     if asset == () || asset == "" || shader == () || shader == "" {
-        return plan_error("visual terrain asset and shader identities are missing from SysML");
+        return support::plan_error("griffin_visual_component_assembly", "visual terrain asset and shader identities are missing from SysML");
     }
     if !asset.starts_with("twin://") && !asset.starts_with("lunco://") {
-        return plan_error("visual terrain asset must be a logical twin:// or lunco:// URI");
+        return support::plan_error("griffin_visual_component_assembly", "visual terrain asset must be a logical twin:// or lunco:// URI");
     }
     if !shader.starts_with("lunco://") {
-        return plan_error("visual terrain shader must be a canonical lunco:// shader URI");
+        return support::plan_error("griffin_visual_component_assembly", "visual terrain shader must be a canonical lunco:// shader URI");
     }
 
     let environment = root + "/Environment";
     let existing = assembly_builder::composed_query(doc, #{path: environment, children: false});
     let ops = [];
-    if query_ok(existing) {
+    if support::query_ok(existing) {
         if existing.type_name != "Xform" {
-            return plan_error(environment + ": existing terrain owner must be an Xform");
+            return support::plan_error("griffin_visual_component_assembly", environment + ": existing terrain owner must be an Xform");
         }
     } else {
         let reference = assembly_builder::referenced_instance_targeted_plan(
@@ -5799,8 +5287,8 @@ fn standard_terrain_plan(doc, edit_target, root) {
     let guide = root + "/Ground/FlatReviewSurface";
     let guide_record=assembly_builder::composed_query(doc,#{path:guide,children:false});
     let width=griffin_spec::_sysml_attribute("visualReviewGroundWidthM");
-    if !query_ok(guide_record) || guide_record.type_name!="Plane" || width==() || width<=0.0 {
-        return plan_error("static review needs its explicit square flat-site Plane and source width");
+    if !support::query_ok(guide_record) || guide_record.type_name!="Plane" || width==() || width<=0.0 {
+        return support::plan_error("griffin_visual_component_assembly", "static review needs its explicit square flat-site Plane and source width");
     }
     ops.push(#{SetTranslate:#{edit_target:edit_target,path:guide,value:[0.0,0.0,0.0]}});
     for field in [#{name:"width",type_name:"double",value:width.to_string()},
@@ -5820,7 +5308,7 @@ fn standard_terrain_plan(doc, edit_target, root) {
     for berm in [environment + "/VisualBerms/BermEast",
                  environment + "/VisualBerms/BermWest"] {
         let berm_record = assembly_builder::composed_query(doc, #{path: berm, children: false});
-        if query_ok(berm_record) {
+        if support::query_ok(berm_record) {
             ops.push(#{SetAttribute: #{edit_target: edit_target, path: berm,
                 name: "visibility", type_name: "token", value: "\"invisible\""}});
         }
@@ -5853,22 +5341,22 @@ fn apply_standard_terrain(doc, edit_target, root, parent_gen) {
 // This changes presentation only; stations, collision and mass stay source-owned.
 fn griffin_surface_finish_plan(doc, edit_target, root) {
     let material = root + "/Looks/MliFoil_Mat";
-    let mat = _component_query(doc, material);
-    if !mat.ok || mat.type_name != "Material" { return plan_error("Griffin foil material is missing"); }
+    let mat = support::component_query(doc, material);
+    if !mat.ok || mat.type_name != "Material" { return support::plan_error("griffin_visual_component_assembly", "Griffin foil material is missing"); }
     let ops = [];
     let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("Griffin foil appearance source unavailable");}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "Griffin foil appearance source unavailable");}
     let owner="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     for field in [#{input:"foil_color",source:"tankFoilBrightColor"},
                   #{input:"shade_color",source:"tankFoilValleyColor"}] {
         let value=model.value(owner+field.source);
         if type_of(value)!="array" || value.len()!=3 {
-            return plan_error("Griffin foil palette incomplete: "+field.source);
+            return support::plan_error("griffin_visual_component_assembly", "Griffin foil palette incomplete: "+field.source);
         }
         for channel in value {
             let c=f64_from(channel);
             if c==() || !griffin_geometry::scalar_is_finite(c) || c<0.0 || c>1.0 {
-                return plan_error("Griffin foil palette channel invalid: "+field.source);
+                return support::plan_error("griffin_visual_component_assembly", "Griffin foil palette channel invalid: "+field.source);
             }
         }
         let color=assembly_builder::_mesh_tuple3(value,"foil color");
@@ -5882,7 +5370,7 @@ fn griffin_surface_finish_plan(doc, edit_target, root) {
         let value=f64_from(model.value(owner+field.source));
         if value==() || !griffin_geometry::scalar_is_finite(value) || value<=0.0
             || (field.normalized && value>1.0) {
-            return plan_error("Griffin foil control invalid: "+field.source);
+            return support::plan_error("griffin_visual_component_assembly", "Griffin foil control invalid: "+field.source);
         }
         // ShaderMaterial's declared GPU input uses float; source stays f64.
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:material+"/Surface",
@@ -5890,8 +5378,8 @@ fn griffin_surface_finish_plan(doc, edit_target, root) {
     }
     for name in griffin_spec::propellant_tank_names() {
         let path = root + "/" + name + "/MliTank";
-        let prim = _component_query(doc, path);
-        if !prim.ok || prim.type_name != "Sphere" { return plan_error("Tank foil shell is missing: " + path); }
+        let prim = support::component_query(doc, path);
+        if !prim.ok || prim.type_name != "Sphere" { return support::plan_error("griffin_visual_component_assembly", "Tank foil shell is missing: " + path); }
         ops.push(#{SetApiSchemas: #{edit_target: edit_target, path: path, schemas: ["MaterialBindingAPI"]}});
         ops.push(#{SetRelationship: #{edit_target: edit_target, path: path,
             name: "material:binding", targets: [material]}});
@@ -5901,9 +5389,9 @@ fn griffin_surface_finish_plan(doc, edit_target, root) {
     let legacy_path = root + "/PayloadAdapter/AdapterRing";
     let legacy = assembly_builder::composed_query(doc,
         #{path: legacy_path, children: false, attrs: ["physics:collisionEnabled"]});
-    if query_ok(legacy) {
+    if support::query_ok(legacy) {
         if legacy.type_name != "Cylinder" || legacy.attrs["physics:collisionEnabled"] != false {
-            return plan_error("Legacy adapter disc must be an identified render-only Cylinder");
+            return support::plan_error("griffin_visual_component_assembly", "Legacy adapter disc must be an identified render-only Cylinder");
         }
         ops.push(#{RemovePrim: #{edit_target: edit_target, path: legacy_path}});
     }
@@ -5916,7 +5404,7 @@ fn _griffin_payload_frame_component_plan(doc, edit_target, root, model) {
     let mount = _griffin_model_value(model, "bodyMount");
     let center = _ramp_model_number(model, "payloadAdapterCenterYM");
     if !vec3_is_native(dims) || !vec3_is_native(mount) || center == () {
-        return plan_error("Payload support placement source incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "Payload support placement source incomplete");
     }
     let geometry = _griffin_payload_frame_geometry(model, dims.x, dims.z, dims.y);
     if !geometry.ok { return geometry; }
@@ -5930,7 +5418,7 @@ fn _griffin_payload_frame_component_plan(doc, edit_target, root, model) {
     let deck_dims = _griffin_model_value(model, "deckDimensions");
     let bottom = deck.y + deck_dims.y / 2.0;
     let top = center - mount.y - dims.y / 2.0;
-    if top <= bottom { return plan_error("payload support must rise above the bus deck"); }
+    if top <= bottom { return support::plan_error("griffin_visual_component_assembly", "payload support must rise above the bus deck"); }
     // Four cardinal columns avoid the four tank domes. Stock reuses the
     // platform thickness; their ends close the two source-owned deck datums.
     for station in [#{name:"Port",x:dims.x/2.0-dims.y/2.0,z:0.0},
@@ -5974,7 +5462,7 @@ fn griffin_avionics_component_plan(doc,edit_target,root) {
     let avionics_center=_griffin_model_value(model,"avionicsDeckCenter");
     let pod_dims=_griffin_model_value(model,"avionicsPodDimensions");
     if !vec3_is_native(avionics_dims) || !vec3_is_native(avionics_center)
-        || !vec3_is_native(pod_dims) {return plan_error("electronics bay source unavailable");}
+        || !vec3_is_native(pod_dims) {return support::plan_error("griffin_visual_component_assembly", "electronics bay source unavailable");}
     for member in [#{name:"AvionicsDeck",position:vec3_array(avionics_center),
             scale:vec3_array(avionics_dims),color:"avionicsDeckDisplayColor"},
         #{name:"AvionicsPod",position:[avionics_center.x,
@@ -5990,7 +5478,7 @@ fn griffin_avionics_component_plan(doc,edit_target,root) {
 
 fn griffin_payload_frame_component_plan(doc, edit_target, root) {
     let model = sysml_requirements::model();
-    if !sysml_model_is(model) { return plan_error("Griffin model unavailable"); }
+    if !sysml_model_is(model) { return support::plan_error("griffin_visual_component_assembly", "Griffin model unavailable"); }
     _griffin_payload_frame_component_plan(doc, edit_target, root, model)
 }
 
@@ -6005,9 +5493,9 @@ fn griffin_payload_installation_plan(doc, edit_target, root) {
         children:false, attrs:[]});
     let m=sysml_requirements::model();
     let dims=m.value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::payloadInterfacePlateDimensions");
-    if !query_ok(plate) || plate.type_name!="Cube" || !vec3_is_native(dims)
+    if !support::query_ok(plate) || plate.type_name!="Cube" || !vec3_is_native(dims)
         || !vec3_is_finite(dims) || dims.x<=0.0 || dims.y<=0.0 || dims.z<=0.0 {
-        return plan_error("payload interface plate dimensions unavailable");
+        return support::plan_error("griffin_visual_component_assembly", "payload interface plate dimensions unavailable");
     }
     let top = geometry.adapter_center_y_m + geometry.adapter_thickness_m/2.0;
     frame.ops.push(#{SetTranslate: #{edit_target:edit_target,path:plate_path,
@@ -6026,13 +5514,13 @@ fn griffin_payload_installation_plan(doc, edit_target, root) {
 // Keep one authored cylinder per station, rather than a second tire subtree.
 fn flip_wheel_surface_plan(doc, edit_target, root) {
     let names = griffin_spec::rover_wheel_station_names();
-    if names.len() != 4 { return plan_error("FLIP requires four typed wheel stations"); }
+    if names.len() != 4 { return support::plan_error("griffin_visual_component_assembly", "FLIP requires four typed wheel stations"); }
     let ops = [];
     for name in names {
         let path = root + "/Suspension_" + name + "/Wheel_" + name;
-        let wheel = _component_query(doc, path);
-        if !wheel.ok || wheel.type_name != "Cylinder" { return plan_error(path + ": wheel Cylinder missing"); }
-        let visual = _component_query(doc, path + "/Visual");
+        let wheel = support::component_query(doc, path);
+        if !wheel.ok || wheel.type_name != "Cylinder" { return support::plan_error("griffin_visual_component_assembly", path + ": wheel Cylinder missing"); }
+        let visual = support::component_query(doc, path + "/Visual");
         if visual.ok { ops.push(#{RemovePrim: #{edit_target:edit_target,path:path+"/Visual"}}); }
         ops.push(#{SetAttribute: #{edit_target:edit_target,path:path,name:"purpose",
             type_name:"token",value:"\"default\""}});
@@ -6043,19 +5531,19 @@ fn flip_wheel_surface_plan(doc, edit_target, root) {
 // One standard material network can bind several members of a component.
 // Appearance has no physics authority; preserve existing schemas on each prim.
 fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, metallic, roughness) {
-    if !absolute_root(root) || paths.is_empty() || color.len()!=3
+    if !support::absolute_root(root) || paths.is_empty() || color.len()!=3
         || metallic<0.0 || metallic>1.0 || roughness<0.0 || roughness>1.0 {
-        return plan_error("surface material parameters incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "surface material parameters incomplete");
     }
     let mat=root+"/Looks/"+name;let shader=mat+"/Surface";let ops=[];
     for part in [#{parent:root,name:"Looks",kind:"Scope"},
         #{parent:root+"/Looks",name:name,kind:"Material"},
         #{parent:mat,name:"Surface",kind:"Shader"}] {
         let existing=assembly_builder::composed_query(doc,#{path:part.parent+"/"+part.name,children:false,attrs:[]});
-        if query_ok(existing) && existing.type_name!=part.kind {
-            return plan_error("material network prim has wrong type: "+part.parent+"/"+part.name);
+        if support::query_ok(existing) && existing.type_name!=part.kind {
+            return support::plan_error("griffin_visual_component_assembly", "material network prim has wrong type: "+part.parent+"/"+part.name);
         }
-        if !query_ok(existing) {
+        if !support::query_ok(existing) {
             ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:part.parent,name:part.name,
                 type_name:part.kind,reference:(),reference_prim_path:()}});
         }
@@ -6070,7 +5558,7 @@ fn griffin_surface_material_plan(doc, edit_target, root, name, paths, color, met
     ops.push(#{SetConnection:#{edit_target:edit_target,path:mat,name:"outputs:surface",type_name:"token",sources:[shader+".outputs:surface"]}});
     for path in paths {
         let prim=assembly_builder::composed_query(doc,#{path:path,children:false,schemas:true,attrs:[]});
-        if !query_ok(prim) {return plan_error("material target missing: "+path);}
+        if !support::query_ok(prim) {return support::plan_error("griffin_visual_component_assembly", "material target missing: "+path);}
         let schemas=prim.api_schemas;if !schemas.contains("MaterialBindingAPI") {schemas.push("MaterialBindingAPI");}
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:schemas}});
         ops.push(#{SetRelationship:#{edit_target:edit_target,path:path,name:"material:binding",targets:[mat]}});
@@ -6086,23 +5574,23 @@ fn flip_chassis_finish_plan(doc, edit_target, root) {
     let source=sysml_requirements::source_with_attributes([own+"usdPath",own+"childNames",own+"appearanceRoles"]);
     let owner=sysml_requirements::attribute(source,own+"usdPath").record.owner_handle;
     let silver=sysml_requirements::vector_from_reference(source,owner,"metalDisplayColor");
-    if !silver.ok {return plan_error(silver.error);}
+    if !silver.ok {return support::plan_error("griffin_visual_component_assembly", silver.error);}
     let ops=[];
     let looks_planned=false;
     let members=sysml_requirement_checks::source_enum_identifiers(source,own+"childNames");
     let roles=sysml_requirement_checks::source_enum_identifiers(source,own+"appearanceRoles");
-    if members.is_empty() || members.len()!=roles.len() {return plan_error("FLIP appearance role/member counts disagree");}
-    for role in roles {if role!="Metal" && role!="Enclosure" {return plan_error("Unknown FLIP finish role: "+role);}}
+    if members.is_empty() || members.len()!=roles.len() {return support::plan_error("griffin_visual_component_assembly", "FLIP appearance role/member counts disagree");}
+    for role in roles {if role!="Metal" && role!="Enclosure" {return support::plan_error("griffin_visual_component_assembly", "Unknown FLIP finish role: "+role);}}
     for prefix in ["metal","enclosure"] {
         let material_name=model.value(own+prefix+"MaterialName");
-        if !sysml_enum_is(material_name) {return plan_error("FLIP material identity is unavailable");}
+        if !sysml_enum_is(material_name) {return support::plan_error("griffin_visual_component_assembly", "FLIP material identity is unavailable");}
         let selected=[];
         for index in 0..members.len() {if roles[index].to_lower()==prefix {selected.push(members[index]);}}
         let profile=#{name:material_name.literal,prefix:prefix,members:selected};
         let color=if profile.prefix=="metal" {silver.value} else {model.value(own+profile.prefix+"DisplayColor")};
-        let metallic=_source_number(model,own+profile.prefix+"Metallic");
-        let roughness=_source_number(model,own+profile.prefix+"Roughness");
-        if color==() || metallic==() || roughness==() {return plan_error("FLIP finish source unavailable");}
+        let metallic=support::source_number(model,own+profile.prefix+"Metallic");
+        let roughness=support::source_number(model,own+profile.prefix+"Roughness");
+        if color==() || metallic==() || roughness==() {return support::plan_error("griffin_visual_component_assembly", "FLIP finish source unavailable");}
         let paths=[];for member in profile.members {paths.push(root+"/"+member);}
         let plan=griffin_surface_material_plan(doc,edit_target,root,profile.name,paths,color,metallic,roughness);
         if !plan.ok {return plan;}
@@ -6120,19 +5608,19 @@ fn flip_chassis_finish_plan(doc, edit_target, root) {
 // The walking contact Mesh also owns the visible plate and folded back.
 fn griffin_ramp_walking_surface_plan(doc, edit_target, section_path) {
     let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("ramp appearance source unavailable");}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "ramp appearance source unavailable");}
     let own="GriffinRampRequirements::GriffinEgressRamp::";
     let color=model.value(own+"rampTrackDisplayColor");
     let metallic=model.value(own+"rampTrackMetallic");
     let roughness=model.value(own+"rampTrackRoughness");
     if color==() || metallic==() || roughness==() {
-        return plan_error("ramp plate finish source incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "ramp plate finish source incomplete");
     }
     let paths=[section_path+"/RampTrackPort",section_path+"/RampTrackStarboard"];
     for path in paths {
-        let mesh=_component_query(doc,path);
-        if !query_ok(mesh) || mesh.type_name!="Mesh" {
-            return plan_error(path+": physical walking plate Mesh unavailable");
+        let mesh=support::component_query(doc,path);
+        if !support::query_ok(mesh) || mesh.type_name!="Mesh" {
+            return support::plan_error("griffin_visual_component_assembly", path+": physical walking plate Mesh unavailable");
         }
     }
     let plan=griffin_surface_material_plan(doc,edit_target,section_path,
@@ -6148,7 +5636,7 @@ fn griffin_ramp_walking_surface_plan(doc, edit_target, section_path) {
 // One existing parked mechanism; bus owns its mount, source owns study sizing.
 fn griffin_high_gain_plan(doc, edit_target, root) {
     let m=sysml_requirements::model();
-    if !sysml_model_is(m) {return plan_error("Griffin antenna source unavailable");}
+    if !sysml_model_is(m) {return support::plan_error("griffin_visual_component_assembly", "Griffin antenna source unavailable");}
     let o="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let deck=m.value(o+"deckDimensions");let center=m.value(o+"deckCenter");
     let mount=m.value(o+"bodyMount");
@@ -6156,20 +5644,20 @@ fn griffin_high_gain_plan(doc, edit_target, root) {
     let radius=f64_from(m.value(o+"highGainMastRadiusM"));
     let scale=f64_from(m.value(o+"highGainHeadScale"));
     let tilt=f64_from(m.value(o+"highGainParkedTiltDeg"));
-    if !absolute_root(root) || !vec3_is_native(deck) || !vec3_is_native(center)
+    if !support::absolute_root(root) || !vec3_is_native(deck) || !vec3_is_native(center)
         || !vec3_is_native(mount) || height==() || height<=0.0 || radius==()
         || radius<=0.0 || scale==() || scale<=0.0 || tilt==() {
-        return plan_error("Griffin antenna mount/dimensions incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "Griffin antenna mount/dimensions incomplete");
     }
     let path=root+"/HighGainDish";
     let position=vec3(mount.x,mount.y+center.y+deck.y/2.0,mount.z-deck.z/2.0+deck.y/2.0);
     let ops=[];
     let existing=assembly_builder::composed_query(doc,#{path:path,attrs:[],children:false});
-    if query_ok(existing) {
+    if support::query_ok(existing) {
         let reflector=assembly_builder::composed_query(doc,
             #{path:path+"/YawHead/DishGimbal/DishHead/Reflector",attrs:[],children:false});
-        if existing.type_name!="Xform" || !query_ok(reflector) || reflector.type_name!="NurbsPatch" {
-            return plan_error("replace the obsolete antenna root before referencing the shared mechanism");
+        if existing.type_name!="Xform" || !support::query_ok(reflector) || reflector.type_name!="NurbsPatch" {
+            return support::plan_error("griffin_visual_component_assembly", "replace the obsolete antenna root before referencing the shared mechanism");
         }
     } else {
         ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"HighGainDish",
@@ -6195,25 +5683,25 @@ fn griffin_high_gain_plan(doc, edit_target, root) {
 // this parked visual adds no separate actuator or physics body.
 fn griffin_medium_gain_plan(doc, edit_target, root) {
     let m=sysml_requirements::model();
-    if !sysml_model_is(m) {return plan_error("medium-gain source unavailable");}
+    if !sysml_model_is(m) {return support::plan_error("griffin_visual_component_assembly", "medium-gain source unavailable");}
     let o="GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::";
     let body=m.value(o+"bodyDimensions");let panel=m.value(o+"mediumGainPanelDimensions");
     let bracket=m.value(o+"mediumGainBracketDimensions");
     let fraction=f64_from(m.value(o+"mediumGainMountWidthFraction"));
-    if !absolute_root(root) || !vec3_is_native(body) || !vec3_is_native(panel)
+    if !support::absolute_root(root) || !vec3_is_native(body) || !vec3_is_native(panel)
         || !vec3_is_native(bracket) || !vec3_is_finite(body) || !vec3_is_finite(panel)
         || !vec3_is_finite(bracket) || fraction==()
         || !griffin_geometry::scalar_is_finite(fraction)
         || fraction<0.0 || fraction>=0.5
         || panel.x<=0.0 || panel.y<=0.0 || panel.z<=0.0
         || bracket.x<=0.0 || bracket.y<=0.0 || bracket.z<=0.0 {
-        return plan_error("medium-gain source dimensions incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "medium-gain source dimensions incomplete");
     }
     let parent=root+"/MediumGainAntenna";let ops=[];
-    let existing=_component_query(doc,parent);
+    let existing=support::component_query(doc,parent);
     if !existing.ok {
         ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"MediumGainAntenna",type_name:"Xform",reference:(),reference_prim_path:""}});
-    } else if existing.type_name!="Xform" {return plan_error("medium-gain assembly must be Xform");}
+    } else if existing.type_name!="Xform" {return support::plan_error("griffin_visual_component_assembly", "medium-gain assembly must be Xform");}
     let origin=vec3(body.x*fraction,body.y/2.0-panel.y/2.0,-body.z/2.0);
     ops.push(#{SetTranslate:#{edit_target:edit_target,path:parent,value:origin}});
     for item in [#{name:"Bracket",size:bracket,center:vec3(0.0,0.0,-bracket.z/2.0),color:m.value(o+"silverDisplayColor")},
@@ -6236,7 +5724,7 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
     let yaws = griffin_spec::component_leg_station_rotation_y_deg();
     let g = physical_landing_leg_pad_geometry();
     if !g.ok || !array_is(anchors) || anchors.len()!=3 || !vec3_is_native(foot)
-        || stations.len()!=4 || yaws.len()!=4 {return plan_error("axial leg source incomplete");}
+        || stations.len()!=4 || yaws.len()!=4 {return support::plan_error("griffin_visual_component_assembly", "axial leg source incomplete");}
     let shock = anchors[0]-foot;
     let length = vlen(shock);
     let tilt = atan(-shock.x/shock.y)*180.0/acos(-1.0);
@@ -6248,7 +5736,7 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
     if radius==() || foot_mass==() || barrel_fraction==() || piston_fraction==()
         || radius_fraction==() || length<=0.0 || shock.y<=0.0
         || abs(shock.z)>g.tolerance_m || radius<=0.0 || foot_mass<=0.0 {
-        return plan_error("shock geometry/mass or axial source invalid");
+        return support::plan_error("griffin_visual_component_assembly", "shock geometry/mass or axial source invalid");
     }
     let ids = ["PX","NX","PZ","NZ"];
     let ops = [];
@@ -6259,7 +5747,7 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
         let qshock=qleg*qtilt;
         let c=stations[i]+qrot(qleg,foot);
         let mount=root+"/"+name+"_BusMount";
-        if !query_ok(assembly_builder::composed_query(doc,#{path:mount,children:false})) {
+        if !support::query_ok(assembly_builder::composed_query(doc,#{path:mount,children:false})) {
             ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:name+"_BusMount",type_name:"Xform",
                 reference:"twin://astrobotic-griffin-1/components/lander/griffin_landing_leg_visual.usda",reference_prim_path:"/LandingLeg"}});
         }
@@ -6270,12 +5758,12 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
             #{parent:leg,name:"ShockPiston",position:foot,center:length*piston_fraction/2.0,h:length*piston_fraction,r:radius*radius_fraction}
         ] {
             let path=tube.parent+"/"+tube.name;
-            if !query_ok(assembly_builder::composed_query(doc,#{path:path,children:false})) {
+            if !support::query_ok(assembly_builder::composed_query(doc,#{path:path,children:false})) {
                 ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:tube.parent,name:tube.name,type_name:"Xform",reference:(),reference_prim_path:""}});
             }
             let pose=assembly_builder::place_plan(edit_target,path,vec3_array(tube.position),[0.0,0.0,tilt],());
             if !pose.ok {return pose;} for op in pose.ops {ops.push(op);}
-            let shape=if query_ok(assembly_builder::composed_query(doc,#{path:path+"/Tube",children:false})) {
+            let shape=if support::query_ok(assembly_builder::composed_query(doc,#{path:path+"/Tube",children:false})) {
                 _component_cylinder_visual_ops(doc,edit_target,path,"Tube",[0.0,tube.center,0.0],[0.0,0.0,0.0],tube.r,tube.h,"Y",[0.62,0.65,0.69])
             } else {
                 assembly_builder::cylinder_shape_plan_axis(edit_target,path,"Tube",tube.r,tube.h,[0.0,tube.center,0.0],[0.0,0.0,0.0],(),"Y",false)
@@ -6315,7 +5803,7 @@ fn axial_landing_gear_plan(doc, edit_target, root) {
 // estimated chamber/valve envelopes in the owning SysML contract.
 fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
-    if !sysml_model_is(model) {return plan_error("RCS source is unavailable");}
+    if !sysml_model_is(model) {return support::plan_error("griffin_visual_component_assembly", "RCS source is unavailable");}
     let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
     let throat=f64_from(model.value(own+"throatRadiusM"));
     let exit=f64_from(model.value(own+"exitRadiusM"));
@@ -6329,7 +5817,7 @@ fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
     if throat==() || exit==() || height==() || collar==() || chamber==() || wall==()
         || contour==() || axial==() || segments==() || throat<=wall
         || exit<=throat || chamber<=throat || height<=0.0 || collar<=0.0 || axial<8 || segments<16 {
-        return plan_error("RCS nozzle dimensions are incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "RCS nozzle dimensions are incomplete");
     }
     let profile=griffin_geometry::hollow_bell_profile(throat,exit,height,wall,contour,axial);
     let neck=[[throat,height/2.0],[chamber,height/2.0+chamber],
@@ -6358,7 +5846,7 @@ fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
     let cant=f64_from(model.value(own+"valveCantDeg"));
     if valve_radius==() || valve_length==() || valve_offset==()
         || inlet_radius==() || inlet_length==() || inlet_offset==() || cant==() {
-        return plan_error("A110 valve envelope source is incomplete");
+        return support::plan_error("griffin_visual_component_assembly", "A110 valve envelope source is incomplete");
     }
     let head_y=height/2.0+collar;
     // Cylinders are visual solenoid/tube envelopes, not independent bodies.
@@ -6380,80 +5868,14 @@ fn griffin_rcs_bell_component_plan(doc, edit_target, root) {
     #{ok:true,ops:ops,exit_radius_m:exit,bell_height_m:height,throat_radius_m:throat}
 }
 
-// The complete feed wiring belongs to the single attitude propulsion network.
-fn griffin_rcs_feed_plan(doc, edit_target, root) {
-    let fuel=griffin_spec::_typed_model_number(
-        "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::plumeFuelFamily");
-    let radius=griffin_spec::_typed_model_number(
-        "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::exitRadiusM");
-    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
-    let isp=griffin_spec::_typed_model_number(own+"nominalSpecificImpulseS");
-    let mixture=griffin_spec::_typed_model_number(own+"oxidizerToFuelRatio");
-    let throat=griffin_spec::_typed_model_number(own+"throatRadiusM");
-    let length=griffin_spec::_typed_model_number(own+"bellHeightM");
-    let contour=griffin_spec::_typed_model_number(own+"bellContourExponent");
-    let force=griffin_spec::_typed_model_number(own+"nominalForceN");
-    if fuel==() || radius==() || radius<=0.0 || isp==() || mixture==()
-        || throat==() || length==() || contour==() || force==() {return plan_error("RCS feed source incomplete");}
-    let ops=[];
-    let aggregate=root+"/AttitudePropulsion/RcsFlowAggregator";
-    ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:aggregate,name:"inputs:oxidizer_to_fuel_ratio"}});
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:aggregate,
-        name:"inputs:oxidizer_to_fuel_ratio",type_name:"double",value:mixture.to_string()}});
-    for reactant in [#{name:"fuel",tank:"FuelTank"},#{name:"oxidizer",tank:"OxidizerTank"}] {
-        ops.push(#{SetConnection:#{edit_target:edit_target,path:root+"/MainPropulsion",
-            name:"outputs:"+reactant.name+"_mass_kg",type_name:"float",
-            sources:[root+"/MainPropulsion/"+reactant.tank+".outputs:mass_kg"]}});
-        ops.push(#{SetConnection:#{edit_target:edit_target,path:root+"/AttitudePropulsion",
-            name:"inputs:available_"+reactant.name+"_mass_kg",type_name:"float",
-            sources:[root+"/MainPropulsion.outputs:"+reactant.name+"_mass_kg"]}});
-    }
-    for jet in griffin_spec::rcs_port_mapping() {
-        let path=root+"/AttitudePropulsion/"+jet.model_name;
-        for reactant in [#{input:"available_fuel_mass_kg",tank:"FuelTank"},
-            #{input:"available_oxidizer_mass_kg",tank:"OxidizerTank"}] {
-            ops.push(#{SetConnection:#{edit_target:edit_target,path:path,
-                name:"inputs:"+reactant.input,type_name:"float",
-                sources:[root+"/AttitudePropulsion.inputs:"+reactant.input]}});
-        }
-        for output in engine_exhaust::physical_outputs() {
-            let name=if output=="intensity" {"light_intensity"}
-                else if output=="radius" {"light_radius"} else {output};
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
-                name:"outputs:"+name,
-                type_name:if engine_exhaust::render_outputs().contains(output) {"float"} else {"double"},value:"0.0"}});
-        }
-        for item in [#{input:"gas_gamma",source:"rcsGasGamma"},
-            #{input:"gas_constant_j_kg_k",source:"gasConstantJkgK"},
-            #{input:"radiative_fraction",source:"rcsRadiativeFraction"},
-            #{input:"luminous_efficacy_lm_w",source:"luminousEfficacyLmW"}] {
-            let value=griffin_spec::_typed_model_number("GriffinPropulsionRequirements::GriffinPlumeStudy::"+item.source);
-            if value==() {return plan_error("RCS optical assumption missing: "+item.source);}
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+item.input,
-                type_name:"double",value:value.to_string()}});
-        }
-        for parameter in [#{name:"fuel_family",value:fuel},
-            #{name:"plume_width_m",value:radius},#{name:"geometry_capacity_m",value:0.0},
-            #{name:"nozzle_throat_radius_m",value:throat},
-            #{name:"nozzle_length_m",value:length},#{name:"nozzle_contour",value:contour},
-            #{name:"f_nom_n",value:force},
-            #{name:"isp_sec",value:isp},#{name:"mixture_ratio",value:mixture}] {
-            ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:path,name:"inputs:"+parameter.name}});
-            ops.push(#{SetAttribute:#{edit_target:edit_target,path:path,
-                name:"inputs:"+parameter.name,type_name:"double",value:parameter.value.to_string()}});
-        }
-    }
-    #{ok:true,ops:ops,jet_count:griffin_spec::rcs_port_mapping().len()}
-}
-
 // Bounded face batches keep mesh observations inside the normal Editor budget.
 // Accept the component only after all four batches at one document generation.
 fn griffin_rcs_bell_check(doc, root, batch) {
-    if batch<0 || batch>=4 {return plan_error("RCS mesh batch must be 0..3");}
+    if batch<0 || batch>=4 {return support::plan_error("griffin_visual_component_assembly", "RCS mesh batch must be 0..3");}
     let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
     let record=assembly_builder::composed_query(doc,#{path:root+"/Bell",
         attrs:["points","faceVertexCounts","faceVertexIndices","physics:collisionEnabled"]});
-    if !query_ok(record) || record.attrs.points==() {return plan_error("RCS mesh unavailable");}
+    if !support::query_ok(record) || record.attrs.points==() {return support::plan_error("griffin_visual_component_assembly", "RCS mesh unavailable");}
     let counts=record.attrs.faceVertexCounts;
     let indices=record.attrs.faceVertexIndices;
     let lower=counts.len()*batch/4;let upper=counts.len()*(batch+1)/4;
@@ -6466,142 +5888,11 @@ fn griffin_rcs_bell_check(doc, root, batch) {
     let throat=griffin_spec::_typed_model_number(own+"throatRadiusM");
     let wall=griffin_spec::_typed_model_number(own+"visualWallThicknessM");
     let tolerance=griffin_spec::_typed_model_number(own+"geometryToleranceM");
-    if radius==() || height==() || throat==() || wall==() || tolerance==() {return plan_error("RCS source incomplete");}
+    if radius==() || height==() || throat==() || wall==() || tolerance==() {return support::plan_error("griffin_visual_component_assembly", "RCS source incomplete");}
     #{ok:mesh.available && mesh.open && (mesh.radius-radius).abs()<=tolerance
         && (mesh.height-height).abs()<=tolerance
         && (mesh.minimum-(throat-wall)).abs()<=tolerance
         && record.attrs["physics:collisionEnabled"]==false,
       batch:batch,batches:4,doc_id:record.doc_id,
       document_generation:record.document_generation,mesh:mesh}
-}
-
-fn _griffin_rcs_mount_frame(record, jet) {
-    let own="GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::";
-    let force=griffin_spec::_typed_model_number(own+"nominalForceN");
-    let height=griffin_spec::_typed_model_number(own+"mountHeightAbovePayloadDeckM");
-    let standoff=griffin_spec::_typed_model_number(own+"mountStandoffM");
-    let offset=griffin_spec::_typed_model_number(own+"memberTangentOffsetM");
-    let dimensions=griffin_spec::visual_body_dimensions();
-    let profile=griffin_spec::visual_outer_body_profile_coordinates();
-    if force==() || height==() || standoff==() || offset==()
-        || dimensions==() || profile.len()!=8 {
-        return plan_error("RCS mount and rating source unavailable");
-    }
-    let old=vec3_from(record.attrs["xformOp:translate"]);
-    if !vec3_is_finite(old) || old.x==0.0 || old.z==0.0 {
-        return plan_error("RCS corner identity requires a finite nonzero X/Z position");
-    }
-    let sx=old.x/old.x.abs();let sz=old.z/old.z.abs();
-    let chamfer=(1.0+profile[0].x.abs())/2.0;
-    let arm_x=dimensions.x/2.0*chamfer+standoff/2.0.sqrt();
-    let arm_z=dimensions.z/2.0*chamfer+standoff/2.0.sqrt();
-    let tangent=if jet.valve_port.contains("pitch") {-offset}
-        else if jet.valve_port.contains("roll") {offset} else {0.0};
-    tangent*=sx*sz;
-    let position=[sx*arm_x-sz*tangent/2.0.sqrt(),
-        griffin_spec::visual_payload_adapter_center_y_m()+griffin_spec::visual_payload_adapter_thickness_m()/2.0+height,
-        sz*arm_z+sx*tangent/2.0.sqrt()];
-    #{ok:true,position:position,force:force,sx:sx,sz:sz,arm_x:arm_x,arm_z:arm_z}
-}
-
-fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
-    let jets=griffin_spec::rcs_port_mapping();
-    if index<0 || index>=jets.len() {return plan_error("RCS station index invalid");}
-    let jet=jets[index];let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
-    let path=root+"/"+name;let model=root+"/AttitudePropulsion/"+jet.model_name;
-    let record=assembly_builder::composed_query(doc,#{path:path,
-        attrs:["xformOp:translate","xformOp:rotateXYZ","lunco:forceActuator:direction","lunco:forceActuator:maxForce"]});
-    if !query_ok(record) || record.attrs["xformOp:translate"]==()
-        || record.attrs["xformOp:rotateXYZ"]==()
-        || record.attrs["lunco:forceActuator:direction"]==() {
-        return plan_error("RCS physical station unavailable");
-    }
-    let frame=_griffin_rcs_mount_frame(record,jet);
-    if !frame.ok {return frame;}
-    let position=frame.position;let force=frame.force;
-    let ops=[#{RemovePrim:#{edit_target:edit_target,path:path}},
-        #{AddPrim:#{edit_target:edit_target,parent_path:root,name:name,type_name:"Xform",reference:(),reference_prim_path:()}},
-        #{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["LunCoForceActuatorAPI"]}},
-        #{SetTranslate:#{edit_target:edit_target,path:path,value:position}},
-        #{SetRotate:#{edit_target:edit_target,path:path,value:record.attrs["xformOp:rotateXYZ"]}},
-        #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:direction",type_name:"float3",value:_color3_literal(record.attrs["lunco:forceActuator:direction"])}},
-        #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:maxForce",type_name:"double",value:force.to_string()}},
-        #{SetRelationship:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:commandSource",targets:[root+"/AttitudeActuation.outputs:"+jet.valve_port]}},
-        #{SetConnection:#{edit_target:edit_target,path:path,name:"inputs:force_command",type_name:"float",sources:[root+"/AttitudePropulsion.outputs:"+jet.thrust_port]}},
-        #{AddPrim:#{edit_target:edit_target,parent_path:path,name:"Nozzle",type_name:"Xform",
-            reference:component_asset("lander/griffin_rcs_bell_visual.usda"),reference_prim_path:"/World"}},
-        // Force is local -Y; the nozzle's exhaust must point local +Y.
-        #{SetRotate:#{edit_target:edit_target,path:path+"/Nozzle",value:[180.0,0.0,0.0]}}];
-    let core=assembly_builder::composed_query(doc,#{path:root+"/"+name+"Core"});
-    if query_ok(core) {ops.push(#{RemovePrim:#{edit_target:edit_target,path:root+"/"+name+"Core"}});}
-    ops.push(#{SetAttribute:#{edit_target:edit_target,path:model,name:"inputs:f_nom_n",type_name:"float",value:force.to_string()}});
-    for op in engine_exhaust::connection_ops(edit_target,path+"/Nozzle",model,
-        #{intensity:"light_intensity",radius:"light_radius"}) {ops.push(op);}
-    #{ok:true,ops:ops,path:path,model:model}
-}
-
-// Positive-conformance wrench evidence from the composed physics datums.
-fn griffin_rcs_wrench_check(doc, root) {
-    let groups=#{pitch_pos:vec3(0.0,0.0,0.0),pitch_neg:vec3(0.0,0.0,0.0),
-        roll_pos:vec3(0.0,0.0,0.0),roll_neg:vec3(0.0,0.0,0.0),
-        yaw_pos:vec3(0.0,0.0,0.0),yaw_neg:vec3(0.0,0.0,0.0)};
-    let forces=#{};
-    for group in groups.keys() {forces[group]=vec3(0.0,0.0,0.0);}
-    let generation=();
-    for jet in griffin_spec::rcs_port_mapping() {
-        let name=jet.model_name.sub_string(0,jet.model_name.len()-5);
-        let record=assembly_builder::composed_query(doc,#{path:root+"/"+name,
-            attrs:["xformOp:translate","xformOp:rotateXYZ","lunco:forceActuator:direction","lunco:forceActuator:maxForce"]});
-        if !query_ok(record) {return plan_error("RCS wrench datum missing");}
-        if generation==() {generation=record.document_generation;}
-        if generation!=record.document_generation {return plan_error("RCS wrench generation changed");}
-        let point=vec3_from(record.attrs["xformOp:translate"]);
-        let rotation=quat_from_euler_xyz_deg(vec3_from(record.attrs["xformOp:rotateXYZ"]));
-        let force=qrot(rotation,vec3_from(record.attrs["lunco:forceActuator:direction"]))
-            *f64_from(record.attrs["lunco:forceActuator:maxForce"]);
-        let group=jet.valve_port.sub_string(0,jet.valve_port.len()-8);
-        groups[group]+=vcross(point,force);forces[group]+=force;
-    }
-    let checks=[];
-    let tolerance=griffin_spec::_typed_model_number(
-        "GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::geometryVerificationToleranceM");
-    for row in [#{name:"pitch_pos",axis:0,sign:1.0},#{name:"pitch_neg",axis:0,sign:-1.0},
-        #{name:"yaw_pos",axis:1,sign:1.0},#{name:"yaw_neg",axis:1,sign:-1.0},
-        #{name:"roll_pos",axis:2,sign:1.0},#{name:"roll_neg",axis:2,sign:-1.0}] {
-        let values=vec3_array(groups[row.name]);
-        let off_axis=0.0;for index in 0..3 {if index!=row.axis {off_axis+=values[index].abs();}}
-        checks.push(#{group:row.name,moment:groups[row.name],net_force:forces[row.name],
-            ok:values[row.axis]*row.sign>0.0 && off_axis<=tolerance
-                && vlen(forces[row.name])<=tolerance});
-    }
-    let ok=true;for check in checks {ok=ok && check.ok;}
-    #{ok:ok,doc_id:doc,document_generation:generation,checks:checks}
-}
-
-// Controller authority follows the weakest pure-axis pair in the composed
-// physical mounts. The source owns the reserve fraction; no copied torque table.
-fn griffin_rcs_command_envelope_plan(doc,edit_target,root) {
-    let pairs=griffin_rcs_wrench_check(doc,root);
-    if !pairs.ok {return plan_error("RCS pure-axis geometry unavailable");}
-    let fraction=griffin_spec::_typed_model_number(
-        "GriffinPropulsionRequirements::GriffinAttitudeEngineAssembly::commandTorqueCapacityFraction");
-    if fraction==() || fraction<=0.0 || fraction>=1.0 {
-        return plan_error("RCS command reserve must be strictly between zero and one");
-    }
-    let capacity=();
-    for pair in pairs.checks {
-        let magnitude=vlen(pair.moment);
-        if capacity==() || magnitude<capacity {capacity=magnitude;}
-    }
-    let limit=capacity*fraction;
-    #{ok:true,document_generation:pairs.document_generation,torque_limit_nm:limit,
-      ops:[#{RemoveAttribute:#{edit_target:edit_target,path:root,
-        name:"inputs:hold_torque_limit_nm"}},
-        #{SetAttribute:#{edit_target:edit_target,path:root,
-        name:"inputs:hold_torque_limit_nm",type_name:"double",value:limit.to_string()}}]}
-}
-
-// One upper-corner mount group, preserving each nozzle/feed/force identity.
-fn griffin_rcs_pod_mount_plan(doc,edit_target,root,sx,sz) {
-    plan_error("Use griffin_rcs_mounts::pod_plan; the flat shelf cannot seat inverted and horizontal A110 chambers")
 }

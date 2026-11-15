@@ -9,6 +9,9 @@ emits typed verdicts; Modelica owns continuous physics.
 physical stops and stationary dwell against `FlipMotionRequirements::MotionStudy`.
 It also bounds native panel tracking error and relative angular velocity during
 driving, braking and dwell, and publishes panel peaks with the motion evidence.
+Its required SysML predicate evaluates both directions with typed runtime
+observations and emits `FLIP_MOTION_ACCEPTANCE` requirement evidence; the final
+45-check motion verdict requires that source acceptance to pass.
 It references the route scene and replaces its observer. Run the production gate:
 
 ```sh

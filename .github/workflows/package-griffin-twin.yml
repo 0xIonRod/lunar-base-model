@@ -16,12 +16,71 @@ permissions:
 jobs:
   package:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 180
     steps:
       - name: Check out selected revision
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+
+      - name: Read qualification contract
+        id: qualification
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re, tomllib
+          contract = tomllib.loads(pathlib.Path('tools/qualification.toml').read_text())
+          engine = contract['engine']
+          assert re.fullmatch(r'[0-9a-f]{40}', engine['revision']), 'full engine SHA required'
+          prefix = 'https://github.com/'
+          assert engine['repository'].startswith(prefix) and engine['repository'].endswith('.git')
+          repository = engine['repository'][len(prefix):-4]
+          assert re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repository)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              print('repository=' + repository, file=out)
+              print('revision=' + engine['revision'], file=out)
+              print('repository_url=' + engine['repository'][:-4], file=out)
+          PY
+
+      - name: Check out matching runtime and shared assets
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.qualification.outputs.repository }}
+          ref: ${{ steps.qualification.outputs.revision }}
+          path: .qualification-engine
+          persist-credentials: false
+
+      - name: Select the engine repository toolchain
+        shell: bash
+        run: |
+          engine_toolchain="$(python3 - <<'PY'
+          import pathlib, tomllib
+          print(tomllib.loads(pathlib.Path('.qualification-engine/rust-toolchain.toml').read_text())['toolchain']['channel'])
+          PY
+          )"
+          rustup toolchain install "$engine_toolchain" --profile minimal --component rust-src
+          printf 'RUSTUP_TOOLCHAIN=%s\n' "$engine_toolchain" >> "$GITHUB_ENV"
+
+      - name: Install Linux build prerequisites
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev libx11-dev xorg-dev
+
+      - name: Cache Rust build inputs
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: .qualification-engine -> target
+          key: griffin-production-${{ steps.qualification.outputs.revision }}
+
+      - name: Build production qualification binaries
+        working-directory: .qualification-engine
+        env:
+          LUNCO_REPOSITORY_URL: ${{ steps.qualification.outputs.repository_url }}
+        shell: bash
+        run: |
+          cargo build --locked -p lunco-luncosim --bin luncosim -j 4
+          cargo build --locked -p lunco-assets --bin lunco-assets -j 4
 
       - name: Stage Twin sources
         shell: bash
@@ -31,19 +90,37 @@ jobs:
             HEAD:twins/astrobotic-griffin-1 | tar -xf - -C package \
               --exclude=astrobotic-griffin-1/.lunco/runtime \
               --exclude=astrobotic-griffin-1/.cache
+          printf '%s\n' "$GITHUB_SHA" > package/astrobotic-griffin-1/SOURCE_COMMIT.txt
+
+      - name: Qualify the staged Twin
+        shell: bash
+        run: |
+          python3 tools/validate_repository.py --twin package/astrobotic-griffin-1
+          python3 tools/qualification.py --engine .qualification-engine \
+            --twin package/astrobotic-griffin-1 --provision \
+            --output runs/qualification --api-port 4299
+          cp runs/qualification/QUALIFICATION.json package/astrobotic-griffin-1/QUALIFICATION.json
 
       - name: Create ZIP and checksum
         shell: bash
         run: |
           test -s package/astrobotic-griffin-1/twin.toml
           test -s package/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda
-          test ! -e package/astrobotic-griffin-1/.cache
-          printf '%s\n' "$GITHUB_SHA" > package/astrobotic-griffin-1/SOURCE_COMMIT.txt
+          test -s package/astrobotic-griffin-1/QUALIFICATION.json
           cd package
-          zip -qr ../astrobotic-griffin-1.zip astrobotic-griffin-1
+          zip -qr ../astrobotic-griffin-1.zip astrobotic-griffin-1 \
+            -x '*/.cache/*' '*/.lunco/*'
           cd ..
           unzip -tq astrobotic-griffin-1.zip
           sha256sum astrobotic-griffin-1.zip > astrobotic-griffin-1.zip.sha256
+
+      - name: Preserve qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: griffin-qualification
+          path: runs/qualification/
+          if-no-files-found: warn
 
       - name: Publish downloadable release
         shell: bash
@@ -61,14 +138,20 @@ jobs:
           fi
           cat > "$RUNNER_TEMP/griffin-release-notes.md" <<EOF
           Download astrobotic-griffin-1.zip and extract the astrobotic-griffin-1 folder.
-          Open that folder as a Twin in a compatible LunCoSim installation.
+          Open that folder using the runtime and matching shared assets identified
+          by QUALIFICATION.json. Native preflight and all release gates passed
+          against that exact engine revision before this archive was published.
 
           Includes Griffin/FLIP Twin files: vehicles, scenes, Rhai scripts,
           SysML requirements, and research records.
           LunCoSim supplies the shared lunco:// assets and runtime; it is not included.
+          Generated terrain is not included. The first open requires network access
+          to prepare the pinned dataset recipe in Assets.toml.
+          Qualification covers headless runtime behavior; it is not visual acceptance.
           This is a study model, not a flight-validated vehicle or mission.
 
           Source revision: $GITHUB_SHA
+          Qualified engine revision: ${{ steps.qualification.outputs.revision }}
           EOF
           gh release create "$release_tag" \
             astrobotic-griffin-1.zip astrobotic-griffin-1.zip.sha256 \

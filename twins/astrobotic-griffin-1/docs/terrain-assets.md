@@ -5,10 +5,10 @@ The canonical preparation recipe is
 It uses LunCoSim's native spherical raster sampling and existing DEM/albedo
 processors. Site parameters and material policy live in that recipe.
 
-A prepared Twin ZIP carries `.cache/`, including its pinned source inputs,
-float64 heightmap, albedo, coverage mask and integrity receipt. Keep that folder
-when extracting or sharing the Twin. Open the extracted Twin in a LunCoSim
-build with artifact-pipeline support.
+Published Twin ZIPs contain the preparation recipe and source provenance.
+Generated `.cache/` data is excluded. On first open, LunCoSim requests the
+declared dataset and prepares its float64 heightmap, albedo, coverage mask and
+integrity receipt. Network access is required until those artifacts are installed.
 
 For a source checkout, build the asset manager from the same engine revision
 used to run the Twin:
@@ -38,6 +38,8 @@ crop size does not redefine that frame. The native output georeferencing
 records the centre, sphere/frame, node spacing and full sample span.
 Crater, overzoom and rock layers remain at their USD/runtime owners.
 
-The packaging workflow builds the native asset manager at its explicit
-`engine_ref`, runs this recipe and verifies the extracted ZIP offline. That
-engine revision must contain the same pipeline contract as the Twin manifest.
+The packaging workflow builds the native asset manager at the engine revision
+pinned in the repository's `tools/qualification.toml`, prepares this recipe in
+the staged Twin and requires runtime qualification before publication. Its
+`QUALIFICATION.json` identifies that engine and the individual gates. The ZIP
+excludes downloaded/generated data; qualification is not an offline-install claim.

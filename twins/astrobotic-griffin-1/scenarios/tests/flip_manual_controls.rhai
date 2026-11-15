@@ -94,7 +94,7 @@ fn flip_motion_snapshot() {
             axle=vec3_array(get(wheel,"WheelRaycast.axle_axis"));
             base=quat_from(get(wheel,"WheelRaycast.visual_base_rotation"));
         }
-        let actual = quat_array(get(visual,"Transform.rotation"));
+        let actual = quat_array(quat_from(get(visual,"Transform.rotation")));
         if spin==() || rate==() || axle==() || base==() || actual==() {
             throw("FLIP wheel roll observation is unavailable at "+path);
         }
@@ -177,5 +177,5 @@ fn flip_brake_assert(before, after, elapsed, distance, config) {
         t_true(after.upright>=config.minimumUprightAxisY,"braking: upright requirement failed; "+detail)];
     let passed=true;for check in checks {if check!="" {passed=false;}}
     #{ok:passed,checks:checks,initial_speed_mps:initial,final_speed_mps:final,
-      elapsed_s:elapsed,deadline_s:deadline,distance_m:distance}
+      elapsed_s:elapsed,deadline_s:deadline,distance_m:distance,upright_axis_y:after.upright}
 }

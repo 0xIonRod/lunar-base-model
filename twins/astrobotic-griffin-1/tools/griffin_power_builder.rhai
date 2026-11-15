@@ -1,3 +1,6 @@
+import "lunco://scripting/tools/assembly_edit" as assembly_edit;
+import "griffin_spec" as griffin_spec;
+import "griffin_assembly_support" as support;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "griffin_geometry" as geometry;
 
@@ -14,7 +17,9 @@ fn si(model, name, dimension) {
     if unit==() || unit.dimension!=dimension || unit.scale_is_exact!=true {
         throw("source property has no exact unit of the required dimension: "+name);
     }
-    quantity_si_value(quantity(value.value,unit))
+    let result=quantity_si_value(quantity(value.value,unit));
+    if result==() || !result.is_finite() {throw("finite SI source value required: "+name);}
+    result
 }
 fn number(model, name) {
     let value=f64_from(model.value(name));
@@ -69,6 +74,8 @@ fn configuration() {
         sky_temperature:si(model,study()+"skyRadiationTemperature",temperature),
         ground_temperature:si(model,study()+"groundRadiationTemperature",temperature),
         sustained_duration:si(model,study()+"sustainedObservationDuration",[0,0,1,0,0,0,0]),
+        equilibrium_duration:si(model,study()+"equilibriumObservationDuration",[0,0,1,0,0,0,0]),
+        settled_duration:si(model,study()+"minimumSettledDuration",[0,0,1,0,0,0,0]),
         settling_rate:si(model,study()+"maximumSettledTemperatureRate",[0,0,-1,0,1,0,0]),
         duration:si(model,study()+"observationDuration",[0,0,1,0,0,0,0]),
         power_tolerance:si(model,study()+"powerResidualTolerance",power),
@@ -90,6 +97,12 @@ fn configuration() {
         || abs(config.sky_view_factor+config.ground_view_factor-1.0)>1.0e-12
         || config.sky_temperature<0.0 || config.ground_temperature<0.0 {
         throw("invalid radiative study boundary");
+    }
+    if config.sustained_duration<=0.0 || config.equilibrium_duration<3600.0
+        || config.equilibrium_duration<config.sustained_duration
+        || config.settled_duration<=0.0 || config.settled_duration>=config.sustained_duration
+        || config.settled_duration>=config.equilibrium_duration || config.settling_rate<=0.0 {
+        throw("thermal studies require positive horizons and rate threshold, an equilibrium horizon of at least one hour and at least as long as the transient, and a shorter positive settled window");
     }
     config
 }
@@ -123,31 +136,18 @@ fn panel_geometry(index) {
     #{area:cell_area*centers.len().to_float(),cell_count:centers.len(),samples:samples}
 }
 
-fn _add(edit, parent, name, kind) {
-    #{AddPrim:#{edit_target:edit,parent_path:parent,name:name,type_name:kind,reference:(),reference_prim_path:()}}
-}
-fn _value(edit, path, name, kind, value) {
-    #{SetAttribute:#{edit_target:edit,path:path,name:name,type_name:kind,value:value}}
-}
-fn _scalar(edit, path, name, value) {_value(edit,path,name,"double",value.to_string())}
-fn _wire(edit, path, name, kind, sources) {
-    #{SetConnection:#{edit_target:edit,path:path,name:name,type_name:kind,sources:sources}}
-}
 fn _program(edit, parent, name, source) {
     let path=parent+"/"+name;
-    [_add(edit,parent,name,"Scope"),
+    [support::add(edit,parent,name,"Scope"),
      #{SetApiSchemas:#{edit_target:edit,path:path,schemas:["LunCoProgramAPI"]}},
-     _value(edit,path,"info:implementationSource","token","\"sourceAsset\""),
-     _value(edit,path,"info:sourceAsset","asset","@lunco://models/LunCo/"+source+".mo@"),
-     _value(edit,path,"lunco:program:realtimeSafe","bool","true")]
-}
-fn _outputs(edit, path, names) {
-    let ops=[];for name in names {ops.push(_scalar(edit,path,"outputs:"+name,0.0));}ops
+     support::attribute(edit,path,"info:implementationSource","token","\"sourceAsset\""),
+     support::attribute(edit,path,"info:sourceAsset","asset","@lunco://models/LunCo/"+source+".mo@"),
+     support::attribute(edit,path,"lunco:program:realtimeSafe","bool","true")]
 }
 fn _exports(edit, net, component, prefix, names) {
     let ops=[];
     for name in names {
-        ops.push(_wire(edit,net,"outputs:"+prefix+name,"double",
+        ops.push(support::connection(edit,net,"outputs:"+prefix+name,"double",
             [component+".outputs:"+name]));
     }
     ops
@@ -160,29 +160,29 @@ fn network_part_plan(doc, edit, root, part) {
     try {
         if part < -1 || part > 3 {throw("unknown network preparation part");}
         let c=configuration();let ops=[];let net=root+"/ElectricalPower";
-        ops.push(_add(edit,root,"ElectricalPower","Scope"));
+        ops.push(support::add(edit,root,"ElectricalPower","Scope"));
         ops.push(#{SetApiSchemas:#{edit_target:edit,path:net,schemas:["CollectionAPI:components"]}});
-        ops.push(_value(edit,net,"collection:components:expansionRule","token","\"explicitOnly\""));
+        ops.push(support::attribute(edit,net,"collection:components:expansionRule","token","\"explicitOnly\""));
         let battery=net+"/Battery";let load=net+"/AvionicsLoad";
         if part == -1 {
         ops+=_program(edit,net,"Battery","Electrical/Battery");
-        ops.push(_value(edit,battery,"connectors:p","token","\"\""));
+        ops.push(support::attribute(edit,battery,"connectors:p","token","\"\""));
         for p in [#{name:"voltage_nom",value:c.bus_voltage},#{name:"capacity",value:c.capacity_ah},
             #{name:"R_internal",value:c.battery_resistance},#{name:"soc_init",value:c.initial_soc}] {
-            ops.push(_scalar(edit,battery,"parameters:"+p.name,p.value));
+            ops.push(support::scalar(edit,battery,"parameters:"+p.name,p.value));
         }
-        ops+=_outputs(edit,battery,["terminal_voltage_v","terminal_current_a","net_power_w","stored_power_w","stored_energy_j","heat_w","soc_out"]);
+        ops+=support::outputs(edit,battery,["terminal_voltage_v","terminal_current_a","net_power_w","stored_power_w","stored_energy_j","heat_w","soc_out"]);
         ops+=_exports(edit,net,battery,"battery_",["terminal_voltage_v","terminal_current_a","net_power_w","stored_power_w","stored_energy_j","heat_w","soc_out"]);
         ops+=_program(edit,net,"AvionicsLoad","Electrical/OnboardComputer");
-        ops.push(_value(edit,load,"connectors:p","token","\"\""));
+        ops.push(support::attribute(edit,load,"connectors:p","token","\"\""));
         for p in [#{name:"p_baseline_w",value:c.baseline_power},#{name:"p_gnc_w",value:c.guidance_power},
             #{name:"voltage_off_v",value:c.voltage_off},#{name:"voltage_on_v",value:c.voltage_on}] {
-            ops.push(_scalar(edit,load,"parameters:"+p.name,p.value));
+            ops.push(support::scalar(edit,load,"parameters:"+p.name,p.value));
         }
         // Requested guidance processing remains a load even when its supply is
         // insufficient; the load's UVLO owns actual powered availability.
-        ops.push(_scalar(edit,load,"inputs:gnc_active",1.0));
-        ops+=_outputs(edit,load,["powered","power_draw_w","heat_w","processing_active"]);
+        ops.push(support::scalar(edit,load,"inputs:gnc_active",1.0));
+        ops+=support::outputs(edit,load,["powered","power_draw_w","heat_w","processing_active"]);
         ops+=_exports(edit,net,load,"avionics_",["powered","power_draw_w","heat_w","processing_active"]);
         }
         let members=[battery,load];let pins=[load+".connectors:p"];let panels=[];
@@ -191,65 +191,67 @@ fn network_part_plan(doc, edit, root, part) {
         for index in selected {
             let g=panel_geometry(index);let name=names[index];let parent=root+"/"+name;
             let probe=parent+"/PowerEnvironment";
-            ops.push(_add(edit,parent,"PowerEnvironment","Points"));
+            ops.push(support::add(edit,parent,"PowerEnvironment","Points"));
             ops.push(#{SetApiSchemas:#{edit_target:edit,path:probe,schemas:["LunCoEnvironmentProbeAPI"]}});
             let points="[";
             for i in 0..g.samples.len() {
                 if i>0 {points+=", ";}let p=g.samples[i];
                 points+="("+p[0]+", "+p[1]+", "+p[2]+")";
             }
-            ops.push(_value(edit,probe,"points","point3f[]",points+"]"));
-            ops.push(_value(edit,probe,"visibility","token","\"invisible\""));
-            ops+=_outputs(edit,probe,["sun_irradiance_w_m2","sun_visibility","sun_mount_x","sun_mount_y","sun_mount_z"]);
+            ops.push(support::attribute(edit,probe,"points","point3f[]",points+"]"));
+            ops.push(support::attribute(edit,probe,"visibility","token","\"invisible\""));
+            ops+=support::outputs(edit,probe,["sun_irradiance_w_m2","sun_visibility","sun_mount_x","sun_mount_y","sun_mount_z"]);
             let pv=net+"/"+name;ops+=_program(edit,net,name,"Electrical/SolarPanel");
-            ops.push(_value(edit,pv,"connectors:p","token","\"\""));
+            ops.push(support::attribute(edit,pv,"connectors:p","token","\"\""));
             for p in [#{name:"area",value:g.area},#{name:"efficiency",value:c.efficiency},
                 #{name:"reference_temperature_k",value:c.reference_temperature},
+                #{name:"temperature_curve_min_k",value:c.reference_temperature},
+                #{name:"temperature_curve_max_k",value:c.maximum_temperature},
                 #{name:"power_temperature_coefficient_per_k",value:c.power_temperature_coefficient},
                 #{name:"solar_absorptivity",value:c.absorptivity},
                 #{name:"peak_power_rating_w",value:g.area*c.efficiency*c.reference_irradiance},
                 // Reduced direct bus connection at the study's nominal voltage;
                 // a flight string/MPPT electrical design is not inferred.
-                #{name:"v_mp",value:c.bus_voltage}] {ops.push(_scalar(edit,pv,"parameters:"+p.name,p.value));}
+                #{name:"v_mp",value:c.bus_voltage}] {ops.push(support::scalar(edit,pv,"parameters:"+p.name,p.value));}
             for pair in [["irradiance","sun_irradiance_w_m2"],["sun_visibility","sun_visibility"],
                 ["target_mount_x","sun_mount_x"],["target_mount_y","sun_mount_y"],["target_mount_z","sun_mount_z"]] {
-                ops.push(_wire(edit,net,"inputs:"+name+"_"+pair[0],"double",[probe+".outputs:"+pair[1]]));
-                ops.push(_wire(edit,pv,"inputs:"+pair[0],"double",[net+".inputs:"+name+"_"+pair[0]]));
+                ops.push(support::connection(edit,net,"inputs:"+name+"_"+pair[0],"double",[probe+".outputs:"+pair[1]]));
+                ops.push(support::connection(edit,pv,"inputs:"+pair[0],"double",[net+".inputs:"+name+"_"+pair[0]]));
             }
             let normal=[c.normal.x,c.normal.y,c.normal.z];let axes=["x","y","z"];
-            for i in 0..3 {ops.push(_scalar(edit,pv,"inputs:panel_normal_"+axes[i],normal[i]));}
-            ops+=_outputs(edit,pv,["power_out","available_power_w","incident_power_w","absorbed_power_w","reflected_power_w","heat_w","temperature_k","temperature_factor","cos_incidence"]);
+            for i in 0..3 {ops.push(support::scalar(edit,pv,"inputs:panel_normal_"+axes[i],normal[i]));}
+            ops+=support::outputs(edit,pv,["power_out","available_power_w","incident_power_w","absorbed_power_w","reflected_power_w","heat_w","temperature_k","temperature_factor","curve_temperature_k","curve_limited","curve_in_range","cos_incidence"]);
             let mass=net+"/"+name+"Mass";ops+=_program(edit,net,name+"Mass","Thermal/ThermalMass");
-            ops.push(_value(edit,mass,"connectors:port","token","\"\""));
-            ops.push(_scalar(edit,mass,"parameters:c_th",c.heat_capacity));ops.push(_scalar(edit,mass,"parameters:T_init",c.initial_temperature));
-            ops+=_outputs(edit,mass,["temp_k","heat_flow_w"]);
+            ops.push(support::attribute(edit,mass,"connectors:port","token","\"\""));
+            ops.push(support::scalar(edit,mass,"parameters:c_th",c.heat_capacity));ops.push(support::scalar(edit,mass,"parameters:T_init",c.initial_temperature));
+            ops+=support::outputs(edit,mass,["temp_k","heat_flow_w"]);
             let heat=net+"/"+name+"Heat";ops+=_program(edit,net,name+"Heat","Thermal/HeatLoad");
-            ops.push(_value(edit,heat,"connectors:port","token","\"\""));
-            ops.push(_wire(edit,heat,"inputs:heat_w","double",[pv+".outputs:heat_w"]));
-            ops+=_outputs(edit,heat,["heat_in_w"]);
+            ops.push(support::attribute(edit,heat,"connectors:port","token","\"\""));
+            ops.push(support::connection(edit,heat,"inputs:heat_w","double",[pv+".outputs:heat_w"]));
+            ops+=support::outputs(edit,heat,["heat_in_w"]);
             let cooler=net+"/"+name+"Cooler";ops+=_program(edit,net,name+"Cooler","Thermal/LimitedCoolingSink");
-            ops.push(_value(edit,cooler,"connectors:port","token","\"\""));
+            ops.push(support::attribute(edit,cooler,"connectors:port","token","\"\""));
             for p in [#{name:"maximum_heat_rejection_w",value:c.maximum_cooling},
                 #{name:"minimum_temperature_k",value:c.minimum_temperature},#{name:"conductance_w_per_k",value:c.conductance}] {
-                ops.push(_scalar(edit,cooler,"parameters:"+p.name,p.value));
+                ops.push(support::scalar(edit,cooler,"parameters:"+p.name,p.value));
             }
-            ops+=_outputs(edit,cooler,["heat_rejection_w","temperature_k"]);
+            ops+=support::outputs(edit,cooler,["heat_rejection_w","temperature_k"]);
             for boundary in [#{suffix:"SkyRadiation",factor:c.sky_view_factor,temperature:c.sky_temperature},
                 #{suffix:"GroundRadiation",factor:c.ground_view_factor,temperature:c.ground_temperature}] {
                 let radiator=pv+boundary.suffix;
                 ops+=_program(edit,net,name+boundary.suffix,"Thermal/Radiator");
-                ops.push(_value(edit,radiator,"connectors:port","token","\"\""));
+                ops.push(support::attribute(edit,radiator,"connectors:port","token","\"\""));
                 for p in [#{name:"area",value:g.area*boundary.factor},#{name:"sigma",value:c.radiation_constant},
                     #{name:"emissivity",value:c.infrared_emissivity},#{name:"T_sink",value:boundary.temperature}] {
-                    ops.push(_scalar(edit,radiator,"parameters:"+p.name,p.value));
+                    ops.push(support::scalar(edit,radiator,"parameters:"+p.name,p.value));
                 }
-                ops+=_outputs(edit,radiator,["heat_rejection_w","temperature_k"]);
+                ops+=support::outputs(edit,radiator,["heat_rejection_w","temperature_k"]);
                 ops+=_exports(edit,net,radiator,name+"_"+boundary.suffix+"_",["heat_rejection_w","temperature_k"]);
             }
-            ops.push(_wire(edit,pv,"inputs:cell_temperature_k","double",[mass+".outputs:temp_k"]));
-            ops.push(_wire(edit,mass,"connectors:port","token",[heat+".connectors:port",cooler+".connectors:port",
+            ops.push(support::connection(edit,pv,"inputs:cell_temperature_k","double",[mass+".outputs:temp_k"]));
+            ops.push(support::connection(edit,mass,"connectors:port","token",[heat+".connectors:port",cooler+".connectors:port",
                 pv+"SkyRadiation.connectors:port",pv+"GroundRadiation.connectors:port"]));
-            ops+=_exports(edit,net,pv,name+"_",["power_out","available_power_w","incident_power_w","absorbed_power_w","reflected_power_w","heat_w","temperature_k","temperature_factor","cos_incidence"]);
+            ops+=_exports(edit,net,pv,name+"_",["power_out","available_power_w","incident_power_w","absorbed_power_w","reflected_power_w","heat_w","temperature_k","temperature_factor","curve_temperature_k","curve_limited","curve_in_range","cos_incidence"]);
             ops+=_exports(edit,net,mass,name+"_mass_",["temp_k","heat_flow_w"]);
             ops+=_exports(edit,net,cooler,name+"_cooler_",["heat_rejection_w","temperature_k"]);
             for member in [pv,mass,heat,cooler,pv+"SkyRadiation",pv+"GroundRadiation"] {members.push(member);}
@@ -259,21 +261,72 @@ fn network_part_plan(doc, edit, root, part) {
         // Review this cross-part wiring against explicit prim declarations.
         // The coordinator deduplicates these identical declarations when it
         // joins all preparation parts into one complete atomic proposal.
-        ops.push(_add(edit,net,"Battery","Scope"));
-        ops.push(_add(edit,net,"AvionicsLoad","Scope"));
-        ops.push(_scalar(edit,load,"outputs:powered",0.0));
+        ops.push(support::add(edit,net,"Battery","Scope"));
+        ops.push(support::add(edit,net,"AvionicsLoad","Scope"));
+        ops.push(support::scalar(edit,load,"outputs:powered",0.0));
         for name in names {
             let pv=net+"/"+name;
             for suffix in ["","Mass","Heat","Cooler","SkyRadiation","GroundRadiation"] {
                 members.push(pv+suffix);
-                ops.push(_add(edit,net,name+suffix,"Scope"));
+                ops.push(support::add(edit,net,name+suffix,"Scope"));
             }
             pins.push(pv+".connectors:p");
         }
-        ops.push(_wire(edit,battery,"connectors:p","token",pins));
+        ops.push(support::connection(edit,battery,"connectors:p","token",pins));
         ops.push(#{SetRelationship:#{edit_target:edit,path:net,name:"collection:components:includes",targets:members}});
-        ops.push(_wire(edit,root,"inputs:control_powered","double",[net+".outputs:avionics_powered"]));
+        ops.push(support::connection(edit,root,"inputs:control_powered","double",[net+".outputs:avionics_powered"]));
         }
         return #{ok:true,ops:ops,panels:panels,source_revision:c.source_revision,kind:"griffin_power_thermal",part:part};
     } catch(error) {return #{ok:false,error:error};}
+}
+
+// Realize FLIP source-owned electrical ratings at the USD/Modelica boundary.
+fn flip_electrical_model_plan(doc, edit_target, root) {
+    if doc == () || edit_target == () || !support::absolute_root(root) {
+        return support::plan_error("griffin_power_assembly", "flip_electrical_model_plan requires a document, edit target, and absolute root");
+    }
+    let energy_kwh = griffin_spec::rover_battery_energy_kwh();
+    let nominal_voltage_v = griffin_spec::rover_battery_nominal_voltage_v();
+    let capacity_ah = griffin_spec::rover_battery_capacity_ah();
+    let peak_power_w = griffin_spec::rover_solar_peak_power_w();
+    if energy_kwh == () || nominal_voltage_v == () || capacity_ah == () || peak_power_w == ()
+        || nominal_voltage_v <= 0.0 || energy_kwh <= 0.0 || peak_power_w <= 0.0 {
+        return support::plan_error("griffin_power_assembly", "FLIP electrical requirement values are missing or invalid");
+    }
+    for path in [root + "/Battery", root + "/SolarArray"] {
+        if !support::component_query(doc, path).ok {
+            return support::plan_error("griffin_power_assembly", "FLIP electrical component is missing at " + path);
+        }
+    }
+    let battery = root + "/Battery";
+    let solar = root + "/SolarArray";
+    let ops = [
+        #{RemoveAttribute: #{edit_target: edit_target, path: battery, name: "inputs:voltage_nom"}},
+        #{RemoveAttribute: #{edit_target: edit_target, path: battery, name: "inputs:capacity"}},
+        #{RemoveAttribute: #{edit_target: edit_target, path: solar, name: "inputs:peak_power_rating_w"}},
+        #{SetAttribute: #{edit_target: edit_target, path: battery,
+            name: "inputs:voltage_nom", type_name: "double",
+            value: nominal_voltage_v.to_string()}},
+        #{SetAttribute: #{edit_target: edit_target, path: battery,
+            name: "inputs:capacity", type_name: "double",
+            value: capacity_ah.to_string()}},
+        #{SetAttribute: #{edit_target: edit_target, path: solar,
+            name: "inputs:peak_power_rating_w", type_name: "double",
+            value: peak_power_w.to_string()}}
+    ];
+    #{ok: true, kind: "flip_electrical_model", root: root,
+      battery_energy_kwh: energy_kwh, battery_nominal_voltage_v: nominal_voltage_v,
+      battery_capacity_ah: capacity_ah, solar_peak_power_w: peak_power_w,
+      paths: [battery, solar], ops: ops, no_op: false}
+}
+
+fn apply_flip_electrical_model(doc, edit_target, root, parent_gen) {
+    let plan = flip_electrical_model_plan(doc, edit_target, root);
+    if !plan.ok { return plan; }
+    let command = assembly_edit::batch(doc, "Realize FLIP source-owned electrical ratings",
+        plan.ops, parent_gen);
+    #{ok: command.ok != false, kind: plan.kind, root: root,
+      battery_energy_kwh: plan.battery_energy_kwh,
+      battery_capacity_ah: plan.battery_capacity_ah,
+      solar_peak_power_w: plan.solar_peak_power_w, command: command}
 }

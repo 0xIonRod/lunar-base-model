@@ -83,6 +83,39 @@ readable identities, saved views, and system-level acceptance. Use the installed
 skill copy when working from a packaged build. Keep Twin-specific requirements
 and evidence here; do not maintain a second copy of that authoring recipe.
 
+## Component and verification ownership
+
+Use the domain assembly builders named by the Twin's current architecture
+contract. Keep executable feed/mass plans out of presentation builders. Compose
+full-mission acceptance fixtures from the production scene and author only their
+explicit verification overrides; isolated component benches retain their own
+prescribed boundaries. Register executable cases against exact SysML verification
+identities and report source-revision-bound evidence. Interactive scenes that wait
+for operator commands are not unattended acceptance fixtures.
+
+Runtime predicates bind measured values and source-owned limits through the
+engine's typed SysML observation adapters. Missing observations remain explicit;
+they cannot become passing zero measurements. Keep raw metrics separate from
+the structured requirement-evidence channels. Use relative imports for helpers
+beside a scenario so its mounted source identity remains authoritative. A test
+that exercises held semantic intents must acquire the actual local controller
+through the possession API; a camera-free authority claim alone does not install
+an input producer. Include a real omitted-actuation negative case where applicable.
+
+Use `tools/validate_repository.py` for manifest structure and local references.
+Use repository `tools/qualification.py` with its pinned clean runtime/assets for
+release qualification. Native preflight and actual scene verdicts are separate
+required checks; a dirty local build can supply development evidence but cannot
+produce a qualified release receipt. Keep terrain provisioning outside source
+archives and use the native asset manager for the declared dataset recipe.
+
+Keep actual physical state separate from any bounded coefficient evaluation.
+Report calibration excursions explicitly, and accept measured thermal evolution
+in either direction while retaining heat and electrical balance checks. Test
+switched loads against a finite source whose voltage rebounds on disconnect.
+Derive generated network membership from the authored collection rather than
+pinning a component count in the verifier.
+
 ## Match the check to the claim
 
 Before running commands, inspect the installed build's help and bundled

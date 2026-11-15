@@ -32,6 +32,7 @@ nasa_lunar_base_data_quality_report.html
 *.ogg
 handover/*.png
 twins/**/.lunco/runtime/
+twins/**/.lunco/workspace.json
 
 # OS metadata
 .DS_Store

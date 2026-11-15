@@ -30,10 +30,19 @@ simplified feed-availability and consumption model.
 
 Tether forces are produced by the tether Modelica model and applied by the
 mission's native wrench bridge. They are not static USD signal connections;
-the diagram does not invent wires for scripted actions. The exit ramp is static.
+enable **Scenario access** to inspect the admitted scenario reads and writes
+as a separate dashed overlay. Counts and exact endpoints remain available when
+grouped cards aggregate repeated accesses. Access declarations authorize actions;
+they do not claim measured force-transfer provenance. The exit ramp is static.
 See `contracts/griffin-safe-egress-2026-11-13.md` for the guarded deployment and
 explicit disconnect contract.
 
 USD owns topology; these view files own grouping and placement. New composed
 nodes remain visible even before they are assigned to a saved group. The saved
 source URI is stable across Twin remounts.
+
+The electrical/thermal network includes the winch converter, heat source, thermal
+mass and radiator. Expand **Power & thermal** to follow the two signed spool-power
+inputs, damping heat and solved drive-availability return to the tether. The
+[system architecture](../contracts/system-architecture.md) distinguishes solved
+parts, lumped representations and unresolved physical detail.

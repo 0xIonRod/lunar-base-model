@@ -62,6 +62,12 @@ script = "scenarios/tests/griffin_sustained_thermal.rhai"
 verdict_channel = "GRIFFIN_SUSTAINED_THERMAL"
 
 [[verification.cases]]
+name = "GriffinPowerThermalRequirements::Verify_GriffinEquilibriumThermal"
+scene = "tests/griffin_equilibrium_thermal.usda"
+script = "scenarios/tests/griffin_sustained_thermal.rhai"
+verdict_channel = "GRIFFIN_SUSTAINED_THERMAL"
+
+[[verification.cases]]
 name = "GriffinPowerThermalRequirements::Verify_GriffinPowerThermal"
 scene = "tests/griffin_power_thermal.usda"
 script = "scenarios/tests/griffin_power_thermal.rhai"
@@ -195,9 +201,9 @@ verdict_channel = "FLIP_SENSOR_POWER_REQUIREMENTS"
 
 [[verification.cases]]
 name = "Griffin1Requirements::Verify_GriffinSurfaceOperations"
-scene = "scenes/griffin_1_surface_ops.usda"
-script = "scenarios/griffin_1_surface_ops.rhai"
-verdict_channel = "GRIFFIN_SURFACE_OPS"
+scene = "tests/griffin_tether_descent.usda"
+script = "scenarios/griffin_tether_egress.rhai"
+verdict_channel = "GRIFFIN_TETHER_DESCENT"
 
 [[verification.cases]]
 name = "GriffinSimulationAccuracyRequirements::Verify_GriffinLandingStability"
@@ -300,6 +306,18 @@ name = "GriffinFunctionalRequirements::Verify_GriffinProductionPayloadRelease"
 scene = "tests/griffin_flip_v5_payload_release.usda"
 script = "scenarios/tests/griffin_payload_release.rhai"
 verdict_channel = "GRIFFIN_PAYLOAD_RELEASE"
+
+[[verification.cases]]
+name = "GriffinWinchRequirements::Verify_GriffinWinchPower"
+scene = "tests/griffin_winch_power.usda"
+script = "scenarios/tests/griffin_winch_power.rhai"
+verdict_channel = "GRIFFIN_WINCH_POWER"
+
+[[verification.cases]]
+name = "GriffinWinchRequirements::Verify_GriffinWinchUnpowered"
+scene = "tests/griffin_winch_unpowered.usda"
+script = "scenarios/tests/griffin_winch_power.rhai"
+verdict_channel = "GRIFFIN_WINCH_POWER"
 
 [[components]]
 name = "griffin.lander"
@@ -408,6 +426,12 @@ name = "griffin.ramp_root_bearing"
 requirements = "requirements/griffin_ramp_root_bearing_requirements.sysml"
 verification = "GriffinRampRootBearingRequirements::Verify_GriffinRampRootBearing"
 usd_path = "/World/RampRootBearing"
+
+[[components]]
+name = "griffin.winch_energy"
+requirements = "requirements/griffin_winch_requirements.sysml"
+verification = "GriffinWinchRequirements::Verify_GriffinWinchPower"
+usd_path = "/World/WinchPower"
 
 [settings]
 "assets.texture_decode_max_bytes" = 1073741824

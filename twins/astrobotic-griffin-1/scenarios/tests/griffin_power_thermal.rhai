@@ -51,13 +51,13 @@ fn on_start(me,ctx) {
     this.temperature_law=true;this.radiant=true;this.thermal=true;
     this.cooling=true;this.electrical=true;this.storage=true;this.load=true;
     this.feedback=true;this.sun=true;this.gate=true;this.geometry=true;
-    this.max_power_residual=0.0;this.max_temperature_residual=0.0;
+    this.max_power_residual=0.0;this.max_temperature_residual=0.0;this.cold_limited_samples=[0,0,0];
     this.layout=[];this.pv_area=[];this.scale=[];
     let net=ROOT+"/ElectricalPower";
     let root=query("QueryUsdPrim",#{path:ROOT,attrs:[],connections:true});
     this.gate=wired(root,"inputs:control_powered",net+".outputs:avionics_powered");
     let boundary=query("QueryUsdPrim",#{path:net,attrs:[],connections:true});
-    let pins=[net+"/AvionicsLoad.connectors:p"];
+    let pins=[net+"/AvionicsLoad.connectors:p",net+"/WinchDrive.connectors:p"];
     for name in this.names {pins.push(net+"/"+name+".connectors:p");}
     this.electrical=node(query("QueryUsdPrim",#{path:net+"/Battery",attrs:[],connections:true}),
         "connectors:p",pins);
@@ -131,14 +131,21 @@ fn on_tick(me,ctx) {
         let temperature=port(e,prefix+"temperature_k");let factor=port(e,prefix+"temperature_factor");
         let mass_temperature=port(e,prefix+"mass_temp_k");let flow=port(e,prefix+"mass_heat_flow_w");
         let cooling=port(e,prefix+"cooler_heat_rejection_w");
-        let expected=max(0.0,1.0+c.power_temperature_coefficient*(temperature-c.reference_temperature));
+        let curve=port(e,prefix+"curve_temperature_k");
+        let limited=port(e,prefix+"curve_limited");let in_range=port(e,prefix+"curve_in_range");
+        let expected_curve=max(c.reference_temperature,temperature);
+        let expected=max(0.0,1.0+c.power_temperature_coefficient*(expected_curve-c.reference_temperature));
+        if limited>0.5 {this.cold_limited_samples[i]+=1;}
         let residual=max(abs(incident-absorbed-reflected),abs(absorbed-power-heat));
         this.max_power_residual=max(this.max_power_residual,residual);
         this.max_temperature_residual=max(this.max_temperature_residual,abs(factor-expected));
         this.temperature_law=this.temperature_law && abs(factor-expected)<=c.temperature_tolerance
             && abs(available-min(min(c.absorptivity,c.efficiency*expected)*incident,
                 this.pv_area[i]*c.efficiency*c.reference_irradiance*expected))<=c.power_tolerance
-            && temperature>=c.reference_temperature-c.temperature_tolerance && temperature<=c.maximum_temperature;
+            && temperature>0.0 && temperature<=c.maximum_temperature
+            && abs(curve-expected_curve)<=c.temperature_tolerance
+            && limited==(if temperature<c.reference_temperature {1.0}else{0.0})
+            && in_range==(if temperature>=c.reference_temperature {1.0}else{0.0});
         this.radiant=this.radiant && residual<=c.power_tolerance;
         // A known broken thermal node already disproves closure. Its removed
         // member outputs are unavailable, so observe the remaining independent
@@ -157,14 +164,14 @@ fn on_tick(me,ctx) {
     if this.samples==0 {this.initial=temperatures;}
     this.final=temperatures;this.samples+=1;
     let battery=port(this.net,"battery_net_power_w");let load=port(this.net,"avionics_power_draw_w");
-    this.electrical=this.electrical && abs(generation-battery-load)<=c.power_tolerance;
+    this.electrical=this.electrical && abs(generation-battery-load-port(this.net,"winch_power_draw_w"))<=c.power_tolerance;
     this.storage=this.storage && abs(battery-port(this.net,"battery_stored_power_w")-port(this.net,"battery_heat_w"))<=c.power_tolerance;
     this.load=this.load && abs(load-c.baseline_power-c.guidance_power)<=c.power_tolerance
         && port(this.net,"avionics_powered")==1.0;
     if (sim_tick()-this.start).to_float()*dt()<c.duration {return;}
     let responded=true;let generated=true;
     for i in 0..this.names.len() {
-        responded=responded && this.final[i]>this.initial[i]+c.temperature_tolerance;
+        responded=responded && abs(this.final[i]-this.initial[i])>c.temperature_tolerance;
         generated=generated && this.generated[i];
     }
     let model=sysml_requirements::model();
@@ -183,10 +190,10 @@ fn on_tick(me,ctx) {
         [PACKAGE+"gep001",PACKAGE+"gep002",PACKAGE+"gep003"],[PACKAGE+VERIFY]);
     let report=sysml_requirements::evaluate(source,checks);
     report.metrics=#{samples:this.samples,thermal_topology_closed:this.thermal_topology,
-        area_m2:this.areas,initial_temperature_k:this.initial,
+        area_m2:this.areas,cold_reference_hold_samples:this.cold_limited_samples,initial_temperature_k:this.initial,
         final_temperature_k:this.final,maximum_power_residual_w:this.max_power_residual,
         maximum_temperature_factor_residual:this.max_temperature_residual};
-    print("GRIFFIN_POWER_THERMAL_METRICS "+to_json(report.metrics));
+    print("GRIFFIN_POWER_THERMAL_METRICS "+report.metrics);
     report_structured_verdict(report,"GRIFFIN POWER THERMAL","GRIFFIN_POWER_THERMAL");
     this.done=true;
 }

@@ -42,11 +42,13 @@ package GriffinFlipEgressStudy {
         attribute webbingNormalStrength : Real = 0.10;
     }
     part def ControlledDescent {
-        doc /* Routed cylindrical rear-wheel-wrap and ideal winch study.
+        doc /* Routed cylindrical rear-wheel-wrap and reduced powered winch study.
          * These values are explicit assumptions, not measured fabric
          * properties or released flight limits. Modelica owns line material
          * velocity, tension, energy, routing and reaction wrenches; the shared
-         * Rhai sequence qualifies native motion and ground-transfer gates. */
+         * Rhai sequence qualifies native motion and ground-transfer gates.
+         * GriffinWinchRequirements owns finite drive power and lumped thermal
+         * ratings; the drum holding brake remains an ideal study assumption. */
         attribute stiffnessNPerM : Real = 4000.0;
         // A wrap couples through wheel spin as well as body translation.
         // I/R^2=9 kg for the retained 1.946025 kg m2, 0.465 m wheel;
@@ -119,6 +121,7 @@ package GriffinFlipEgressStudy {
         attribute groundTransferDriveThrottleLimit : Real = 1.0;
         attribute minimumTrackClearanceM : Real = 0.10;
         attribute minimumGroundDwellTicks : Real = 120.0;
+        attribute manualStopTimeoutTicks : Real = 600.0;
         attribute minimumDescentProgressM : Real = 0.05;
         // Braked rear lowering measured 0.015 m/s with sustained preload.
         // Resolve real motion at 10 mm / 2 s; retain the 300 s overall bound.
@@ -132,4 +135,58 @@ package GriffinFlipEgressStudy {
         attribute governedDescentSpeedMps : Real = 0.10;
         attribute payoutStopSpeedMps : Real = 0.18;
     }
+
+    constraint def GFEObservedAcceptance {
+        in accepted : Boolean;
+        accepted == true;
+    }
+    requirement def GFE001_QualifiedUnlock {
+        doc /* GFE-001: Landing qualification, balanced preload and real adapter release shall precede the mission egress unlock.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-001'> gfe001 : GFE001_QualifiedUnlock { subject egress : ControlledDescent; }
+    requirement def GFE002_DriveAuthority {
+        doc /* GFE-002: Qualified tether disconnect and ground transfer shall enable drive without subsequent restraint lock messages.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-002'> gfe002 : GFE002_DriveAuthority { subject egress : ControlledDescent; }
+    requirement def GFE003_ManualDrive {
+        doc /* GFE-003: After unlock FLIP shall travel at least ControlledDescent.minimumUnlockDriveDistanceM under manual drive.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-003'> gfe003 : GFE003_ManualDrive { subject egress : ControlledDescent; }
+    requirement def GFE004_LineLoad {
+        doc /* GFE-004: Each line shall remain within ControlledDescent.maximumMissionTensionN throughout deployment.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-004'> gfe004 : GFE004_LineLoad { subject egress : ControlledDescent; }
+    requirement def GFE005_GroundTransfer {
+        doc /* GFE-005: Both tethers shall be unloaded and released and the rover shall retain stable four-wheel fixed-ground support.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-005'> gfe005 : GFE005_GroundTransfer { subject egress : ControlledDescent; }
+    requirement def GFE006_BrakeAdmission {
+        doc /* GFE-006: The local brake command admission check shall reject an invalid station before descent.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-006'> gfe006 : GFE006_BrakeAdmission { subject egress : ControlledDescent; }
+    requirement def GFE007_SupportIdentity {
+        doc /* GFE-007: Wheel support telemetry shall distinguish the dynamic lander from fixed ground and finish with four fixed supports.
+         * Acceptance is the mapped production-controller observation procedure;
+         * the reduced rigging model is not flight qualification. */
+        require GFEObservedAcceptance;
+    }
+    requirement <'GFE-007'> gfe007 : GFE007_SupportIdentity { subject egress : ControlledDescent; }
 }

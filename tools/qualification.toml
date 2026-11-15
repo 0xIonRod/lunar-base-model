@@ -1,0 +1,51 @@
+schema_version = 1
+twin = "twins/astrobotic-griffin-1"
+datasets = ["nobile03_dem"]
+
+[engine]
+repository = "https://github.com/LunCoSim/lunco-sim.git"
+revision = "ce189b97c37fe2496f7fc10d49590b4344adc4ec"
+
+[[cases]]
+verification = "FlipMotionRequirements::Verify_FLIPMotion"
+max_ticks = 2400
+
+[[cases]]
+verification = "Griffin1Requirements::Verify_GriffinSurfaceOperations"
+max_ticks = 14000
+
+[[cases]]
+verification = "GriffinPropulsionRequirements::Verify_GriffinEngineOut"
+max_ticks = 1800
+
+[[cases]]
+verification = "GriffinPropulsionRequirements::Verify_GriffinFuelExhaustion"
+max_ticks = 3000
+
+[[cases]]
+verification = "GriffinPropulsionRequirements::Verify_GriffinOxidizerExhaustion"
+max_ticks = 3000
+
+[[cases]]
+verification = "GriffinPowerThermalRequirements::Verify_GriffinPowerThermal"
+max_ticks = 3600
+
+[[cases]]
+verification = "GriffinPowerThermalRequirements::Verify_GriffinControlPowerLoss"
+max_ticks = 1200
+
+[[cases]]
+verification = "GriffinWinchRequirements::Verify_GriffinWinchPower"
+max_ticks = 1200
+
+[[cases]]
+verification = "GriffinWinchRequirements::Verify_GriffinWinchUnpowered"
+max_ticks = 1200
+
+[[cases]]
+verification = "GriffinPowerThermalRequirements::Verify_GriffinSustainedThermal"
+max_ticks = 6000
+
+[[cases]]
+verification = "GriffinPowerThermalRequirements::Verify_GriffinEquilibriumThermal"
+max_ticks = 6000

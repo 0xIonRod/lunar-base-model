@@ -12,8 +12,12 @@ flight-qualified vehicle or mission.
 
 ### 1. Install LunCoSim
 
-Download and install [LunCoSim for your operating system](https://github.com/LunCoSim/lunco-sim/releases),
-or [build LunCoSim from source](https://github.com/LunCoSim/lunco-sim/blob/main/docs/apps/README.md#build-from-source).
+Use the engine revision identified by the Twin release's `QUALIFICATION.json`,
+including its matching shared assets. An arbitrary latest application may have
+a different component interface. Obtain a compatible
+[LunCoSim release](https://github.com/LunCoSim/lunco-sim/releases), or
+[build that exact source revision](https://github.com/LunCoSim/lunco-sim/blob/main/docs/apps/README.md#build-from-source).
+For repository sources, the release contract is [tools/qualification.toml](tools/qualification.toml).
 
 ### 2. Get the Griffin-1 / FLIP model files
 
@@ -51,7 +55,26 @@ and [Twin overview](twins/astrobotic-griffin-1/README.md).
 
 ## Downloadable builds
 
-A push to `main` packages the Twin files and publishes a ZIP and SHA-256
-checksum to GitHub Releases. After the first successful main build, the
-download links above point to the newest successful main build. Each archive
-records its source commit. The LunCoSim application is not included.
+A push to `main` stages the Twin, builds the pinned engine and shared asset
+revision, prepares its declared terrain, and requires native preflight plus
+the registered release gates before publishing a ZIP and SHA-256 checksum.
+The archive records the Twin source commit and includes `QUALIFICATION.json`
+with the tested engine revision, binary hashes and individual runtime reports.
+Headless qualification does not establish visual acceptance.
+
+The application and generated terrain cache are not included. The first open
+prepares missing terrain from `Assets.toml` and requires internet access.
+The download links point to the latest main revision that passed qualification.
+
+For local checks, build `luncosim` and `lunco-assets` from the clean pinned
+engine checkout, then run:
+
+```sh
+python3 tools/validate_repository.py
+python3 tools/qualification.py --engine /path/to/lunco-sim --provision --api-port 4299
+```
+
+The first command checks manifest structure and package-local references only.
+The second requires native Twin/SysML/scene preflight and bounded production
+verdicts. It rejects a mismatched or dirty engine and leaves evidence under
+`runs/qualification/`. It never builds, edits USD, or publishes a release.

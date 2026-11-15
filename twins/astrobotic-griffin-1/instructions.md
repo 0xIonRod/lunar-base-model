@@ -1,220 +1,114 @@
-# Griffin-1 Twin setup instructions
+# Griffin-1 Twin setup and verification
 
-This file is the operational setup guide for the Astrobotic Griffin-1 /
-Moon Base II study Twin. It assumes a clean LunCoSim checkout and a native
-Windows build, but the USD and Rhai package is portable to other hosts.
+The active study composes `vehicles/griffin_1.usda`, the CAD-based
+`vehicles/flip_v5.usda`, the NOBILE03 terrain, and the landing and restrained
+FLIP deployment controllers. The exit tracks are fixed. DEPLOY FLIP starts
+balanced tether preload, adapter release, controlled descent and ground
+transfer; DISCONNECT TETHERS releases unloaded lines before manual drive.
+The numerical vehicle, rigging and actuator assumptions are not flight ratings.
 
-## Inputs required before a flight-fidelity build
+## Match the runtime and assets
 
-The current package can be run as an integration MVP without these inputs, but
-a flight-fidelity version requires:
+For a downloaded Twin, use the engine revision recorded in `QUALIFICATION.json`
+and its complete matching shared assets. For repository sources, use the exact
+revision in the repository's [`tools/qualification.toml`](../../tools/qualification.toml).
+The runtime executable and `lunco://` component/Modelica library must come from
+that same checkout. The qualification receipt covers headless execution, while
+visual inspection remains a separate check.
 
-1. Griffin as-built CAD/envelope and measured mass properties.
-2. Griffin propulsion, RCS, propellant, leg, sensor, and GNC interfaces.
-3. FLIP as-built geometry, mass properties, wheel/traction, power, thermal,
-   payload, and communications data.
-4. Final registered Griffin touchdown DEM/site frame. The package currently
-   includes a reproducible regional LROC NOBILE03 crop as an interim terrain
-   source; its center is not a confirmed touchdown coordinate.
-5. Mission epoch, solar geometry, command timeline, and release sequence.
-6. A source or owner confirmation for every parameter marked unknown.
+An installed compatible application can open the extracted Twin directly.
+For a source build, run in the matching engine checkout:
 
-Until these arrive, keep the parameter-status metadata and the assumption
-table unchanged.
+```sh
+cargo build --locked -p lunco-luncosim --bin luncosim -j 4
+cargo build --locked -p lunco-assets --bin lunco-assets -j 4
+```
 
-## Step 1: prepare the repository
+Use that checkout's `target/debug/luncosim` (`luncosim.exe` on Windows) as
+`LUNCOSIM_BIN` for the commands below. The Twin folder is
+`twins/astrobotic-griffin-1` in this model repository; supply its absolute path
+when launching from the engine checkout. Keep the Twin's portable `twin://`
+references intact.
 
-Use a LunCoSim checkout containing commit `21eeefa75` and its matching shared
-assets. The required USD engine assembly and diagram work is published on the
-`tutorials` branch. The checkout must expose the typed SysML, USD Editor, and
-generic requirement-evaluation APIs used by this Twin. Confirm that it contains
-Cargo.toml, assets/, crates/, and skills/.
+## Prepare terrain
 
-## Step 2: place the Twin
+Release ZIPs contain `Assets.toml` and source provenance; they exclude generated
+`.cache/` data. The application requests the dataset on first open and network
+access is required until preparation finishes. The source-build asset-manager
+commands and expected artifacts are in [terrain preparation](docs/terrain-assets.md).
 
-The package root is:
+The native recipe prepares a 2048 m square, 513 × 513-node NOBILE03 crop at the
+source-declared regional study anchor. This is reproducible terrain registration,
+not a confirmed mission touchdown coordinate. Downloads, processed terrain and
+runtime state stay ignored.
 
-    twins/astrobotic-griffin-1
+## Open and operate
 
-Keep this structure:
+Open the folder containing `twin.toml` through **Open Twin**. It selects
+`scenes/griffin_1_surface_ops.usda`. For an agent-owned source-build session,
+select an explicit free API port and launch from the engine checkout:
 
-    twin.toml
-    scenes/griffin_1_surface_ops.usda       # default Griffin/FLIP landing mission
-    vehicles/griffin_1.usda
-    vehicles/flip.usda
-    behaviors/griffin_1_flip_patrol.btxml
-    Assets.toml
-    .cache/terrain/nobile03/          # generated and ignored
-    environments/south_pole_surrogate.usda
-    scenarios/griffin_1_surface_ops.rhai
-    tools/griffin_controls.rhai
-    research/griffin_1_assumptions.md
-    README.md
-    handover.md
+```sh
+"$LUNCOSIM_BIN" --scene /path/to/astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda --api 4201
+```
 
-The Twin-local references use twin://astrobotic-griffin-1/. Do not change them
-to absolute Windows paths.
+Wait for scene data, Modelica and physics readiness before operating. Confirm
+that the lander, attached CAD FLIP rover, terrain and tracking camera are
+present. Powered descent ends with qualified four-pad landing. Then:
 
-## Step 3: provision the reproducible regional terrain
+1. Select **DEPLOY FLIP** and observe preload and restrained descent.
+2. Wait for stable ground transfer and the unloaded-line indication.
+3. Select **DISCONNECT TETHERS** and confirm that manual FLIP drive is enabled.
+4. Use the HUD's configured drive, turn, brake and possession controls.
 
-If you downloaded a Griffin Twin release ZIP, this step is already complete.
-Keep the included `.cache/` directory: it contains both pinned NOBILE03 sources
-and the processed terrain crop. Open the extracted Twin with a compatible
-installed LunCoSim runtime; archive users do not need the source-build step below.
+The interactive scene intentionally waits for these operator actions. Its
+landing alone is not a complete mission-verification verdict. The
+[system views](views/README.md) expose authored physical wiring and subsystem
+boundaries. A runtime scripting interaction is distinct from an acausal link.
 
-From the repository root, follow [`docs/terrain-assets.md`](docs/terrain-assets.md)
-to request the complete native NOBILE03 processing recipe. It downloads its
-pinned DEM, orthophoto and provenance label and publishes the terrain bundle. Downloads and generated terrain bytes must remain ignored; verify
-the boundary with `git check-ignore -v` before staging.
+## Run acceptance
 
-The processing recipe uses a 2048 m × 2048 m, 513 × 513-node crop centered at
-`-84.72672255, 29.14428685` east, with an explicit source-datum normalization
-into the scene-local height frame.
+The mapped acceptance fixture composes the production scene and enables the
+shared deployment controller's explicit verification mode. Run from the engine
+checkout with a free test API port:
 
-## Step 4: build the current LunCoSim binary
+```sh
+"$LUNCOSIM_BIN" test --scene /path/to/astrobotic-griffin-1/tests/griffin_tether_descent.usda --verification Griffin1Requirements::Verify_GriffinSurfaceOperations --max-ticks 14000 --tick-hz 60 --threads 1 --jitter 0 --api 4202
+```
 
-From the repository root:
+Require `GRIFFIN_TETHER_DESCENT` PASS and the native
+`LUNCO_SCENE_TEST_REPORT` for that verification identity. Exit 0 means the
+observer passed; exit 1 is a failed verdict; exit 2 means no verdict and fails
+acceptance. Inspect the reported stage, native contacts, line loads, brake and
+joint ownership when a run stops. A timeout cannot substitute for a verdict.
+See the [test catalogue](tests/README.md) for focused cases.
 
-    $env:PATH = 'C:\Program Files\Git\usr\bin;' + $env:PATH
-    cargo build -p lunco-luncosim --bin luncosim
+For release qualification, build the binaries from the clean pinned checkout,
+then run from this model repository:
 
-The PATH line supplies date.exe for the current celestial EOP build helper.
-It changes only the current PowerShell process.
+```sh
+python3 tools/validate_repository.py
+python3 tools/qualification.py --engine /path/to/lunco-sim --provision --api-port 4299
+```
 
-## Step 5: validate authored source
+The structural command checks native TOML structure and package-local manifest
+references only. Qualification prepares declared datasets through the native
+asset manager, validates the mounted Twin, its entire indexed SysML source set
+and mapped scenes, and requires every release-case runtime verdict. It records
+source and executable identities and rejects source changes during the run.
+The workflow applies those gates to the staged archive contents before marking
+a release latest. Generated terrain and session state are excluded from the ZIP.
 
-Run:
+## Update the engineering model
 
-    .\target\debug\luncosim.exe --validate twins\astrobotic-griffin-1\vehicles\griffin_1.usda twins\astrobotic-griffin-1\vehicles\flip.usda twins\astrobotic-griffin-1\environments\south_pole_surrogate.usda twins\astrobotic-griffin-1\scenarios\griffin_1_surface_ops.rhai twins\astrobotic-griffin-1\tools\griffin_controls.rhai twins\astrobotic-griffin-1\behaviors\griffin_1_flip_patrol.btxml
+Keep requirements, configuration datums and provenance in the owning SysML
+packages; executable topology and parameters in USD; continuous equations in
+Modelica; and mission policy and observations in Rhai. Author USD changes through
+the simulator's document tools, save explicitly, and inspect the saved result.
 
-Expected result: six OK lines. A parse pass only proves syntax and source
-loading; it does not prove physics or mission completion.
-
-## Step 6: open the surface-operations Twin
-
-Opening the Twin uses `scenes/griffin_1_surface_ops.usda`, as declared in
-`twin.toml`. The surface-operations scene runs the powered
-landing mission and its Griffin-specific control HUD.
-
-Run:
-
-    .\target\debug\luncosim.exe --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda
-
-Check:
-
-- the Griffin lander is present at the authored descent start;
-- the NOBILE03 DEM-backed South-Pole ground is present;
-- the camera and landing target are present;
-- the four-wheel FLIP study proxy is visible on the lander top deck during
-  descent;
-- the isogrid deck, clean top deck, three adjacent vertical solar arrays on the
-  forward face and both forward chamfers, two
-  collision-safe ramps, and the ordered route markers are present;
-- the runtime has no unresolved twin:// asset error.
-
-The persistent control brief is part of the interactive acceptance check:
-
-- click the Griffin lander to possess it and verify the lander control card;
-- confirm GNC remains engaged until the first flight-control input; releasing
-  that input retains manual mode, and RECONNECT GNC restores guidance;
-- use `W/S` pitch, `A/D` roll, `Q/E` yaw, `Space` thrust, and `G` release;
-- after rover release, click FLIP to possess it and verify the rover HUD;
-- use the configured drive/turn/brake controls; Alt+left-click adds operator route points and the action control starts or stops the route;
-- use `Escape` or `Backspace` to return to free flight.
-
-The Twin-local Rhai tool library exposes the same handoff explicitly for the
-console: `griffin_controls::control_lander()`,
-`griffin_controls::control_rover()`, and
-`griffin_controls::release_control()`.
-
-The active vehicle sources are `vehicles/griffin_1.usda` and
-`vehicles/flip.usda`. Mission sequencing, physical attachment/release, deployed
-ramp stability, and rover route completion status are maintained in
-`contracts/implementation_gaps.md`.
-
-## Step 6: run the deterministic headless check
-
-Run:
-
-    .\target\debug\luncosim.exe test --scene twins\astrobotic-griffin-1\scenes\griffin_1_surface_ops.usda --max-ticks 120000 --tick-hz 60 --verdict-channel GRIFFIN_SURFACE_OPS
-
-This is a 2,000-second outer run budget, not an acceptance threshold. A focused
-landing diagnosis can use `--max-ticks 20000` (333.3 seconds), allowing the
-SysML-owned 300-second landing watchdog to report a structured failure.
-The former 14,400-tick budget stopped at 240 seconds, before that watchdog.
-
-Interpret the result:
-
-- exit 0: the complete scenario reported PASS;
-- exit 1: the scenario or physics reported FAIL;
-- exit 2: the bound expired or the app exited before a verdict.
-
-The route tree is Griffin-local because its waypoint paths belong to this
-scene. Current mission-verification status and unresolved runtime behavior are
-tracked in `contracts/implementation_gaps.md`.
-
-## Step 7: investigate before changing the verdict
-
-If the command reports NO-VERDICT:
-
-1. Check the terminal log for a physics-body-escaped fault.
-2. Confirm the lander event source paths.
-3. Confirm the Rhai task is attached to /Griffin1SurfaceOps/Scenario/Mission.
-4. After release, confirm the surface-waypoint and base-site events are
-   emitted by FLIP; do not treat attached ramp sensors as acceptance events.
-5. Confirm the rover command reaches its supported drive ports and that its
-   body leaves the adapter release pose.
-6. Add diagnostics to the acceptance observer, including live body state,
-   velocity, contacts, wheel state, and joint ownership.
-7. Keep the deterministic bound and report the missing phase.
-
-Do not add a timer-only PASS.
-
-## Step 8: extend the flight-attached path with measured data
-
-Keep the active attached prototype bounded and do not treat it as flight
-validation. Replace its proxy geometry and mass properties only when the
-measured Griffin/FLIP ICD is available.
-
-The implementation must define:
-
-- joint or payload constraint topology;
-- combined mass, COM, and inertia;
-- which body owns guidance mass;
-- release-state transition;
-- body-escape telemetry;
-- bounded landing test;
-- reproducible PASS/FAIL verdict.
-
-Start with the smallest lander-plus-FLIP attached fixture. Add the route only
-after the landing fixture is stable.
-
-## Step 9: replace assumptions with evidence
-
-When a mission owner or public source supplies data:
-
-1. Add the source and date to research/griffin_1_assumptions.md.
-2. Mark each value as measured, supplier-provided, public estimate, assumed,
-   or unknown.
-3. Update the relevant USD or Modelica input.
-4. Add a focused runtime or numerical check.
-5. Update README.md, handover.md, and contracts/implementation_gaps.md.
-6. Record any changed verdict bounds separately from physics changes.
-
-## Step 10: final product definition
-
-The finished product is complete only when it contains:
-
-- a source-backed Griffin/FLIP parameter manifest;
-- a reusable Griffin lander and FLIP vehicle;
-- a registered South-Pole environment;
-- a physical attachment and release model;
-- a working landing event chain;
-- power, thermal, communications, and mobility constraints;
-- ordered surface tasks and route markers;
-- deterministic, jittered, and threaded acceptance results;
-- provenance and limitations documented;
-- a reproducible GRIFFIN_SURFACE_OPS PASS.
-
-The current package is the integration-MVP foundation for that product, not the
-final flight-fidelity Twin.
+Replace assumptions with measured or supplier data at their owning source,
+update affected component plans and tests, and record changed acceptance bounds
+separately from physics changes. Flight-fidelity work still needs as-built CAD,
+mass properties, propulsion and electrical interfaces, rigging and actuator
+characteristics, the registered site and mission timeline. Keep unknown values
+visible in the assumption register until evidence resolves them.

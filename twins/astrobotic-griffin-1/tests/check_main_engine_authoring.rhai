@@ -18,8 +18,8 @@ fn incomplete_main_feed_ops() {
     ops
 }
 fn check_main_engine_authoring(incomplete_doc,complete_doc) {
-    let rejected=griffin_visual_builder::griffin_main_engine_feed_plan(incomplete_doc,"@root@","/World");
-    let accepted=griffin_visual_builder::griffin_main_engine_feed_plan(complete_doc,"@root@","/Griffin1SurfaceOps/Lander");
+    let rejected=griffin_propulsion_builder::griffin_main_engine_feed_plan(incomplete_doc,"@root@","/World");
+    let accepted=griffin_propulsion_builder::griffin_main_engine_feed_plan(complete_doc,"@root@","/Griffin1SurfaceOps/Lander");
     let members=[];
     if accepted.ok {
         for op in accepted.ops {

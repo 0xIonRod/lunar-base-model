@@ -25,7 +25,7 @@ fn on_start(me,ctx) {
     this.off_tick=();this.powered_samples=0;this.off_samples=0;
     this.powered_demand=false;this.powered_thrust=false;this.suppressed=true;
     this.off_load=true;this.balance=true;this.demand_held=true;
-    this.peak_thrust=0.0;this.final_thrust=();this.cutoff_voltage=();
+    this.peak_thrust=0.0;this.final_thrust=();this.first_unpowered_voltage=();
     this.peak_rcs=0.0;this.final_rcs=();
     let gate=query("QueryUsdPrim",#{path:ROOT,attrs:[],connections:true});
     this.wired=gate.connections["inputs:control_powered"]==[ROOT+"/ElectricalPower.outputs:avionics_powered"];
@@ -51,7 +51,7 @@ fn on_tick(me,ctx) {
         this.powered_demand=this.powered_demand || (throttle>0.1 && abs(torque)>1.0e-6);
         this.powered_thrust=this.powered_thrust || thrust>100.0;
     } else if powered==0.0 {
-        if this.off_tick==() {this.off_tick=sim_tick();this.cutoff_voltage=volts;}
+        if this.off_tick==() {this.off_tick=sim_tick();this.first_unpowered_voltage=volts;}
         this.off_samples+=1;
         this.off_load=this.off_load && abs(load)<1.0e-6;
         // The network output and controller participant cross completed fixed
@@ -67,10 +67,12 @@ fn on_tick(me,ctx) {
     this.balance=this.balance && abs(generation)<1.0e-6
         && abs(generation-port(this.net,"battery_net_power_w")-load)<1.0e-4;
     if (sim_tick()-this.start).to_float()*dt()<8.0 {return;}
+    // The first completed off sample includes battery-voltage rebound. The
+    // held converter must remain off below its distinct restart threshold.
     let full=this.off_tick!=() && (sim_tick()-this.off_tick).to_float()*dt()>2.0;
     let values=[
         ["poweredCommandsObserved",this.powered_samples>60 && this.powered_demand && this.powered_thrust],
-        ["lowSupplyObserved",full && this.off_samples>60 && this.cutoff_voltage<=this.config.voltage_off],
+        ["lowSupplyObserved",full && this.off_samples>60 && this.first_unpowered_voltage<this.config.voltage_on],
         ["commandsSuppressed",this.wired && this.demand_held && this.suppressed],
         ["loadDisconnected",this.off_load && this.balance],
         ["actuatorsSettled",this.peak_thrust>100.0 && this.final_thrust<0.001
@@ -90,10 +92,10 @@ fn on_tick(me,ctx) {
     let source=sysml_requirements::source_with_selection([],[PACKAGE+"gep004"],[PACKAGE+VERIFY]);
     let report=sysml_requirements::evaluate(source,[check]);
     report.metrics=#{powered_samples:this.powered_samples,off_samples:this.off_samples,
-        cutoff_voltage_v:this.cutoff_voltage,cutoff_tick:this.off_tick,peak_thrust_n:this.peak_thrust,
+        first_unpowered_voltage_v:this.first_unpowered_voltage,cutoff_tick:this.off_tick,peak_thrust_n:this.peak_thrust,
         final_thrust_n:this.final_thrust,peak_rcs_thrust_n:this.peak_rcs,
         final_rcs_thrust_n:this.final_rcs,conditions:values};
-    print("GRIFFIN_CONTROL_POWER_LOSS_METRICS "+to_json(report.metrics));
+    print("GRIFFIN_CONTROL_POWER_LOSS_METRICS "+report.metrics);
     report_structured_verdict(report,"GRIFFIN CONTROL POWER LOSS","GRIFFIN_CONTROL_POWER_LOSS");
     this.done=true;
 }

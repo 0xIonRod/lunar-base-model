@@ -40,18 +40,14 @@ The native `flip_motion.rhai` observer now samples actual hinge angle and angula
 velocity against the controller's output setpoint on every drive, brake and
 stopped-dwell tick, in both directions. Missing/nonfinite samples or exceeded
 limits fail the existing verdict. It retains sample count and peak error/rate;
-the positive gate now has 44 checks. No drive, braking or posture limits were
+the positive gate has 45 checks including source acceptance. No drive, braking or posture limits were
 relaxed. Stow/deploy remains covered by `flip_cad_capabilities.rhai`.
 
-Both changed Rhai files pass the production parser. The reduced response check
-passes against the composed authored values. `git diff --check` passes.
-
-**Native execution remains unqualified in this installation.** Before editing,
-the native motion test returned NO-VERDICT at its 30-second readiness timeout:
-the installed Modelica library index has no namespaces, core tool sources and
-NOBILE03 data are unavailable, and the panel Modelica participant never becomes
-ready. Logs are `logs/panel-baseline.stdout.log` and
-`logs/panel-baseline.stderr.log` in the workspace. Standalone USD/SysML validation
-also cannot resolve the Twin/import closure in that invocation. Editor lint
-retains seven unavailable rigid-body output-port diagnostics. Neither the
-native motion gate nor the existing stow/deploy gate is claimed to pass here.
+Native motion qualification passes through the production scene-test runner:
+45 checks and both directions' required SysML predicates pass over 15.90 seconds
+of simulation. A document-authored variant without the brake command emits a
+terminal failure on measured stopping speed/distance, rather than timing out or
+failing source preparation. The source scene is preserved and the temporary
+variant is removed. Run the positive/negative driver in
+[motion acceptance](flip-motion-runtime.md). This motion evidence does not
+qualify the separate stow/deploy case or flight actuator hardware.

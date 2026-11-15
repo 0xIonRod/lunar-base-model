@@ -1,5 +1,6 @@
 package FlipMotionRequirements {
     private import ScalarValues::Real;
+    private import ScalarValues::Boolean;
     private import FlipRequirements::FlipRover;
 
     part def MotionStudy {
@@ -28,6 +29,40 @@ package FlipMotionRequirements {
         attribute maximumPanelRateDegPerS : Real = 15.0;
     }
 
+    constraint def FMR001_DirectionEnvelope {
+        in signedTravelM : Real;
+        in minimumWheelRateRadPerS : Real;
+        in minimumRenderRotationDot : Real;
+        in minimumUprightAxisY : Real;
+        in entrySpeedMps : Real;
+        in stoppedSpeedMps : Real;
+        in stopDurationS : Real;
+        in stopDistanceM : Real;
+        in maximumHoldSpeedMps : Real;
+        in maximumHoldDriftM : Real;
+        in panelSamples : Real;
+        in maximumPanelAngleErrorDeg : Real;
+        in maximumPanelRateDegPerS : Real;
+        in nativeSequenceComplete : Boolean;
+        nativeSequenceComplete == true
+            and signedTravelM > MotionStudy::minimumMotionTravelM
+            and minimumWheelRateRadPerS > MotionStudy::minimumWheelRateRadPerS
+            and minimumRenderRotationDot > MotionStudy::minimumRenderRotationDot
+            and minimumUprightAxisY >= MotionStudy::minimumUprightAxisY
+            and entrySpeedMps >= MotionStudy::brakeEntrySpeedMps
+            and entrySpeedMps <= MotionStudy::maximumBrakeEntrySpeedMps
+            and stoppedSpeedMps <= MotionStudy::stoppedSpeedMps
+            and stopDurationS > 0.0
+            and stopDurationS <= (entrySpeedMps - MotionStudy::stoppedSpeedMps)
+                / MotionStudy::minimumAverageDecelerationMps2 + MotionStudy::brakeResponseAllowanceS
+            and stopDistanceM <= MotionStudy::maximumStoppingDistanceM
+            and maximumHoldSpeedMps <= MotionStudy::stoppedSpeedMps
+            and maximumHoldDriftM <= MotionStudy::maximumStoppedDriftM
+            and panelSamples > 0.0
+            and maximumPanelAngleErrorDeg <= MotionStudy::maximumPanelAngleErrorDeg
+            and maximumPanelRateDegPerS <= MotionStudy::maximumPanelRateDegPerS;
+    }
+
     requirement def FMR001_ControlledStop {
         doc /* FMR-001: native forward and reverse motion must advance, roll
          * all four authored wheel visuals and stay upright. Braking starts
@@ -37,6 +72,7 @@ package FlipMotionRequirements {
          * stopped-speed and drift limits throughout the dwell. A rejected
          * command, missing sample or failed observation emits the terminal
          * failure verdict with measured speed, time, distance and bounds. */
+        require FMR001_DirectionEnvelope;
     }
     requirement <'FMR-001'> fmr001 : FMR001_ControlledStop {
         subject rover : FlipRover;

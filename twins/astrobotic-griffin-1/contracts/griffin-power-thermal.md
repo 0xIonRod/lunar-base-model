@@ -1,7 +1,7 @@
 # Griffin solar power and cooling study
 
 The three reconstructed array faces supply one 28 V battery bus and a regulated
-avionics load. Each face has its own lumped temperature, solar-heat input,
+avionics load and winch converter. Each face has its own lumped temperature, solar-heat input,
 capacity-limited coolant boundary and signed infrared exchange with prescribed
 sky and ground baths. This is an executable study, not a claim
 about Griffin's unpublished cell supplier, battery inventory or cooling hardware.
@@ -64,36 +64,50 @@ storage and load power. Negative tests must reject disconnected temperature
 feedback or a broken electrical/thermal connection. GNC power availability
 must be wired to the solved avionics supply before claiming powered control.
 
-The radiative network passes GEP-001, GEP-002 and GEP-003 over
-45 simulation seconds (270 ten-tick samples). Independent integration of the
-rendered collecting faces gives 2.5814605, 2.3283761 and 2.3283761 m². Final
-temperatures are 310.3207, 305.5662 and 305.3774 K, with the 200 W per-panel
-cooling cap respected. Radiant, thermal, electrical and battery storage/loss
-checks pass. The earlier coupled-power checkpoint also covered eight Griffin
-control, Sun-pointing, landing, engine-out and propellant-exhaustion/impact cases.
-Those mission results precede the radiative addition. These runs qualify the
-declared reduced study; they do not establish flight calibration or FPS.
-The shared controller separately passes 108 powered/interrupted/recovery checks.
-The coolant boundary remains ideal and unlimited in total energy.
+Temperature acceptance observes change in either direction: a shaded face can
+cool while illuminated faces warm. `temperature_k` remains the actual thermal
+state. `curve_temperature_k` is the temperature used by the selected electrical
+coefficient, with `curve_limited` and `curve_in_range` exposing the distinction.
+Griffin authors the selected reference interval, 301.15–413.15 K. Below its cold
+end the coefficient is held at the reference as an explicit study assumption;
+this does not label the colder physical temperature as calibrated. Exceeding
+the upper bound rejects the Modelica step. Cooling, radiant balance, battery
+storage and electrical-node conservation remain independently required.
 
-`GEP-005` runs the **exact USD-generated 20-member network** for 3600 seconds
-under a held snapshot of its 15 physical Sun input values. It is a subsystem
-experiment, not a one-hour replay of changing flight attitude, shadows or
-terrain. The gate requires the actual linked Modelica document to match the
-projected source and retain its document generation. `RunModelicaSolve`
-receives finite constant input bindings and tolerance `1e-8`; no equations
-are copied into the observer. All 361 requested ten-second grid points and
-two additional event samples are checked without downsampling.
+`GEP-005` asks whether the exact USD-generated electrical network closes its
+radiative and thermal balances throughout a 3600-second transient under a held
+snapshot of its public inputs. Its members must match the authored component
+collection. The actual one-hour end temperatures and rates are retained even
+when the network has not settled. A false `one_hour_settled_window` is reported
+as an observation; it does not turn a physically valid transient into a failed
+equilibrium claim.
 
-The passing run ends at 373.2437, 338.4129 and 338.4253 K for the forward,
-front-starboard and front-port faces. Every sample stays in the reference
-cell's 301.15–413.15 K coefficient range. Final temperature rates are
-`2.12e-7`, `6.80e-6` and `6.79e-6 K/s`, below the typed `0.001 K/s` settling
-criterion. The gate also checks radiating area, material and environment
-parameters, exact thermal connector topology, the T⁴ law and full heat
-balance. The shared radiator separately passes 17 cooling, warming,
-equilibrium, zero-emissivity and invalid-emissivity checks. These results
-qualify the declared reduced study, not Griffin's flight thermal design.
+`GEP-006` asks a separate bounded equilibrium question. It uses the same
+unchanged generated network and held-forcing procedure over the source-owned
+7200-second horizon. It requires every `GEP-005` closure and coefficient-range
+condition, plus `GEP006_StableRateWindow`: each panel's absolute
+`mass_heat_flow_w / panelHeatCapacity` must remain at or below the unchanged
+`0.001 K/s` threshold throughout at least the final 300-second sampled window.
+Every returned point in that window is checked, rather than only the last row.
+If the window start lies between requested grid points, the preceding point is
+also checked so the observed interval covers the full duration. A non-settling
+network fails this case. The 7200-second horizon and 300-second dwell are
+computational study parameters, not flight limits; they do not alter heat
+capacity, radiation, cooling, geometry or Sun inputs.
+
+Both cases are subsystem experiments, not replays of changing flight attitude,
+shadows or terrain. The gate requires the actual linked Modelica document to
+match the projected source and retain its generation. `RunModelicaSolve`
+receives finite constant input bindings and tolerance `1e-8`; no equations are
+copied into the observer. Every requested ten-second grid point and any
+additional event samples are checked without downsampling. The gate checks
+radiating area, material and environment parameters, exact thermal connectors,
+the T⁴ law, full heat balance and bounded coefficient evaluation. Both modes
+retain the real one-hour checkpoint, final temperatures and rates, cold
+off-calibration rows, maximum window rates and window sample counts. The
+explicit `inputs:equilibrium_study` Boolean on the `SustainedThermal` program
+selects the case; a missing or malformed mode is rejected. The two thin fixtures reference the same production scene and install the
+same observer; their explicit mode selects the transient or equilibrium horizon.
 
 `GEP-004` independently qualifies low-supply protection on the production
 vehicle. Its fixture inherits the landing scene, changes only battery capacity
@@ -103,11 +117,11 @@ conditions, not revised flight or nominal study ratings. A sustained 0.35
 thrust request and 0.2 yaw request remain present throughout the eight-second
 run. The gate observes a powered interval, solved avionics UVLO, zero computer
 draw, suppression of throttle and all three attitude requests within three
-fixed intervals, and subsequent main-engine and RCS extinction. The current
-run passes with 299 powered and 181 unpowered samples; cutoff occurs at tick
-300. Peak main-engine thrust is 7,628.58 N and peak summed RCS thrust is
-231.969 N; final values are below 0.001 N. The rapid voltage transition of this
-tiny test inventory does not calibrate a real battery OCV or BMS curve.
+fixed intervals, and subsequent main-engine and RCS extinction. The voltage
+crossing latch retains converter state through battery rebound after a load
+disconnects; algebraic denominator regularization does not own switching. The
+rapid voltage transition of this tiny test inventory does not calibrate a real
+battery OCV or BMS curve.
 
 Run the positive cases through the normal Twin verification registry:
 
@@ -115,6 +129,7 @@ Run the positive cases through the normal Twin verification registry:
 luncosim test --scene tests/griffin_power_thermal.usda --verification GriffinPowerThermalRequirements::Verify_GriffinPowerThermal
 luncosim test --scene tests/griffin_control_power_loss.usda --verification GriffinPowerThermalRequirements::Verify_GriffinControlPowerLoss
 luncosim test --scene tests/griffin_sustained_thermal.usda --verification GriffinPowerThermalRequirements::Verify_GriffinSustainedThermal
+luncosim test --scene tests/griffin_equilibrium_thermal.usda --verification GriffinPowerThermalRequirements::Verify_GriffinEquilibriumThermal
 ```
 
 For fault qualification, `tests/check_power_failure_rejection.py` forks the
@@ -139,25 +154,7 @@ held admission. Other cuts must produce a failing typed requirement verdict.
 The script is an external API/CLI coordinator; the existing Rhai observer and Modelica
 admission owner supply the rejection evidence.
 
-Qualification on 21 October 2026 confirms all four cuts: the temperature input
-is rejected as neither a scalar value nor a connection; the disconnected PV
-connector is rejected as outside the generated acausal network; and the heat
-source and sky-radiation disconnections complete the observation horizon with
-failing GEP-002 verdicts. A broken thermal topology disproves node closure;
-the observer continues independent measurements without reading removed
-radiation outputs or substituting a zero heat flow. The unmodified network
-passes GEP-001–003 with the strengthened exact
-electrical/thermal node checks. Together with the separate GEP-004 pass, these
-close the power-loss and broken-wiring acceptance gaps. Raw evidence is in the
-engine checkout's `.cache/codex-evidence/griffin-radiation-20261021/` and this
-Twin's `.cache/power-failure-qualification/`. These faults do not alter the
-positive source or nominal study ratings and do not qualify FPS.
-
-The one-hour evidence and current positive power/control reports are under the
-engine checkout's `.cache/codex-evidence/griffin-radiation-20261021/`.
-`sustained-final.log` retains the typed GEP-005 verdict, exact experiment
-identity, source CID, held forcing, temperatures and rates. The subsystem
-source CID is `bafkreihxufarbfkjqwzm7ljautqgkbytqt6d5iohjt3fclm7x2chuww3ke`.
-The native binary SHA-256 is
-`39f60840b5ea0412f5eb3aabc0769d1ceb57e671050ad563f3674ec62962834c`.
-This thermal checkpoint does not qualify native one-hour mission behavior or FPS.
+The current qualification procedure is defined in repository
+`tools/qualification.toml`. It requires native source validation and registered
+production verdicts, with reports tied to the admitted source revision. Historical
+checkpoint temperatures and cached binary hashes do not qualify a changed model.

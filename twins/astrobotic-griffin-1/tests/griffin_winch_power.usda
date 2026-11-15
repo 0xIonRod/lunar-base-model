@@ -1,0 +1,193 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World" (
+    prepend apiSchemas = ["LunCoEpochAPI"]
+)
+{
+    double lunco:time:epochJd = 2461448.2197239352
+    def Scope "WinchPower" (
+        prepend apiSchemas = ["CollectionAPI:components"]
+    )
+    {
+        uniform token collection:components:expansionRule = "explicitOnly"
+        custom double outputs:battery_terminal_voltage_v
+        double outputs:battery_terminal_voltage_v.connect = </World/WinchPower/Battery.outputs:terminal_voltage_v>
+        custom double outputs:battery_net_power_w
+        double outputs:battery_net_power_w.connect = </World/WinchPower/Battery.outputs:net_power_w>
+        custom double outputs:battery_stored_power_w
+        double outputs:battery_stored_power_w.connect = </World/WinchPower/Battery.outputs:stored_power_w>
+        custom double outputs:battery_stored_energy_j
+        double outputs:battery_stored_energy_j.connect = </World/WinchPower/Battery.outputs:stored_energy_j>
+        custom double outputs:battery_heat_w
+        double outputs:battery_heat_w.connect = </World/WinchPower/Battery.outputs:heat_w>
+        custom double outputs:battery_soc_out
+        double outputs:battery_soc_out.connect = </World/WinchPower/Battery.outputs:soc_out>
+        custom double inputs:winch_spool_power0_w = 0.0
+        double inputs:winch_spool_power0_w.connect = </World/Tether.outputs:spool_power0>
+        custom double inputs:winch_spool_power1_w = 0.0
+        double inputs:winch_spool_power1_w.connect = </World/Tether.outputs:spool_power1>
+        custom double inputs:winch_damper_power_w = 0.0
+        double inputs:winch_damper_power_w.connect = </World/Tether.outputs:damper_power>
+        custom double inputs:winch_enabled = 0.0
+        double inputs:winch_enabled.connect = </World/Tether.outputs:actuator_enabled>
+        custom double outputs:winch_available
+        double outputs:winch_available.connect = </World/WinchPower/WinchDrive.outputs:available>
+        custom double outputs:winch_power_draw_w
+        double outputs:winch_power_draw_w.connect = </World/WinchPower/WinchDrive.outputs:power_draw_w>
+        custom double outputs:winch_heat_w
+        double outputs:winch_heat_w.connect = </World/WinchPower/WinchDrive.outputs:heat_w>
+        custom double outputs:winch_mechanical_output_power_w
+        double outputs:winch_mechanical_output_power_w.connect = </World/WinchPower/WinchDrive.outputs:mechanical_output_power_w>
+        custom double outputs:winch_brake_power_w
+        double outputs:winch_brake_power_w.connect = </World/WinchPower/WinchDrive.outputs:brake_power_w>
+        custom double outputs:winch_power_residual_w
+        double outputs:winch_power_residual_w.connect = </World/WinchPower/WinchDrive.outputs:power_residual_w>
+        custom double outputs:winch_temperature_k
+        double outputs:winch_temperature_k.connect = </World/WinchPower/WinchMass.outputs:temp_k>
+        custom double outputs:winch_thermal_storage_w
+        double outputs:winch_thermal_storage_w.connect = </World/WinchPower/WinchMass.outputs:heat_flow_w>
+        custom double outputs:winch_heat_rejection_w
+        double outputs:winch_heat_rejection_w.connect = </World/WinchPower/WinchRadiator.outputs:heat_rejection_w>
+        rel collection:components:includes = [</World/WinchPower/Battery>, </World/WinchPower/WinchDrive>, </World/WinchPower/WinchMass>, </World/WinchPower/WinchHeat>, </World/WinchPower/WinchRadiator>]
+        def Scope "Battery" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Electrical/Battery.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double parameters:voltage_nom = 28.0
+            custom double parameters:R_internal = 0.02
+            custom double parameters:capacity = 0.001
+            custom double parameters:soc_init = 0.8
+            custom double outputs:terminal_voltage_v = 0.0
+            custom double outputs:net_power_w = 0.0
+            custom double outputs:stored_power_w = 0.0
+            custom double outputs:stored_energy_j = 0.0
+            custom double outputs:heat_w = 0.0
+            custom double outputs:soc_out = 0.0
+            custom token connectors:p
+            token connectors:p.connect = </World/WinchPower/WinchDrive.connectors:p>
+        }
+        def Scope "WinchDrive" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/models/GriffinWinchDrive.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double parameters:efficiency = 0.8
+            custom double parameters:idle_power_w = 15.0
+            custom double parameters:voltage_off_v = 18.0
+            custom double parameters:voltage_on_v = 20.0
+            custom token connectors:p = ""
+            custom double inputs:spool_power0_w
+            double inputs:spool_power0_w.connect = </World/WinchPower.inputs:winch_spool_power0_w>
+            custom double inputs:spool_power1_w
+            double inputs:spool_power1_w.connect = </World/WinchPower.inputs:winch_spool_power1_w>
+            custom double inputs:damper_power_w
+            double inputs:damper_power_w.connect = </World/WinchPower.inputs:winch_damper_power_w>
+            custom double inputs:enabled
+            double inputs:enabled.connect = </World/WinchPower.inputs:winch_enabled>
+            custom double outputs:available = 0.0
+            custom double outputs:power_draw_w = 0.0
+            custom double outputs:heat_w = 0.0
+            custom double outputs:mechanical_output_power_w = 0.0
+            custom double outputs:brake_power_w = 0.0
+            custom double outputs:power_residual_w = 0.0
+        }
+        def Scope "WinchMass" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/ThermalMass.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double parameters:c_th = 10000.0
+            custom double parameters:T_init = 293.15
+            custom token connectors:port = ""
+            token connectors:port.connect = [</World/WinchPower/WinchHeat.connectors:port>, </World/WinchPower/WinchRadiator.connectors:port>]
+            custom double outputs:temp_k = 0.0
+            custom double outputs:heat_flow_w = 0.0
+        }
+        def Scope "WinchHeat" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/HeatLoad.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom token connectors:port = ""
+            custom double inputs:heat_w
+            double inputs:heat_w.connect = </World/WinchPower/WinchDrive.outputs:heat_w>
+            custom double outputs:heat_in_w = 0.0
+        }
+        def Scope "WinchRadiator" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @lunco://models/LunCo/Thermal/Radiator.mo@
+            uniform bool lunco:program:realtimeSafe = true
+            custom double parameters:area = 0.05
+            custom double parameters:emissivity = 0.8
+            custom double parameters:T_sink = 250.0
+            custom token connectors:port = ""
+            custom double outputs:heat_rejection_w = 0.0
+            custom double outputs:temperature_k = 0.0
+        }
+    }
+    def Scope "Tether" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/models/GriffinTetherPairStudy.mo@
+        uniform bool lunco:program:realtimeSafe = false
+        custom double inputs:stiffness = 4000.0
+        custom double inputs:damping = 300.0
+        custom double inputs:initial_length = 10.0
+        custom double inputs:preload_tension = 50.0
+        custom double inputs:payout_extension = 0.03
+        custom double inputs:tension_limit = 2500.0
+        custom double inputs:maximum_motor_power_w = 1.0
+        custom double inputs:span0_x = 10.025
+        custom double inputs:span1_x = 10.025
+        custom double inputs:enabled = 1.0
+        custom double inputs:regulate = 0.0
+        custom double inputs:payout_speed0 = 0.12
+        custom double inputs:payout_speed1 = 0.12
+        custom double outputs:actuator_enabled = 0.0
+        custom double outputs:spool_power0 = 0.0
+        custom double outputs:spool_power1 = 0.0
+        custom double outputs:damper_power = 0.0
+        custom double outputs:paid_rate0 = 0.0
+        custom double outputs:paid_rate1 = 0.0
+        custom double outputs:length0 = 0.0
+        custom double outputs:length1 = 0.0
+        custom double outputs:tension0 = 0.0
+        custom double outputs:tension1 = 0.0
+        custom double inputs:drive_powered
+        double inputs:drive_powered.connect = </World/WinchPower.outputs:winch_available>
+    }
+    def Scope "WinchObservation"
+    {
+        def Scope "Program" (
+            prepend apiSchemas = ["LunCoProgramAPI"]
+        )
+        {
+            uniform token info:implementationSource = "sourceAsset"
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/griffin_winch_power.rhai@
+            uniform bool lunco:program:realtimeSafe = true
+            custom bool inputs:initially_unpowered = false
+        }
+    }
+    def DistantLight "Sun"
+    {
+    }
+}

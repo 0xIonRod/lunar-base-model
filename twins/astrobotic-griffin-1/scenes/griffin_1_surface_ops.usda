@@ -226,6 +226,17 @@ def Xform "Griffin1SurfaceOps" (
             custom double parameters:heading_tolerance_rad = 0.08726646259971647
             custom double parameters:heading_rate_tolerance_rad_s = 0.02
         }
+        over "ElectricalPower"
+        {
+            custom double inputs:winch_spool_power0_w
+            double inputs:winch_spool_power0_w.connect = </Griffin1SurfaceOps/EgressTether.outputs:spool_power0>
+            custom double inputs:winch_spool_power1_w
+            double inputs:winch_spool_power1_w.connect = </Griffin1SurfaceOps/EgressTether.outputs:spool_power1>
+            custom double inputs:winch_damper_power_w
+            double inputs:winch_damper_power_w.connect = </Griffin1SurfaceOps/EgressTether.outputs:damper_power>
+            custom double inputs:winch_enabled
+            double inputs:winch_enabled.connect = </Griffin1SurfaceOps/EgressTether.outputs:actuator_enabled>
+        }
     }
     def "FLIP" (
         references = @twin://astrobotic-griffin-1/vehicles/flip_v5.usda@</FLIP>
@@ -546,6 +557,14 @@ def Xform "Griffin1SurfaceOps" (
         custom double inputs:loading_response_time = 0.15
         custom double inputs:unloading_response_time = 0.05
         custom double inputs:front_grounded = 0.0
+        custom double inputs:drive_powered
+        double inputs:drive_powered.connect = </Griffin1SurfaceOps/Lander/ElectricalPower.outputs:winch_available>
+        custom double inputs:maximum_motor_power_w = 3000.0
+        custom double outputs:spool_power0 = 0.0
+        custom double outputs:spool_power1 = 0.0
+        custom double outputs:damper_power0 = 0.0
+        custom double outputs:damper_power1 = 0.0
+        custom double outputs:actuator_enabled = 0.0
     }
     def Scope "CompactEgressObservation"
     {

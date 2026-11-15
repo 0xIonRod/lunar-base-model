@@ -31,6 +31,7 @@ fn visual_plan(doc) {
             ops.push(surface::attr(curve,"normals","normal3f[]","[(0.0, 1.0, 0.0), (0.0, 1.0, 0.0)]"));
             ops.push(surface::attr(curve,"widths","float[]","[0.04]"));
             ops.push(surface::attr(curve,"doubleSided","bool","true"));
+            ops.push(surface::attr(curve,"physics:collisionEnabled","bool","false"));
             ops.push(#{SetApiSchemas:#{edit_target:"@root@",path:curve,schemas:["MaterialBindingAPI"]}});
             ops.push(#{SetRelationship:#{edit_target:"@root@",path:curve,name:"material:binding",targets:[root+"/Looks/Webbing"]}});
         }

@@ -1539,6 +1539,10 @@ package GriffinRequirementSources {
         ref targetRequirement = GriffinPowerThermalRequirements::gep005;
         ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_image_solar_thermal_reference, source_nist_stefan_boltzmann);
     }
+    part evidence_gep_006 : RequirementEvidence {
+        ref targetRequirement = GriffinPowerThermalRequirements::gep006;
+        ref sources = (source_griffin_power_thermal_contract, source_griffin_power_thermal_study, source_image_solar_thermal_reference, source_nist_stefan_boltzmann);
+    }
     part source_griffin_ramp_middle_component : EvidenceSource {
         doc /* Detached shorter-middle reconstruction, not supplier CAD or an installed mechanism. */
         attribute role : EvidenceSourceRole = "VisualAsset";
@@ -1600,5 +1604,83 @@ package GriffinRequirementSources {
     part root_bearing_evidence : RequirementEvidence {
         ref targetRequirement = GriffinRampRootBearingRequirements::grb001;
         ref sources = (source_root_bearing_reconstruction);
+    }
+
+    part source_griffin_tether_study : EvidenceSource {
+        doc /* Project-owned reduced rigging and deployment assumptions;
+         * this source does not establish flight hardware or qualification. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_flip_egress.sysml";
+    }
+    part source_griffin_tether_observer : EvidenceSource {
+        doc /* Executable production-controller acceptance procedure. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/griffin_tether_egress.rhai";
+    }
+    part evidence_gfe_001 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe001;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+    part evidence_gfe_002 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe002;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+    part evidence_gfe_003 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe003;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+    part evidence_gfe_004 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe004;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+    part evidence_gfe_005 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe005;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+    part evidence_gfe_006 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe006;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+    part evidence_gfe_007 : RequirementEvidence {
+        ref targetRequirement = GriffinFlipEgressStudy::gfe007;
+        ref sources = (source_griffin_tether_study, source_griffin_tether_observer);
+    }
+
+    part source_flip_motion_study : EvidenceSource {
+        doc /* Reconstructed rover simulator envelope and observation method;
+         * these are study assumptions, not supplier braking specifications. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/contracts/flip-motion-runtime.md";
+    }
+    part evidence_fmr_001 : RequirementEvidence {
+        ref targetRequirement = FlipMotionRequirements::fmr001;
+        ref sources = (source_flip_motion_study);
+    }
+
+    part source_griffin_winch_study : EvidenceSource {
+        doc /* Assumed actuator ratings and lumped thermal path selected for
+         * this integration study; no flight hardware identification. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/requirements/griffin_winch_requirements.sysml";
+    }
+    part source_griffin_winch_observer : EvidenceSource {
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "twin://astrobotic-griffin-1/scenarios/tests/griffin_winch_power.rhai";
+    }
+    part evidence_gwp_001 : RequirementEvidence {
+        ref targetRequirement = GriffinWinchRequirements::gwp001;
+        ref sources = (source_griffin_winch_study, source_griffin_winch_observer);
+    }
+    part evidence_gwp_002 : RequirementEvidence {
+        ref targetRequirement = GriffinWinchRequirements::gwp002;
+        ref sources = (source_griffin_winch_study, source_griffin_winch_observer);
+    }
+    part evidence_gwp_003 : RequirementEvidence {
+        ref targetRequirement = GriffinWinchRequirements::gwp003;
+        ref sources = (source_griffin_winch_study, source_griffin_winch_observer);
+    }
+    part evidence_gwp_004 : RequirementEvidence {
+        ref targetRequirement = GriffinWinchRequirements::gwp004;
+        ref sources = (source_griffin_winch_study, source_griffin_winch_observer);
     }
 }
