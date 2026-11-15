@@ -369,15 +369,14 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     let fuel_inlets=[];
     let oxidizer_inlets=[];
     for name in names {
-        let engine=main_engine_model_path(root,name);
         let plume=main_engine_plume_path(root,name);
-        if !_exists(doc,engine) || !_exists(doc,plume) || !_exists(doc,main+"/"+name+"Wall") {
-            return plan_error(name+": install valves, chamber, plume and wall before admitting the feed");
-        }
         let assembly=main+"/"+name;
-        for member in pressure_fed_engine::component_members(assembly) {members.push(member);}
-        members.push(plume);
-        members.push(main+"/"+name+"Wall");
+        let required=pressure_fed_engine::component_members(assembly);
+        required.push(plume);required.push(main+"/"+name+"Wall");
+        for member in required {
+            if !_exists(doc,member) {return plan_error(member+": required propulsion member has not composed");}
+            members.push(member);
+        }
         fuel_inlets.push(assembly+"/FuelValve.connectors:inlet");
         oxidizer_inlets.push(assembly+"/OxidizerValve.connectors:inlet");
     }

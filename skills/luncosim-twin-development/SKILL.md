@@ -73,6 +73,16 @@ Do not hardcode a machine-specific executable or installation path in committed
 Twin files or skills. Resolve the path for the current task and keep it local to
 the command/session.
 
+## Inspectable system structure
+
+In the matching LunCoSim checkout, read
+`skills/compose-multidomain-twin/references/inspectable-usd-systems.md` when
+creating a multi-domain model or changing its assembly boundaries. That is the
+canonical guide for explicit physical parts, USD wiring, coupled solver scope,
+readable identities, saved views, and system-level acceptance. Use the installed
+skill copy when working from a packaged build. Keep Twin-specific requirements
+and evidence here; do not maintain a second copy of that authoring recipe.
+
 ## Match the check to the claim
 
 Before running commands, inspect the installed build's help and bundled

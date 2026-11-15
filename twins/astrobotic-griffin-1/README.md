@@ -14,6 +14,15 @@ mobility claim is made. The terrain source is real LROC data, but the selected
 regional center is a reproducible study anchor, not a confirmed touchdown
 coordinate.
 
+The USD engine assemblies require LunCoSim commit `21eeefa75` or a revision
+containing it, including the shared
+`components/propulsion/pressure_fed_engine.usda` asset and matching
+`PressureFedValve` health input. The updated authoring and diagram guidance is
+published on LunCoSim's `tutorials` branch. Use the complete matching asset set;
+a binary-only rebuild with older shared assets is insufficient.
+See [the saved system diagrams](views/README.md) for full-scene, feed and internal
+engine views.
+
 The current plume interface requires the coordinated single-volume propulsion
 update in LunCoSim: `plume.wesl`, `plume_field.wesl`, `blackbody_radiance.wesl`,
 the shared engine visual/helper, and the matching Modelica outputs. Deploy that

@@ -24,9 +24,11 @@ table unchanged.
 
 ## Step 1: prepare the repository
 
-Use a current LunCoSim main checkout with the typed SysML, USD Editor, and
-generic requirement-evaluation APIs used by this Twin. Confirm that the
-checkout contains Cargo.toml, assets/, crates/, and twins/.
+Use a LunCoSim checkout containing commit `21eeefa75` and its matching shared
+assets. The required USD engine assembly and diagram work is published on the
+`tutorials` branch. The checkout must expose the typed SysML, USD Editor, and
+generic requirement-evaluation APIs used by this Twin. Confirm that it contains
+Cargo.toml, assets/, crates/, and skills/.
 
 ## Step 2: place the Twin
 

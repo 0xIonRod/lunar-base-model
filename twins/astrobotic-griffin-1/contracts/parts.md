@@ -89,6 +89,14 @@ released Astrolab battery dimensions. The visible case and collision shape
 share the explicit translate/scale order. The sensor/power fixture declares
 SI metres and Y-up so its composed bounds can verify the allocation directly.
 
+The dry feed-authoring gate is `tests/check_main_engine_authoring.rhai`.
+In a mounted Griffin Twin with its SysML source set ready, create an untitled USD
+document and apply `incomplete_main_feed_ops()` through `ApplyUsdOps`. Wait for
+that document's composed projection, then run
+`check_main_engine_authoring(incomplete_doc, surface_scene_doc)`. It rejects the
+missing valve with no write plan and accepts the complete 39-member network.
+Discard the scratch document; do not save the incomplete fixture as vehicle data.
+
 Each Griffin main engine is modelled separately. `MainPropulsion/EngineNN` is
 a USD assembly with explicit `FuelValve`, `OxidizerValve` and `Chamber`
 program parts. Both shared tanks feed the valves through USD fluid connections,

@@ -25,9 +25,9 @@ retain focused checks and the final desktop binary build.
 
 `engine-fixes.patch` contains the seven native engine files changed by this
 task. `source-manifest.json` identifies the engine base revision, binary SHA256,
-and current Twin/native source hashes. The native patch is required for this
-acceptance; running the Twin with an older installed engine is unverified.
-The changes remain local and uncommitted.
+and current Twin/native source hashes. The captured native fixes are integrated in LunCoSim commit `9a36186b3`;
+use an engine revision containing that commit. These receipts identify the
+sources used for this dated run, rather than the current Twin working tree.
 
 Reproduce the full scene test using the command in `source-manifest.json`
 from the engine checkout. Set TWIN to this Twin's absolute path first. For the
