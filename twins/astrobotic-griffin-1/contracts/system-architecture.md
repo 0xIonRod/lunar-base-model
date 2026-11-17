@@ -17,6 +17,13 @@ its observer's `verification_mode`. It is the manifest-mapped
 | Grouping and diagram placement | `views/*.lunco-view.toml`; independent of executable topology |
 | Release compatibility and qualification | repository `tools/qualification.toml`, pinned runtime/assets, native validation and registered scene verdicts |
 
+The egress task samples the current lander, ramp and rear wheel poses into one
+routing snapshot. Modelica's input adapter adds live rates and centre-of-mass
+facts and writes the ordered scalar ports. The tether view consumes routing
+vectors directly. During landing standby it samples them after the previous
+curve publication completes, on the existing visual tick cadence. Route
+selection still comes from the Modelica output snapshot.
+
 Authoring plans are separated by domain. `griffin_propulsion_builder` owns
 engine/feed assembly, propellant mass properties, thrust ratings and RCS
 actuator plans. `griffin_power_builder` owns the electrical/thermal network and

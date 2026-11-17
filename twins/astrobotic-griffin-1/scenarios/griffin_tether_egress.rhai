@@ -21,25 +21,45 @@ fn simulation_dependencies(me,ctx) {
     dependencies
 }
 
-fn input_geometry(rover,lander,anchor_x,anchor_y,anchor_z) {
-    let config=griffin_tether_study::routing_config();
-    input_geometry(rover,lander,anchor_x,anchor_y,anchor_z,config)
-}
-
-fn input_geometry(rover,lander,anchor_x,anchor_y,anchor_z,config) {
-    let rp=query("QueryPhysicsState",#{id:rover});
-    let lp=query("QueryPhysicsState",#{id:lander});
-    let rpos=world_pos3(rover);let lpos=world_pos3(lander);
-    let rrot=world_rotation_quat(rover);let lrot=world_rotation_quat(lander);
-    let rc=rpos+qrot(rrot,vec3_from(rp.center_of_mass_m));
-    let lc=lpos+qrot(lrot,vec3_from(lp.center_of_mass_m));
-    let rv=vec3_from(rp.linear_velocity_mps);let lv=vec3_from(lp.linear_velocity_mps);
-    let rw=vec3_from(rp.angular_velocity_radps);let lw=vec3_from(lp.angular_velocity_radps);
-    let writes=[];let index=0;
+// Sample the shared routing geometry once. The displayed curves consume these
+// poses directly; the solver adapter adds rates and encodes its named inputs.
+fn routing_geometry(lander,anchor_x,anchor_y,anchor_z,config) {
+    let lpos=world_pos3(lander);let lrot=world_rotation_quat(lander);
+    let inverse=quat_inverse(lrot);
     let ramp=find_path(ROOT+"/Lander/CompactEgress");
     let ramp_position=world_pos3(ramp);let ramp_rotation=world_rotation_quat(ramp);
     let inboard=qrot(ramp_rotation,vec3(1.0,0.0,0.0));
     let up=qrot(ramp_rotation,vec3(0.0,1.0,0.0));
+    let wheels=[];
+    for station in ["RL","RR"] {
+        let id=find_path(ROOT+"/FLIP/Suspension_"+station+"/Wheel_"+station);
+        let hub=world_pos3(id);
+        let rotation=world_rotation_quat(id);
+        let axis=qrot(rotation,vec3(1.0,0.0,0.0));
+        let wheel_local=qrot(inverse,hub-lpos);
+        let side=if wheel_local.z<0.0 {-1.0}else{1.0};
+        let anchor=lpos+qrot(lrot,vec3(-anchor_x,anchor_y,side*anchor_z));
+        let guides=[];
+        for j in 0..config.profile_x.len() {
+            let guide=ramp_position+qrot(ramp_rotation,vec3(config.profile_x[j],config.profile_y[j],-side*anchor_z));
+            guides.push(guide-hub);
+        }
+        wheels.push(#{id:id,hub:hub,rotation:rotation,axis:axis,anchor:anchor,span:anchor-hub,guides:guides});
+    }
+    #{lander_position:lpos,lander_rotation:lrot,lander_inverse:inverse,inboard:inboard,up:up,wheels:wheels}
+}
+
+fn input_geometry(rover,lander,routing) {
+    let rp=query("QueryPhysicsState",#{id:rover});
+    let lp=query("QueryPhysicsState",#{id:lander});
+    let rpos=world_pos3(rover);let lpos=routing.lander_position;
+    let rrot=world_rotation_quat(rover);let lrot=routing.lander_rotation;
+    let rc=rpos+qrot(rrot,vec3_from(rp.center_of_mass_m));
+    let lc=lpos+qrot(lrot,vec3_from(lp.center_of_mass_m));
+    let lv=vec3_from(lp.linear_velocity_mps);
+    let rw=vec3_from(rp.angular_velocity_radps);let lw=vec3_from(lp.angular_velocity_radps);
+    let writes=[];let index=0;
+    let inboard=routing.inboard;let up=routing.up;
     let pitch_axis=vcross(inboard*(-1.0),vec3(0.0,1.0,0.0));
     writes.push(["body_angular_speed",vlen(rw)]);
     writes.push(["up_vertical",qrot(rrot,vec3(0.0,1.0,0.0)).y]);
@@ -52,29 +72,24 @@ fn input_geometry(rover,lander,anchor_x,anchor_y,anchor_z,config) {
     }
     // Modelica resolves cylindrical tangency and material speed, including
     // wheel rotation. Native wheel endpoints receive the resulting wrench.
-    for station in ["RL","RR"] {
-        let wheel=find_path(ROOT+"/FLIP/Suspension_"+station+"/Wheel_"+station);
-        let wp=query("QueryPhysicsState",#{id:wheel});
-        let hub=world_pos3(wheel);
-        let waxis=qrot(world_rotation_quat(wheel),vec3(1.0,0.0,0.0));
+    for wheel in routing.wheels {
+        let wp=query("QueryPhysicsState",#{id:wheel.id});
         let omega=vec3_from(wp.angular_velocity_radps);
-        let wheel_com=qrot(world_rotation_quat(wheel),vec3_from(wp.center_of_mass_m));
+        let wheel_com=qrot(wheel.rotation,vec3_from(wp.center_of_mass_m));
         let wv=vec3_from(wp.linear_velocity_mps)-vcross(omega,wheel_com);
-        let wheel_local=qrot(quat_inverse(lrot),hub-lpos);
-        let side=if wheel_local.z<0.0 {-1.0}else{1.0};
-        let anchor=lpos+qrot(lrot,vec3(-anchor_x,anchor_y,side*anchor_z));
-        for j in 0..config.profile_x.len() {
-            let guide=ramp_position+qrot(ramp_rotation,vec3(config.profile_x[j],config.profile_y[j],-side*anchor_z));
-            let offset=guide-hub;
-            for i in 0..3 {writes.push(["guide"+index+"_"+j+"_"+["x","y","z"][i],vec3_array(offset)[i]]);}
+        let j=0;
+        for guide in wheel.guides {
+            let offset=vec3_array(guide);
+            for i in 0..3 {writes.push(["guide"+index+"_"+j+"_"+["x","y","z"][i],offset[i]]);}
+            j+=1;
         }
-        let span=anchor-hub;let distance=vlen(span);let ra=hub-rc;let la=anchor-lc;
+        let span=wheel.span;let distance=vlen(span);let ra=wheel.hub-rc;let la=wheel.anchor-lc;
         let relative=wv-lv-vcross(lw,la);
         writes.push(["rate"+index,-vdot(relative,span)/max(distance,0.000001)]);
         for axis in 0..3 {
             let letter=["x","y","z"][axis];
             writes.push(["span"+index+"_"+letter,vec3_array(span)[axis]]);
-            writes.push(["axis"+index+"_"+letter,vec3_array(waxis)[axis]]);
+            writes.push(["axis"+index+"_"+letter,vec3_array(wheel.axis)[axis]]);
             writes.push(["relative"+index+"_"+letter,vec3_array(relative)[axis]]);
             writes.push(["omega"+index+"_"+letter,vec3_array(omega)[axis]]);
             writes.push(["rover_arm"+index+"_"+letter,vec3_array(ra)[axis]]);
@@ -269,7 +284,8 @@ fn release_tether_wrenches(rover,lander) {
 
 fn safe_hold_tether(tether,rover,lander,anchor_x,anchor_y,anchor_z) {
     try {
-        let geometry=input_geometry(rover,lander,anchor_x,anchor_y,anchor_z);
+        let routing=routing_geometry(lander,anchor_x,anchor_y,anchor_z,griffin_tether_study::routing_config());
+        let geometry=input_geometry(rover,lander,routing);
         write_tether(tether,geometry,1.0,0.0,0.0,rover,lander);
         #{ok:true,error:""}
     } catch(error) {
@@ -458,14 +474,17 @@ fn advance_egress(me,ctx) {
     }
 }
 
-fn refresh_visuals(geometry) {
+fn refresh_visuals(routing) {
     if this.visuals.len()!=2 || this.cut_tick!=() || sim_tick()%3!=0 {return;}
     try {
         // Each snapshot must publish before another supersedes it. Physics can
         // run several fixed steps per render frame; a tick-only throttle would
         // continually invalidate the asynchronous renderer's pending result.
         if this.visual_requested && !griffin_tether_visuals::ready(this.visuals) {return;}
-        let result=griffin_tether_visuals::update(this.visuals,geometry,read_tether(this.tether),this.lander);
+        if routing==() {
+            routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+        }
+        let result=griffin_tether_visuals::update(this.visuals,routing,read_tether(this.tether));
         if result.ok!=true {
             if !this.visual_error {emit("griffin_tether_visual_error",result);}
             this.visual_error=true;
@@ -519,7 +538,7 @@ fn step_egress(me,ctx) {
     }
     if this.stage=="wait_landing" {
         if this.visuals.len()==2 && sim_tick()%6==0 {
-            this.refresh_visuals(input_geometry(this.rover,this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this));
+            this.refresh_visuals(());
         }
         if !this.egress_requested {return;}
         let landing=griffin_surface_ops::landed_status();
@@ -534,7 +553,8 @@ fn step_egress(me,ctx) {
             this.failure="FLIP adapter was absent before pretension qualification";return;
         }
         if this.landed_tick==() {this.landed_tick=sim_tick();}
-        let preflight=input_geometry(this.rover,this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+        let routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+        let preflight=input_geometry(this.rover,this.lander,routing);
         write_tether(this.tether,preflight,0.0,0.0,0.0,this.rover,this.lander);
         let before=read_tether(this.tether);
         let actual_initial_length=min(before.length0,before.length1);
@@ -555,8 +575,9 @@ fn step_egress(me,ctx) {
         this.arm_tick=sim_tick();this.stage="arm_pretension";
     }
 
-    let geometry=input_geometry(this.rover,this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
-    this.refresh_visuals(geometry);
+    let routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+    let geometry=input_geometry(this.rover,this.lander,routing);
+    this.refresh_visuals(routing);
     if this.stage=="arm_pretension" {
         let before=read_tether(this.tether);
         // Modelica continuously reduces take-up as elastic preload is reached.

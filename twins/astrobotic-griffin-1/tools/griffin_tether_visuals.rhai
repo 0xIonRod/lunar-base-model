@@ -26,12 +26,6 @@ fn setup() {
     rows
 }
 
-fn vector_value(geometry,prefix) {
-    let v=[geometry[prefix+"_x"],geometry[prefix+"_y"],geometry[prefix+"_z"]];
-    for value in v {if value==() || !value.is_finite() {throw("Missing or invalid tether geometry: "+prefix);}}
-    vec3_from(v)
-}
-
 fn submit(row,curve,points,normals) {
     cmd("UpdateUsdCurveView",#{doc_id:row.doc,root_entity_id:if curve==row.bridle {row.wheel}else{row.root},
         curve_entity_id:curve,points:points,normals:normals,width_m:row.width,projection:"Spatial"})
@@ -51,38 +45,41 @@ fn ready(rows) {
     true
 }
 
-fn update(rows,geometry,state,lander) {
+fn finite_vector(value) {
+    value.x.is_finite() && value.y.is_finite() && value.z.is_finite()
+}
+
+fn update(rows,routing,state) {
     if rows.len()!=2 {return #{ok:true,rendered:false};}
     // Headless hosts do not project render meshes and must not prepare them.
     if get(rows[0].span,"Mesh3d.0")==() {return #{ok:true,rendered:false};}
-    // All guide vectors consume one immutable scalar snapshot. Index it once
-    // rather than scanning every scalar for every axis of every guide point.
-    let indexed=#{};
-    for scalar in geometry {indexed[scalar[0]]=scalar[1];}
-    let origin=world_pos3(lander);let inverse=quat_inverse(world_rotation_quat(lander));
+    let origin=routing.lander_position;let inverse=routing.lander_inverse;
     let index=0;
-    for station in ["RL","RR"] {
+    for wheel in routing.wheels {
         let row=rows[index];
-        let wheel=find_path(ROOT+"/FLIP/Suspension_"+station+"/Wheel_"+station);
-        let hub=world_pos3(wheel);
-        let anchor=vector_value(indexed,"span"+index);
+        let hub=wheel.hub;let anchor=wheel.span;
         let selected=vec3(state["routing"+index+"_x"],state["routing"+index+"_y"],state["routing"+index+"_z"]);
         let active=-1;let best=vlen(selected-anchor);
-        let guides=[];
+        let guides=wheel.guides;
+        if guides.len()<7 || !finite_vector(anchor) || !finite_vector(wheel.axis) || !finite_vector(routing.inboard) {
+            throw("Missing or invalid tether routing geometry");
+        }
+        // The tether route uses the same first seven guide stations as the
+        // authored contact selection, in their original order.
         for j in 0..7 {
-            let guide=vector_value(indexed,"guide"+index+"_"+j);guides.push(guide);
-            let distance=vlen(guide-selected);
+            if !finite_vector(guides[j]) {throw("Invalid tether guide point "+j);}
+            let distance=vlen(guides[j]-selected);
             if distance<best {best=distance;active=j;}
         }
         let path=[qrot(inverse,hub+anchor-origin)];
-        let inboard=vector_value(indexed,"inboard");
+        let inboard=routing.inboard;
         for j in 0..7 {
             if j<=active && vdot(guides[j]-anchor,inboard)<=0.0 {
                 path.push(qrot(inverse,hub+guides[j]-origin));
             }
         }
         path.push(qrot(inverse,hub-origin));
-        let axis=qrot(inverse,vector_value(indexed,"axis"+index));
+        let axis=qrot(inverse,wheel.axis);
         let points=[];let normals=[];
         for j in 0..path.len() {
             let before=path[max(0,j-1)];let after=path[min(path.len()-1,j+1)];
