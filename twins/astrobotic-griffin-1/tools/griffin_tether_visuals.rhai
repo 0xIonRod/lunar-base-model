@@ -27,8 +27,7 @@ fn setup() {
 }
 
 fn vector_value(geometry,prefix) {
-    let v=[(),(),()];
-    for row in geometry {for i in 0..3 {if row[0]==prefix+"_"+["x","y","z"][i] {v[i]=row[1];}}}
+    let v=[geometry[prefix+"_x"],geometry[prefix+"_y"],geometry[prefix+"_z"]];
     for value in v {if value==() || !value.is_finite() {throw("Missing or invalid tether geometry: "+prefix);}}
     vec3_from(v)
 }
@@ -56,30 +55,34 @@ fn update(rows,geometry,state,lander) {
     if rows.len()!=2 {return #{ok:true,rendered:false};}
     // Headless hosts do not project render meshes and must not prepare them.
     if get(rows[0].span,"Mesh3d.0")==() {return #{ok:true,rendered:false};}
+    // All guide vectors consume one immutable scalar snapshot. Index it once
+    // rather than scanning every scalar for every axis of every guide point.
+    let indexed=#{};
+    for scalar in geometry {indexed[scalar[0]]=scalar[1];}
     let origin=world_pos3(lander);let inverse=quat_inverse(world_rotation_quat(lander));
     let index=0;
     for station in ["RL","RR"] {
         let row=rows[index];
         let wheel=find_path(ROOT+"/FLIP/Suspension_"+station+"/Wheel_"+station);
         let hub=world_pos3(wheel);
-        let anchor=vector_value(geometry,"span"+index);
+        let anchor=vector_value(indexed,"span"+index);
         let selected=vec3(state["routing"+index+"_x"],state["routing"+index+"_y"],state["routing"+index+"_z"]);
         let active=-1;let best=vlen(selected-anchor);
         let guides=[];
         for j in 0..7 {
-            let guide=vector_value(geometry,"guide"+index+"_"+j);guides.push(guide);
+            let guide=vector_value(indexed,"guide"+index+"_"+j);guides.push(guide);
             let distance=vlen(guide-selected);
             if distance<best {best=distance;active=j;}
         }
         let path=[qrot(inverse,hub+anchor-origin)];
-        let inboard=vector_value(geometry,"inboard");
+        let inboard=vector_value(indexed,"inboard");
         for j in 0..7 {
             if j<=active && vdot(guides[j]-anchor,inboard)<=0.0 {
                 path.push(qrot(inverse,hub+guides[j]-origin));
             }
         }
         path.push(qrot(inverse,hub-origin));
-        let axis=qrot(inverse,vector_value(geometry,"axis"+index));
+        let axis=qrot(inverse,vector_value(indexed,"axis"+index));
         let points=[];let normals=[];
         for j in 0..path.len() {
             let before=path[max(0,j-1)];let after=path[min(path.len()-1,j+1)];

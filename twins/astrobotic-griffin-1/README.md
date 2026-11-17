@@ -78,7 +78,9 @@ requirements. The [safe-egress review](contracts/griffin-safe-egress-2026-11-13.
 records references, implementation boundaries and [runtime evidence](contracts/griffin-safe-egress-2026-11-13.md#validation).
 The mapped deployment gate checks seven egress requirements plus the two
 source-bound landing datums, including restrained descent, line release and manual drive. Live ribbons follow the Modelica routing
-and rear-wheel bridles; the disconnect command removes their view. Use Standard
+and rear-wheel bridles; the disconnect command removes their view. The visual
+adapter indexes each scalar geometry snapshot once for its guide-vector reads;
+curve geometry, width and publication cadence remain unchanged. Use Standard
 rendering for lighting inspection: Fast deliberately renders standard materials
 unlit. Tank-support frames have shared coplanar face coverage removed.
 See the [compact-egress contract](contracts/griffin-compact-egress-2026-10-28.md)
