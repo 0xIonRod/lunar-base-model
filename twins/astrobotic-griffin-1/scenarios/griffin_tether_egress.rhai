@@ -477,15 +477,16 @@ fn on_stop(me,ctx) {
 }
 
 fn task(me,ctx) {
-    wait_until(|m| {this.advance_egress(m,ctx);this.done})
+    wait_until(Fn("advance_egress"))
 }
 
-fn advance_egress(me,ctx) {
-    try {this.step_egress(me,ctx);} catch(error) {
+fn advance_egress(me) {
+    try {this.step_egress();} catch(error) {
         this.failure="Tether egress controller error: "+error.to_string();
         if !this.verification {cmd("SetTimeTransport",#{playing:false});}
-        this.step_egress(me,ctx);
+        this.step_egress();
     }
+    this.done
 }
 
 fn refresh_visuals(routing) {
@@ -509,7 +510,7 @@ fn refresh_visuals(routing) {
     }
 }
 
-fn step_egress(me,ctx) {
+fn step_egress() {
     if this.done {return;}
     if this.request_pending {
         this.started=sim_tick();this.egress_requested=true;this.request_pending=false;
