@@ -3,6 +3,7 @@ import "social_surface_finish" as surface;
 import "social_geometry_detail" as geometry;
 import "griffin_bus_detail" as harness;
 import "lunco://scripting/tools/assembly_builder" as builder;
+import "griffin_insulation_detail" as wrapping;
 
 fn datum(name) {
     let m=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_upper_visuals.sysml");
@@ -18,16 +19,47 @@ fn visual(ops,path,material) {
     ops.push(surface::attr(path,"physics:collisionEnabled","bool","false"));
     ops.push(finish::binding(path,material));ops
 }
-fn body_profile() {
-    let r=datum("BottleRadiusM");let half=datum("BottleBarrelLengthM")/2.0;
-    let n=datum("DomeStations").to_int();let profile=[[0.0,-half-r]];
-    for i in 1..n+1 {
-        let a=acos(-1.0)*0.5*i.to_float()/n.to_float();
-        profile.push([r*sin(a),-half-r*cos(a)]);
+fn cover_ops(root,index,parameters) {
+    let radius=datum("BottleRadiusM")+parameters.UpperCoverAllowanceM;
+    let half=datum("BottleBarrelLengthM")/2.0+datum("BottleRadiusM")+parameters.UpperCoverEndAllowanceM;
+    let mesh=wrapping::upper_surface(radius,half,parameters);
+    let ops=wrapping::mesh_plan(root,"Blanket",mesh.points,mesh.counts,mesh.indices,"/World/Looks/Insulation");
+    for side in [-1.0,1.0] {
+        let name="CoverTape"+if side<0.0 {"A"}else{"B"};
+        let x=side*datum("BandStationsXM")[1];
+        let y=0.0;
+        let slope=0.0;
+        let segments=parameters.UpperCoverSegments.to_int();
+        for station in 0..10 {
+            let left=mesh.points[1+station*segments];
+            let right=mesh.points[1+(station+1)*segments];
+            if x>=left[0] && x<=right[0] {
+                slope=(right[1]-left[1])/(right[0]-left[0]);
+                y=left[1]+(x-left[0])*slope+datum("BlanketTapeDepthM")/2.0;
+            }
+        }
+        ops=geometry::cube(ops,root,geometry::shape(name,
+            [x,y,0.0],
+            [datum("BlanketTapeWidthM"),datum("BlanketTapeDepthM"),datum("BlanketTapeHeightM")],
+            [0.0,0.0,atan(slope)*180.0/acos(-1.0)],"/World/Looks/Valve"));
     }
-    profile.push([r,half]);
-    for i in 1..n {let a=acos(-1.0)*0.5*i.to_float()/n.to_float();profile.push([r*cos(a),half+r*sin(a)]);}
-    profile.push([0.0,half+r]);profile
+    ops
+}
+fn cover_plan(doc,index) {
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:"/World"});
+    let root="/World/"+if index==0 {"UpperBottlePort"}else{"UpperBottleStarboard"};
+    if !query("InspectUsdDocument",#{doc_id:doc,path:root}).prim.exists {throw("Missing upper bottle owner");}
+    let ops=[#{RemovePrim:#{edit_target:"@root@",path:root+"/Blanket"}}];
+    let parameters=wrapping::settings();
+    for op in cover_ops(root,index,parameters) {ops.push(op);}
+    #{doc_id:doc,generation:q.generation,ops:ops}
+}
+// The foil network is referenced from the tank component. Apply this plan with
+// InstanceOverride scope on the upper-cover component's local material instance.
+fn cover_material_plan(doc) {
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:"/World/Looks/Insulation/Surface"});
+    #{doc_id:doc,generation:q.generation,scope:"InstanceOverride",
+      ops:wrapping::foil_ops("/World/Looks/Insulation/Surface",wrapping::settings())}
 }
 fn revolve(ops,parent,name,profile,position,material,crease) {
     let path=parent+"/"+name;ops.push(surface::add(parent,name,"Mesh"));
@@ -54,7 +86,7 @@ fn bottle_plan(doc,index) {
     let name=if index==0 {"UpperBottlePort"}else{"UpperBottleStarboard"};let root="/World/"+name;
     let ops=[surface::add("/World",name,"Xform")];
     ops=harness::append(ops,builder::place_plan("@root@",root,[0.0,datum("BottleCenterYM"),datum("BottleCentersZM")[index]],[0.0,0.0,0.0],[1.0,1.0,1.0]));
-    ops=revolve(ops,root,"Blanket",body_profile(),[0.0,0.0,0.0],"/World/Looks/Insulation",datum("NormalCreaseDeg"));
+    for op in cover_ops(root,index,wrapping::settings()) {ops.push(op);}
     let r=datum("BottleRadiusM");let width=datum("BandWidthM");let t=datum("BandThicknessM");
     let ring=[[r,-width/2.0],[r+t,-width/2.0],[r+t,width/2.0],[r,width/2.0]];
     let n=0;for x in datum("BandStationsXM") {
@@ -105,16 +137,14 @@ fn check_bottle(doc,index) {
     let q=query("QueryUsdPrim",#{doc_id:doc,path:root+"/Blanket",attrs:["points","physics:collisionEnabled","purpose"],relationships:true,schemas:true});
     if q.type_name!="Mesh" || q.attrs.purpose!="render" || q.attrs["physics:collisionEnabled"]!=false {throw("Invalid render-only bottle");}
     let lo=[1.0e20,1.0e20,1.0e20];let hi=[-1.0e20,-1.0e20,-1.0e20];
-    // Shared revolution topology has two unique poles and complete station rings.
-    // Read the poles and four cardinal points of the equator; avoid walking
-    // thousands of face corners inside the bounded Rhai observation hook.
-    let seg=datum("AngularSegments").to_int();let first=(datum("DomeStations").to_int()-1)*seg+1;
-    let samples=[q.attrs.points[0],q.attrs.points[q.attrs.points.len()-1]];
-    for i in 0..4 {samples.push(q.attrs.points[first+i*(seg/4)]);}
-    for p in samples {for a in 0..3 {lo[a]=min(lo[a],p[a]);hi[a]=max(hi[a],p[a]);}}
-    if abs(hi[0]-lo[0]-datum("BottleBarrelLengthM")-2.0*datum("BottleRadiusM"))>0.00001 {throw("Bottle length differs from source");}
-    if abs(hi[1]-lo[1]-2.0*datum("BottleRadiusM"))>0.00001 {throw("Bottle diameter differs from source");}
-    #{ok:true,bounds:[lo,hi],vertex_count:q.attrs.points.len(),scope:"Two visible pressurant envelopes only; third location and pressure dynamics unresolved"}
+    let parameters=wrapping::settings();
+    for p in q.attrs.points {for a in 0..3 {lo[a]=min(lo[a],p[a]);hi[a]=max(hi[a],p[a]);}}
+    let length=datum("BottleBarrelLengthM")+2.0*(datum("BottleRadiusM")+parameters.UpperCoverEndAllowanceM);
+    let radius=datum("BottleRadiusM")+parameters.UpperCoverAllowanceM;
+    if abs(hi[0]-lo[0]-length)>0.00001 {throw("Upper cover length differs from source");}
+    if hi[1]-lo[1]<2.0*radius || hi[1]-lo[1]>2.0*(radius*1.02+parameters.UpperCoverFoldDepthM) {throw("Upper cover exceeds its fold allowance");}
+    if q.attrs.points.len()!=parameters.UpperCoverSegments.to_int()*11+2 {throw("Upper cover topology differs from source");}
+    #{ok:true,bounds:[lo,hi],vertex_count:q.attrs.points.len(),scope:"Folded render cover at the existing bottle datum"}
 }
 fn check_deck(doc) {
     let root="/GriffinBus/RoverPayloadDeck";

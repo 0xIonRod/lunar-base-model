@@ -3,6 +3,8 @@ import "griffin_tank_finish" as finish;
 import "social_surface_finish" as surface;
 import "social_geometry_detail" as geometry;
 import "griffin_bus_detail" as harness;
+import "griffin_insulation_detail" as wrapping;
+import "lunco://scripting/tools/assembly_builder" as builder;
 
 fn root() {"/GriffinBus/TankSupportPlate/ExteriorBlankets"}
 fn bay(doc,index) {
@@ -30,75 +32,124 @@ fn prepare_plan(doc) {
     ops.push(surface::attr(root(),"documentation","string","\"Hardware-photo-informed silver exterior blankets. Source frame defines bay dimensions. Seam/tape layout is an unqualified visual study. No collision, mass, thermal or pressure authority.\""));
     // Reuse the existing foil network; do not add lighting or shader source.
     let shader="/GriffinBus/Looks/ExteriorPanels/Surface";
-    for row in [["crinkle","SkirtFoilCrinkle"],["facet_depth","SkirtFoilFacet"],["sheen","SkirtFoilSheen"],["v_scale","SkirtFoilAxialScale"]] {
-        ops.push(surface::attr(shader,"inputs:"+row[0],"float",study::datum(row[1]).to_string()));
-    }
+    for op in wrapping::foil_ops(shader,wrapping::settings()) {ops.push(op);}
     #{doc_id:doc,generation:q.generation,ops:ops}
 }
-fn specs(doc,index) {
-    let b=bay(doc,index);let result=[geometry::shape("Blanket"+index,b.position,b.scale,b.rotation,"/GriffinBus/Looks/ExteriorPanels")];
+fn drape(doc,index,parameters) {
+    let b=bay(doc,index);
+    let frame=query("QueryUsdPrim",#{doc_id:doc,path:"/GriffinBus/PerimeterFrame",attrs:["points"]});
+    let bottom=1.0e20;
+    let top=-1.0e20;
+    for point in frame.attrs.points {
+        bottom=min(bottom,point[1]);
+        top=max(top,point[1]);
+    }
+    bottom-=parameters.BusLowerOverhangM;
+    b.position[1]=0.0;
+    let outset=parameters.BusOutsetM+study::datum("BlanketThicknessM");
+    b.position[0]+=b.normal[0]*outset;
+    b.position[2]+=b.normal[2]*outset;
+    let phase=index.to_float()*1.618;
+    let mesh=wrapping::bus_surface(b.scale[0],bottom,top,phase,parameters);
+    #{bay:b,bottom:bottom,top:top,phase:phase,mesh:mesh}
+}
+fn patch_specs(d,index,parameters) {
+    let b=d.bay;
+    let result=[];
     let radians=b.rotation[1]*acos(-1.0)/180.0;
     let tangent=[cos(radians),0.0,-sin(radians)];
-    let patch_depth=study::datum("BlanketTapeDepthM");
-    let lift=(b.scale[2]+patch_depth)/2.0;
-    for side in [-1.0,1.0] {
-        let offset=side*b.scale[0]*study::datum("BlanketTapeStationFraction");
-        let p=[b.position[0]+tangent[0]*offset+b.normal[0]*lift,
-          b.position[1]+b.scale[1]/2.0-study::datum("BlanketTapeTopInsetM"),
-          b.position[2]+tangent[2]*offset+b.normal[2]*lift];
-        result.push(geometry::shape("Tape"+index+if side<0.0 {"A"}else{"B"},p,
-          [study::datum("BlanketTapeWidthM"),study::datum("BlanketTapeHeightM"),patch_depth],b.rotation,
-          "/GriffinBus/Looks/ServiceConnectors"));
+    for i in 0..parameters.TapeStations.len() {
+        let station=parameters.TapeStations[i];
+        let row=parameters.TapeRows[i];
+        let columns=parameters.BusColumns.to_int();
+        let grid_x=(station+0.5)*columns.to_float();
+        let grid_y=row*parameters.BusRows.to_float();
+        let column=floor(grid_x).to_int();
+        let grid_row=floor(grid_y).to_int();
+        let u=grid_x-column.to_float();
+        let v=grid_y-grid_row.to_float();
+        let a=grid_row*(columns+1)+column;
+        let corners=if v<=u {[a,a+1,a+columns+2]} else {[a,a+columns+2,a+columns+1]};
+        let weights=if v<=u {[1.0-u,u-v,v]} else {[1.0-v,u,v-u]};
+        let local=[0.0,0.0,0.0];
+        for vertex in 0..3 {for axis in 0..3 {
+            local[axis]+=d.mesh.points[corners[vertex]][axis]*weights[vertex];
+        }}
+        let p0=d.mesh.points[corners[0]];
+        let p1=d.mesh.points[corners[1]];
+        let p2=d.mesh.points[corners[2]];
+        let e=[p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2]];
+        let f=[p2[0]-p0[0],p2[1]-p0[1],p2[2]-p0[2]];
+        let normal=[e[1]*f[2]-e[2]*f[1],e[2]*f[0]-e[0]*f[2],e[0]*f[1]-e[1]*f[0]];
+        let length=sqrt(normal[0]*normal[0]+normal[1]*normal[1]+normal[2]*normal[2]);
+        for axis in 0..3 {normal[axis]/=length;}
+        let depth=study::datum("BlanketTapeDepthM");
+        for axis in 0..3 {local[axis]+=normal[axis]*depth/2.0;}
+        let p=[b.position[0]+tangent[0]*local[0]+b.normal[0]*local[2],local[1],
+               b.position[2]+tangent[2]*local[0]+b.normal[2]*local[2]];
+        let rotation=[-asin(normal[1])*180.0/acos(-1.0),
+            b.rotation[1]+harness::angle(normal[0],normal[2])*180.0/acos(-1.0),0.0];
+        result.push(geometry::shape("Tape"+index+"Patch"+i,p,
+            [study::datum("BlanketTapeWidthM"),study::datum("BlanketTapeHeightM"),study::datum("BlanketTapeDepthM")],
+            rotation,"/GriffinBus/Looks/ServiceConnectors"));
     }
     result
 }
 fn face_plan(doc,index) {
     let q=query("InspectUsdDocument",#{doc_id:doc,path:root()});
     if !q.prim.exists {throw("Prepare the exterior blanket collection first");}
-    let ops=[];for s in specs(doc,index) {ops=geometry::cube(ops,root(),s);}
-    #{doc_id:doc,generation:q.generation,ops:ops}
-}
-// Photo-informed border tape. Existing bay datums and tape dimensions own the
-// envelope. Borders sit on the blanket face and meet at fitted corner contacts.
-fn border_specs(doc,index) {
-    let b=bay(doc,index);
-    let width=study::datum("BlanketTapeHeightM");
-    let depth=study::datum("BlanketTapeDepthM");
-    let lift=(b.scale[2]+depth)/2.0;
-    let radians=b.rotation[1]*acos(-1.0)/180.0;
-    let tangent=[cos(radians),0.0,-sin(radians)];
-    let result=[];
-    for side in [-1.0,1.0] {
-        let suffix=if side<0.0 {"A"} else {"B"};
-        let y=side*(b.scale[1]-width)/2.0;
-        result.push(geometry::shape("BorderHorizontal"+index+suffix,
-          [b.position[0]+b.normal[0]*lift,b.position[1]+y,b.position[2]+b.normal[2]*lift],
-          [b.scale[0],width,depth],b.rotation,"/GriffinBus/Looks/ServiceConnectors"));
-        let x=side*(b.scale[0]-width)/2.0;
-        result.push(geometry::shape("BorderVertical"+index+suffix,
-          [b.position[0]+tangent[0]*x+b.normal[0]*lift,b.position[1],b.position[2]+tangent[2]*x+b.normal[2]*lift],
-          [width,b.scale[1]-2.0*width,depth],b.rotation,"/GriffinBus/Looks/ServiceConnectors"));
-    }
-    result
-}
-fn border_plan(doc,index) {
-    let q=query("InspectUsdDocument",#{doc_id:doc,path:root()});
-    if !q.prim.exists {throw("Prepare the exterior blanket collection first");}
+    let parameters=wrapping::settings();
+    let d=drape(doc,index,parameters);
+    let name="Blanket"+index;
+    let path=root()+"/"+name;
     let ops=[];
-    for s in border_specs(doc,index) {ops=geometry::cube(ops,root(),s);}
+    if query("QueryUsdPrim",#{doc_id:doc,path:path,attrs:[]}).type_name!=() {
+        ops.push(#{RemovePrim:#{edit_target:"@root@",path:path}});
+    }
+    for suffix in ["A","B"] {
+        let old=root()+"/Tape"+index+suffix;
+        if query("QueryUsdPrim",#{doc_id:doc,path:old,attrs:[]}).type_name!=() {
+            ops.push(#{RemovePrim:#{edit_target:"@root@",path:old}});
+        }
+    }
+    for op in wrapping::mesh_plan(root(),name,d.mesh.points,d.mesh.counts,d.mesh.indices,"/GriffinBus/Looks/ExteriorPanels") {
+        ops.push(op);
+    }
+    ops=harness::append(ops,builder::place_plan("@root@",path,d.bay.position,d.bay.rotation,[1.0,1.0,1.0]));
+    for spec in patch_specs(d,index,parameters) {ops=geometry::cube(ops,root(),spec);}
+    for op in wrapping::foil_ops("/GriffinBus/Looks/ExteriorPanels/Surface",parameters) {ops.push(op);}
     #{doc_id:doc,generation:q.generation,ops:ops}
 }
 fn check_face(doc,index) {
-    let observed=[];
-    for s in specs(doc,index) {
-        let q=query("QueryUsdPrim",#{doc_id:doc,path:root()+"/"+s.name,
-          attrs:["xformOp:translate","xformOp:scale","xformOp:rotateXYZ","purpose","physics:collisionEnabled"],relationships:true,schemas:true});
-        if q.type_name!="Cube" || q.attrs.purpose!="render" || q.attrs["physics:collisionEnabled"]!=false || q.api_schemas.contains("PhysicsCollisionAPI") || q.api_schemas.contains("PhysicsRigidBodyAPI") {throw("Blanket detail gained physical authority");}
-        if q.relationships["material:binding"]!=[s.material] {throw("Blanket material does not match the existing network");}
-        for a in 0..3 {
-            if abs(q.attrs["xformOp:translate"][a]-s.position[a])>0.000001 || abs(q.attrs["xformOp:scale"][a]-s.scale[a])>0.000001 || abs(q.attrs["xformOp:rotateXYZ"][a]-s.rotation[a])>0.000001 {throw("Blanket detail departed from its source frame bay");}
-        }
-        observed.push(s.name);
+    let parameters=wrapping::settings();
+    let d=drape(doc,index,parameters);
+    let q=query("QueryUsdPrim",#{doc_id:doc,path:root()+"/Blanket"+index,
+        attrs:["points","faceVertexCounts","faceVertexIndices","purpose","physics:collisionEnabled"],relationships:true,schemas:true});
+    if q.type_name!="Mesh" || q.attrs.purpose!="render" || q.attrs["physics:collisionEnabled"]!=false
+        || q.api_schemas.contains("PhysicsCollisionAPI") || q.api_schemas.contains("PhysicsRigidBodyAPI") {
+        throw("Blanket detail gained physical authority");
     }
-    #{ok:true,bay:index,parts:observed,scope:"Frame-fitted render blankets only; no tether, collider or thermal physics"}
+    if q.attrs.points.len()!=d.mesh.points.len() || q.attrs.faceVertexIndices.len()!=d.mesh.indices.len() {
+        throw("Folded blanket topology departed from its source plan");
+    }
+    if q.relationships["material:binding"]!=["/GriffinBus/Looks/ExteriorPanels"] {throw("Blanket lost its foil material");}
+    for spec in patch_specs(d,index,parameters) {
+        let patch=query("QueryUsdPrim",#{doc_id:doc,path:root()+"/"+spec.name,attrs:["purpose","physics:collisionEnabled"]});
+        if patch.type_name!="Cube" || patch.attrs.purpose!="render" || patch.attrs["physics:collisionEnabled"]!=false {
+            throw("Invalid localized tape patch");
+        }
+    }
+    #{ok:true,bay:index,vertices:q.attrs.points.len(),triangles:q.attrs.faceVertexCounts.len(),patches:parameters.TapeStations.len()}
+}
+
+fn patch_plan(doc,index) {
+    let q=query("InspectUsdDocument",#{doc_id:doc,path:root()});
+    let parameters=wrapping::settings();
+    let d=drape(doc,index,parameters);
+    let ops=[];
+    for spec in patch_specs(d,index,parameters) {
+        ops=harness::append(ops,builder::place_plan("@root@",root()+"/"+spec.name,
+            spec.position,spec.rotation,spec.scale));
+    }
+    #{doc_id:doc,generation:q.generation,ops:ops}
 }
