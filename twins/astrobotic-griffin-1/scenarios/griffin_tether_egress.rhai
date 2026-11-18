@@ -35,19 +35,30 @@ fn routing_contacts(anchor_x,anchor_y,anchor_z,profile_x,profile_y) {
     sides
 }
 
-// Sample the live poses once for both the solver and the displayed curves.
+// Both the solver and the renderer use this ordered sample of native poses.
+fn routing_poses(lander) {
+    let ids=[lander,find_path(ROOT+"/Lander/CompactEgress")];
+    for station in ["RL","RR"] {
+        ids.push(find_path(ROOT+"/FLIP/Suspension_"+station+"/Wheel_"+station));
+    }
+    let poses=[];
+    for id in ids {poses.push(#{id:id,position:world_pos3(id),rotation:world_rotation_quat(id)});}
+    poses
+}
+
 fn routing_geometry(lander,contacts) {
-    let lpos=world_pos3(lander);let lrot=world_rotation_quat(lander);
+    geometry_from_poses(routing_poses(lander),contacts)
+}
+
+fn geometry_from_poses(poses,contacts) {
+    let lpos=poses[0].position;let lrot=poses[0].rotation;
     let inverse=quat_inverse(lrot);
-    let ramp=find_path(ROOT+"/Lander/CompactEgress");
-    let ramp_position=world_pos3(ramp);let ramp_rotation=world_rotation_quat(ramp);
+    let ramp_position=poses[1].position;let ramp_rotation=poses[1].rotation;
     let inboard=qrot(ramp_rotation,vec3(1.0,0.0,0.0));
     let up=qrot(ramp_rotation,vec3(0.0,1.0,0.0));
     let wheels=[];
-    for station in ["RL","RR"] {
-        let id=find_path(ROOT+"/FLIP/Suspension_"+station+"/Wheel_"+station);
-        let hub=world_pos3(id);
-        let rotation=world_rotation_quat(id);
+    for i in 2..poses.len() {
+        let id=poses[i].id;let hub=poses[i].position;let rotation=poses[i].rotation;
         let axis=qrot(rotation,vec3(1.0,0.0,0.0));
         let wheel_local=qrot(inverse,hub-lpos);
         let side=if wheel_local.z<0.0 {0}else{1};
@@ -416,6 +427,7 @@ fn on_start(me,ctx) {
     this.rover=find_path(ROOT+"/FLIP");
     this.tether=find_path(ROOT+"/EgressTether");
     this.visuals=griffin_tether_visuals::setup();this.visual_error=false;this.visual_requested=false;
+    this.parked_visual=();
     this.validity=find_path(ROOT+"/Lander/ContactValidity");
     subscribe("griffin.contact-validity-exceeded");
     subscribe("simulation-object-paused");
@@ -495,16 +507,33 @@ fn refresh_visuals(routing) {
         // Each snapshot must publish before another supersedes it. Physics can
         // run several fixed steps per render frame; a tick-only throttle would
         // continually invalidate the asynchronous renderer's pending result.
-        if this.visual_requested && !griffin_tether_visuals::ready(this.visuals) {return;}
+        let revisions=if this.visual_requested {griffin_tether_visuals::applied_revisions(this.visuals)} else {[]};
+        if revisions==() {return;}
+        let names=routing_outputs();
+        let state=tether_outputs(this.tether,names);
+        let inputs=();
         if routing==() {
-            routing=routing_geometry(this.lander,this.routing_contacts);
+            let poses=routing_poses(this.lander);
+            inputs=griffin_tether_visuals::source_bytes(poses,state,names);
+            if this.parked_visual!=() && this.parked_visual.revisions==revisions && this.parked_visual.inputs==inputs {return;}
+            routing=geometry_from_poses(poses,this.routing_contacts);
         }
-        let result=griffin_tether_visuals::update(this.visuals,routing,tether_outputs(this.tether,routing_outputs()));
+        this.parked_visual=();
+        let result=griffin_tether_visuals::update(this.visuals,routing,state);
         if result.ok!=true {
             if !this.visual_error {emit("griffin_tether_visual_error",result);}
             this.visual_error=true;
-        } else {this.visual_error=false;if result.rendered {this.visual_requested=true;}}
+        } else {
+            this.visual_error=false;
+            if result.rendered {
+                this.visual_requested=true;
+                if inputs!=() {
+                    this.parked_visual=#{inputs:inputs,revisions:griffin_tether_visuals::requested_revisions(this.visuals)};
+                }
+            }
+        }
     } catch(error) {
+        this.parked_visual=();
         if !this.visual_error {emit("griffin_tether_visual_error",error.to_string());}
         this.visual_error=true;
     }

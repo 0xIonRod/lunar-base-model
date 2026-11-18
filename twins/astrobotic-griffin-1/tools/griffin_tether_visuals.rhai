@@ -36,13 +36,38 @@ fn clear(rows) {
     for row in rows {for curve in [row.span,row.bridle] {submit(row,curve,[],[]);}}
 }
 
-fn ready(rows) {
-    for row in rows {for curve in [row.span] {
-        let status=query("InspectUsdCurveView",#{doc_id:row.doc,entity_id:curve});
-        if status.state=="pending" {return false;}
+fn span_status(row) {
+    query("InspectUsdCurveView",#{doc_id:row.doc,entity_id:row.span})
+}
+
+fn requested_revisions(rows) {
+    let revisions=[];
+    for row in rows {revisions.push(span_status(row).requested_revision);}
+    revisions
+}
+
+fn applied_revisions(rows) {
+    let revisions=[];
+    for row in rows {
+        let status=span_status(row);
+        if status.state=="pending" {return ();}
         if status.error!="" {throw("Tether mesh preparation failed: "+status.error);}
-    }}
-    true
+        revisions.push(if status.local_visibility=="hidden" || status.result_segment_count==0 {()} else {status.applied_revision});
+    }
+    revisions
+}
+
+// Byte equality preserves every native pose and routing scalar at the rendering boundary.
+fn source_bytes(poses,state,names) {
+    let bytes=blob((7*poses.len()+names.len())*8);
+    let offset=0;
+    for pose in poses {
+        for value in vec3_array(pose.position)+quat_array(pose.rotation) {
+            bytes.write_le(offset,8,value);offset+=8;
+        }
+    }
+    for name in names {bytes.write_le(offset,8,state[name]);offset+=8;}
+    bytes
 }
 
 fn finite_vector(value) {

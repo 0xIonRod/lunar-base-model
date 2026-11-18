@@ -82,7 +82,12 @@ and rear-wheel bridles; the disconnect command removes their view. The visual
 adapter reads the six Modelica routing coordinates for each visual refresh.
 The scenario prepares the authored anchor and guide points in local coordinates
 at startup. The solver and ribbon view share their projection through the live
-lander, ramp and wheel poses.
+lander, ramp and wheel poses. While waiting for deployment, it reuses the two
+published ribbons when all four poses, all six routing coordinates and both
+applied curve revisions match. Clearing a ribbon or moving the mechanism
+causes the view to publish again. In the landed tracking view, run the
+`scenarios/tests/griffin_parked_tether_views.rhai` scenario with the active scene’s `doc_id` before release to
+check stationary ribbons, restoration after a clear and updates on deployment.
 The tether controller validates its full set of 42 outputs whenever it consumes
 the physical state. Both readers reject missing or non-finite samples. Use Standard
 rendering for lighting inspection: Fast deliberately renders standard materials
