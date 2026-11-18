@@ -21,9 +21,22 @@ fn simulation_dependencies(me,ctx) {
     dependencies
 }
 
-// Sample the shared routing geometry once. The displayed curves consume these
-// poses directly; the solver adapter adds rates and encodes its named inputs.
-fn routing_geometry(lander,anchor_x,anchor_y,anchor_z,config) {
+// The anchor and guide stations are authored in their respective local frames.
+// Prepare those immutable vectors once for each side of the admitted route.
+fn routing_contacts(anchor_x,anchor_y,anchor_z,profile_x,profile_y) {
+    let sides=[];
+    for side in [-1.0,1.0] {
+        let guides=[];
+        for j in 0..profile_x.len() {
+            guides.push(vec3(profile_x[j],profile_y[j],-side*anchor_z));
+        }
+        sides.push(#{anchor:vec3(-anchor_x,anchor_y,side*anchor_z),guides:guides});
+    }
+    sides
+}
+
+// Sample the live poses once for both the solver and the displayed curves.
+fn routing_geometry(lander,contacts) {
     let lpos=world_pos3(lander);let lrot=world_rotation_quat(lander);
     let inverse=quat_inverse(lrot);
     let ramp=find_path(ROOT+"/Lander/CompactEgress");
@@ -37,11 +50,12 @@ fn routing_geometry(lander,anchor_x,anchor_y,anchor_z,config) {
         let rotation=world_rotation_quat(id);
         let axis=qrot(rotation,vec3(1.0,0.0,0.0));
         let wheel_local=qrot(inverse,hub-lpos);
-        let side=if wheel_local.z<0.0 {-1.0}else{1.0};
-        let anchor=lpos+qrot(lrot,vec3(-anchor_x,anchor_y,side*anchor_z));
+        let side=if wheel_local.z<0.0 {0}else{1};
+        let contact=contacts[side];
+        let anchor=lpos+qrot(lrot,contact.anchor);
         let guides=[];
-        for j in 0..config.profile_x.len() {
-            let guide=ramp_position+qrot(ramp_rotation,vec3(config.profile_x[j],config.profile_y[j],-side*anchor_z));
+        for local in contact.guides {
+            let guide=ramp_position+qrot(ramp_rotation,local);
             guides.push(guide-hub);
         }
         wheels.push(#{id:id,hub:hub,rotation:rotation,axis:axis,anchor:anchor,span:anchor-hub,guides:guides});
@@ -281,7 +295,9 @@ fn release_tether_wrenches(rover,lander) {
 
 fn safe_hold_tether(tether,rover,lander,anchor_x,anchor_y,anchor_z) {
     try {
-        let routing=routing_geometry(lander,anchor_x,anchor_y,anchor_z,griffin_tether_study::routing_config());
+        let config=griffin_tether_study::routing_config();
+        let contacts=routing_contacts(anchor_x,anchor_y,anchor_z,config.profile_x,config.profile_y);
+        let routing=routing_geometry(lander,contacts);
         let geometry=input_geometry(rover,lander,routing);
         write_tether(tether,geometry,1.0,0.0,0.0,rover,lander);
         #{ok:true,error:""}
@@ -380,6 +396,7 @@ fn on_start(me,ctx) {
     this.drive_throttle=griffin_tether_study::datum("driveThrottleLimit");
     this.profile_x=griffin_compact_egress::datum("stationsXM");
     this.profile_y=griffin_compact_egress::datum("heightsYM");
+    this.routing_contacts=routing_contacts(this.anchor_x,this.anchor_y,this.anchor_z,this.profile_x,this.profile_y);
     this.track_end_x=this.profile_x[this.profile_x.len()-1];
     this.minimum_clearance=griffin_tether_study::datum("minimumTrackClearanceM");
     this.transfer_payout=griffin_tether_study::datum("groundTransferPayoutSpeedMps");
@@ -479,7 +496,7 @@ fn refresh_visuals(routing) {
         // continually invalidate the asynchronous renderer's pending result.
         if this.visual_requested && !griffin_tether_visuals::ready(this.visuals) {return;}
         if routing==() {
-            routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+            routing=routing_geometry(this.lander,this.routing_contacts);
         }
         let result=griffin_tether_visuals::update(this.visuals,routing,tether_outputs(this.tether,routing_outputs()));
         if result.ok!=true {
@@ -550,7 +567,7 @@ fn step_egress(me,ctx) {
             this.failure="FLIP adapter was absent before pretension qualification";return;
         }
         if this.landed_tick==() {this.landed_tick=sim_tick();}
-        let routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+        let routing=routing_geometry(this.lander,this.routing_contacts);
         let preflight=input_geometry(this.rover,this.lander,routing);
         write_tether(this.tether,preflight,0.0,0.0,0.0,this.rover,this.lander);
         let before=read_tether(this.tether);
@@ -572,7 +589,7 @@ fn step_egress(me,ctx) {
         this.arm_tick=sim_tick();this.stage="arm_pretension";
     }
 
-    let routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
+    let routing=routing_geometry(this.lander,this.routing_contacts);
     let geometry=input_geometry(this.rover,this.lander,routing);
     this.refresh_visuals(routing);
     if this.stage=="arm_pretension" {

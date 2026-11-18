@@ -80,6 +80,9 @@ The mapped deployment gate checks seven egress requirements plus the two
 source-bound landing datums, including restrained descent, line release and manual drive. Live ribbons follow the Modelica routing
 and rear-wheel bridles; the disconnect command removes their view. The visual
 adapter reads the six Modelica routing coordinates for each visual refresh.
+The scenario prepares the authored anchor and guide points in local coordinates
+at startup. The solver and ribbon view share their projection through the live
+lander, ramp and wheel poses.
 The tether controller validates its full set of 42 outputs whenever it consumes
 the physical state. Both readers reject missing or non-finite samples. Use Standard
 rendering for lighting inspection: Fast deliberately renders standard materials
