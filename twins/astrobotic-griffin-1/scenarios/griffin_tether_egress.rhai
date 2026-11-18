@@ -206,9 +206,22 @@ fn check_rear_brake_admission() {
     }
 }
 
+fn routing_outputs() {
+    ["routing0_x","routing0_y","routing0_z","routing1_x","routing1_y","routing1_z"]
+}
+
+fn tether_outputs(tether,names) {
+    let snapshot=read_ports(tether,names);
+    let state=#{};
+    for p in snapshot.ports {if p.direction=="out" {state[p.name]=p.value;}}
+    for name in names {
+        if state[name]==() || !state[name].is_finite() {throw("Tether telemetry is missing or non-finite: "+name);}
+    }
+    state
+}
+
 fn read_tether(tether) {
-    let names=[];
-    for i in 0..2 {for axis in ["x","y","z"] {names.push("routing"+i+"_"+axis);}}
+    let names=routing_outputs();
     for i in 0..2 {for field in ["wheel_force","wheel_torque"] {for axis in ["x","y","z"] {
         names.push(field+i+"_"+axis);
     }}}
@@ -216,23 +229,7 @@ fn read_tether(tether) {
     names+= ["tension0","tension1","length0","length1",
         "elastic_energy","drive_scale","force_x","force_y","force_z","reaction_x","reaction_y","reaction_z",
         "torque_x","torque_y","torque_z","reaction_torque_x","reaction_torque_y","reaction_torque_z"];
-    let snapshot=read_ports(tether,names);
-    let state=#{};
-    for p in snapshot.ports {if p.direction=="out" {state[p.name]=p.value;}}
-    let required=names;
-    for name in required {
-        if state[name]==() || !state[name].is_finite() {throw("Tether telemetry is missing or non-finite: "+name);}
-    }
-    if state.tension0==() || state.tension1==() || state.elastic_energy==()
-        || state.length0==() || state.length1==() {
-        throw("Tether telemetry is incomplete");
-    }
-    if !state.tension0.is_finite() || !state.tension1.is_finite()
-        || !state.elastic_energy.is_finite() || !state.length0.is_finite()
-        || !state.length1.is_finite() {
-        throw("Tether telemetry is non-finite");
-    }
-    state
+    tether_outputs(tether,names)
 }
 
 fn apply_tether_wrenches(tether,rover,lander) {
@@ -484,7 +481,7 @@ fn refresh_visuals(routing) {
         if routing==() {
             routing=routing_geometry(this.lander,this.anchor_x,this.anchor_y,this.anchor_z,this);
         }
-        let result=griffin_tether_visuals::update(this.visuals,routing,read_tether(this.tether));
+        let result=griffin_tether_visuals::update(this.visuals,routing,tether_outputs(this.tether,routing_outputs()));
         if result.ok!=true {
             if !this.visual_error {emit("griffin_tether_visual_error",result);}
             this.visual_error=true;
