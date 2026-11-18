@@ -13,6 +13,23 @@ published 6.22 kWh energy; the panel's rounded 270 W rating also follows its
 public post. This is simulator integration evidence, not supplier-calibrated
 power, mobility or thermal performance. See `flip-public-power-2026-10-27.md`.
 
+The nine solar visibility samples lie on an equal-area 3 × 3 grid over the
+active cell footprint in the moving panel frame. The surface-operations scene
+connects the probe to Griffin’s `solarBlockers` USD collection. Its explicit
+members cover the flight body, deck, legs and solar-array structures. The
+physical ray query also samples regional terrain. The resulting clear fraction
+feeds the electrical panel model independently of the active camera.
+
+`tests/flip_lander_shade.usda` places the Griffin flight-body collision assembly
+across the Sun rays reaching the deployed FLIP panel and moves it away again.
+The authored verdict checks both the physical visibility port and available watts.
+
+`tests/check_flip_shadow_frame.py --sim-root <checkout> --port <free-port>`
+uses the production binary selected by `LUNCOSIM_BIN`. It observes a fixed
+site point through the forward camera’s native shadow map while FLIP drives
+with celestial time advancing. It checks physical motion, render-coordinate
+displacement and fractional shadow-map motion independently.
+
 ## Production evidence
 
 | Gate | Result | Evidence |

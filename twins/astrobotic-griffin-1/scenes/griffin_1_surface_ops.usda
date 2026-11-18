@@ -258,6 +258,16 @@ def Xform "Griffin1SurfaceOps" (
                 double outputs:angle = 0.0
                 double outputs:deployment_deg = 0.0
             }
+            over "Photovoltaics"
+            {
+                over "Environment" (
+                    prepend apiSchemas = ["CollectionAPI:occluders"]
+                )
+                {
+                    uniform token collection:occluders:expansionRule = "explicitOnly"
+                    rel collection:occluders:includes = </Griffin1SurfaceOps/Lander.collection:solarBlockers>
+                }
+            }
         }
         over "PanelHinge"
         {

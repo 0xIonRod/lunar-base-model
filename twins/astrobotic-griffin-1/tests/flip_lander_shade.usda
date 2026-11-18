@@ -1,0 +1,60 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    prepend references = @twin://astrobotic-griffin-1/tests/flip_route_follow.usda@</Griffin1SurfaceOps>
+)
+{
+    over "Scenario"
+    {
+        def "Test" (
+            active = true
+        )
+        {
+            uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/scenarios/tests/flip_lander_shade.rhai@
+        }
+    }
+    over "Avatar"
+    {
+        custom double3 xformOp:translate = (8.0, 5.0, 10.0)
+        double3 lunco:cameraLookAt = (0.0, 0.7, 0.0)
+    }
+    def Xform "TestBus" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        bool physics:kinematicEnabled = true
+        float physics:mass = 1.0
+        custom double3 xformOp:translate = (40.0, 12.0, 40.0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+        def Xform "GriffinBody" (
+            references = @twin://astrobotic-griffin-1/components/lander/griffin_body_collision.usda@
+        )
+        {
+        }
+    }
+    over "FLIP"
+    {
+        over "SolarMechanism"
+        {
+            over "Photovoltaics"
+            {
+                over "Environment" (
+                    prepend apiSchemas = ["CollectionAPI:occluders"]
+                )
+                {
+                    uniform token collection:occluders:expansionRule = "explicitOnly"
+                    rel collection:occluders:includes = [</Griffin1SurfaceOps/TestBus/GriffinBody/BodyCollisionProxy>, </Griffin1SurfaceOps/TestBus/GriffinBody/BodyCollisionNorth>, </Griffin1SurfaceOps/TestBus/GriffinBody/BodyCollisionSouth>, </Griffin1SurfaceOps/TestBus/GriffinBody/BodyCollisionEast>, </Griffin1SurfaceOps/TestBus/GriffinBody/BodyCollisionWest>]
+                }
+            }
+        }
+    }
+}
