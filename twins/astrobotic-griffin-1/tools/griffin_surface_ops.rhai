@@ -1480,7 +1480,8 @@ fn surface_route_presentation_plan(frame, entry_on_deck) {
     let x=griffin_spec::surface_route_marker_x();let z=griffin_spec::surface_route_marker_z();
     if griffin_compact_egress::enabled() {
         let stations=griffin_compact_egress::datum("stationsXM");
-        let cad=sysml_model("twin://astrobotic-griffin-1/requirements/flip_cad_requirements.sysml");
+        let cad=sysml_requirements::model();
+        if !sysml_model_is(cad) {throw("Landed route requires the prepared Griffin SysML model");}
         let wheelbase=cad.value("FlipCadRequirements::CadStudy::wheelbaseMm")
           /cad.value("FlipCadRequirements::CadStudy::millimetresPerMetre");
         x[0]=abs(stations[1]);

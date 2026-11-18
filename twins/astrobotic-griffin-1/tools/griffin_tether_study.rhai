@@ -2,8 +2,7 @@ import "griffin_tank_finish" as finish;
 import "social_surface_finish" as surface;
 
 fn datum(name) {
-    let m=sysml_model("twin://astrobotic-griffin-1/requirements/griffin_flip_egress.sysml");
-    let v=m.value("GriffinFlipEgressStudy::ControlledDescent::"+name);
+    let v=griffin_spec::_typed_model_value("GriffinFlipEgressStudy::ControlledDescent::"+name);
     if v==() {throw("Missing controlled-descent study parameter: "+name);}v
 }
 

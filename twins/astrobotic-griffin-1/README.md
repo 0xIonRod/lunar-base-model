@@ -68,7 +68,7 @@ balanced tether preload, adapter release, restrained descent, four-wheel ground
 transfer and unloading. When the HUD reports both lines unloaded, click
 **DISCONNECT TETHERS** to release them and enable manual drive. The button is
 disabled while attached, loaded or unstable. The
-production scene and headless verification use the same controller. Modelica
+production scene and headless verification use the same controller. The egress controller and landed route read their qualified study and CAD values from the mounted Twin’s prepared SysML source set. Modelica
 models two routed, tension-only rear-wheel bridles with a reduced balanced-sling
 resultant, bounded powered payout/take-up, finite electrical demand and lumped
 heat rejection. Native wheel wrench ports carry the

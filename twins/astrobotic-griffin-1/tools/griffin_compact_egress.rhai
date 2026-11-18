@@ -2,12 +2,7 @@ import "lunco://scripting/tools/assembly_builder" as builder;
 import "social_surface_finish" as surface;
 import "griffin_tank_finish" as finish;
 fn datum(name) {
-    let owner=twin_source_identity();
-    if owner=="" {throw "Compact-egress data requires its owning Twin context";}
-    let source="twin://"+owner+"/requirements/griffin_flip_egress.sysml";
-    let m=sysml_model(source);
-    if !sysml_model_is(m) {throw "Compact-egress SysML source could not be opened: "+source+"; "+m;}
-    let v=m.value("GriffinFlipEgressStudy::CompactEgress::"+name);
+    let v=griffin_spec::_typed_model_value("GriffinFlipEgressStudy::CompactEgress::"+name);
     if v==() {throw("Missing compact-egress datum: "+name);} v
 }
 fn enabled() {find_path("/Griffin1SurfaceOps/Lander/CompactEgress")>=0}
