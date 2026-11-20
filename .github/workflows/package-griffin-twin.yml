@@ -39,7 +39,6 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               print('repository=' + repository, file=out)
               print('revision=' + engine['revision'], file=out)
-              print('repository_url=' + engine['repository'][:-4], file=out)
           PY
 
       - name: Check out matching runtime and shared assets
@@ -50,37 +49,87 @@ jobs:
           path: .qualification-engine
           persist-credentials: false
 
-      - name: Select the engine repository toolchain
+      - name: Resolve a LunCoSim Nightly built from the pinned source
+        id: nightly
         shell: bash
         run: |
-          engine_toolchain="$(python3 - <<'PY'
-          import pathlib, tomllib
-          print(tomllib.loads(pathlib.Path('.qualification-engine/rust-toolchain.toml').read_text())['toolchain']['channel'])
+          python3 - <<'PY'
+          import json, os, re, urllib.request
+
+          repository = 'LunCoSim/lunco-sim-updates'
+          expected = '${{ steps.qualification.outputs.revision }}'
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'User-Agent': 'luncosim-twin-nightly-resolver',
+          }
+          page = 1
+          match = None
+          while True:
+              url = f'https://api.github.com/repos/{repository}/releases?per_page=100&page={page}'
+              request = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  releases = json.load(response)
+              for release in releases:
+                  if not release.get('tag_name', '').startswith('nightly-'):
+                      continue
+                  source = re.search(r'Source commit:\s*\[([0-9a-f]{40})\]', release.get('body', ''))
+                  if source is None or source.group(1) != expected:
+                      continue
+                  asset = next((item for item in release.get('assets', [])
+                                if item.get('name') == 'LunCoSim-Linux-x86_64.AppImage'), None)
+                  if asset is None:
+                      raise SystemExit(
+                          f"Nightly {release['tag_name']} matches {expected} but has no Linux AppImage"
+                      )
+                  if not asset['browser_download_url'].startswith(
+                      f'https://github.com/{repository}/releases/download/'
+                  ):
+                      raise SystemExit('Nightly AppImage URL did not come from the expected repository')
+                  match = (release['tag_name'], asset['browser_download_url'])
+                  break
+              if match or len(releases) < 100:
+                  break
+              page += 1
+
+          if match is None:
+              raise SystemExit(
+                  f'No published LunCoSim Linux Nightly matches pinned source {expected}. '
+                  'This workflow consumes published Nightlies and never builds LunCoSim; '
+                  'publish a Nightly from that source revision first.'
+              )
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('tag=' + match[0], file=output)
+              print('appimage_url=' + match[1], file=output)
+          print(f'Resolved {match[0]} for pinned source {expected}')
           PY
-          )"
-          rustup toolchain install "$engine_toolchain" --profile minimal --component rust-src
-          printf 'RUSTUP_TOOLCHAIN=%s\n' "$engine_toolchain" >> "$GITHUB_ENV"
 
-      - name: Install Linux build prerequisites
+      - name: Install the prebuilt Nightly runtime
         shell: bash
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev libx11-dev xorg-dev
+          appimage_dir="$RUNNER_TEMP/luncosim-nightly"
+          mkdir -p "$appimage_dir"
+          curl --fail --location --retry 3 \
+            '${{ steps.nightly.outputs.appimage_url }}' \
+            --output "$appimage_dir/LunCoSim-Linux-x86_64.AppImage"
+          chmod +x "$appimage_dir/LunCoSim-Linux-x86_64.AppImage"
+          (cd "$appimage_dir" && ./LunCoSim-Linux-x86_64.AppImage --appimage-extract >/dev/null)
 
-      - name: Cache Rust build inputs
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: .qualification-engine -> target
-          key: griffin-production-${{ steps.qualification.outputs.revision }}
+          packaged_bin="$appimage_dir/squashfs-root/usr/bin"
+          test -x "$packaged_bin/luncosim" || {
+            echo 'Pinned LunCoSim Nightly AppImage does not contain usr/bin/luncosim' >&2
+            exit 1
+          }
+          install -D -m 0755 "$packaged_bin/luncosim" .qualification-engine/target/debug/luncosim
+          printf 'Using LunCoSim Nightly %s (%s)\n' \
+            '${{ steps.nightly.outputs.tag }}' '${{ steps.qualification.outputs.revision }}'
 
-      - name: Build production qualification binaries
-        working-directory: .qualification-engine
-        env:
-          LUNCO_REPOSITORY_URL: ${{ steps.qualification.outputs.repository_url }}
+      - name: Install virtual display for native dataset preparation
         shell: bash
         run: |
-          cargo build --locked -p lunco-luncosim --bin luncosim -j 4
-          cargo build --locked -p lunco-assets --bin lunco-assets -j 4
+          if ! command -v xvfb-run >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq xvfb
+          fi
 
       - name: Stage Twin sources
         shell: bash
@@ -96,7 +145,8 @@ jobs:
         shell: bash
         run: |
           python3 tools/validate_repository.py --twin package/astrobotic-griffin-1
-          python3 tools/qualification.py --engine .qualification-engine \
+          xvfb-run -a -s '-screen 0 1280x800x24' \
+            python3 tools/qualification.py --engine .qualification-engine \
             --twin package/astrobotic-griffin-1 --provision \
             --output runs/qualification --api-port 4299
           cp runs/qualification/QUALIFICATION.json package/astrobotic-griffin-1/QUALIFICATION.json

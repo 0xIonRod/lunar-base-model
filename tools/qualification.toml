@@ -4,7 +4,7 @@ datasets = ["nobile03_dem"]
 
 [engine]
 repository = "https://github.com/LunCoSim/lunco-sim.git"
-revision = "ce189b97c37fe2496f7fc10d49590b4344adc4ec"
+revision = "4e88c6182b710671f5534b52e601e76ecadc25a7"
 
 [[cases]]
 verification = "FlipMotionRequirements::Verify_FLIPMotion"

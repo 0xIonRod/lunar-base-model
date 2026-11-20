@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Qualify a Twin package with one pinned LunCoSim source and shared asset set.
 
-No builds or USD edits are performed here. Build both production binaries from
-that clean revision first. Native preflight and registered scene verdicts remain
-separate, required gates; a timeout or missing report never qualifies a release.
+No builds or USD edits are performed here. Optional dataset provisioning uses
+the pinned LunCoSim Nightly runtime's native API. Native preflight and registered
+scene verdicts remain separate, required gates; a timeout or missing report
+never qualifies a release.
 """
 from __future__ import annotations
 
@@ -149,6 +150,104 @@ def report_passes(report: dict, code: int, verification: str, channel: str) -> b
         and report.get("runner_diagnostic") is None and report.get("non_pass_checks") == []
 
 
+def provision_twin_datasets(engine: Path, binary: Path, twin: Path,
+                            datasets: list[str], output: Path, port: int) -> None:
+    """Prepare declared Twin assets using the Nightly app's built-in provisioner."""
+    os.environ.update(LUNCOSIM_BIN=str(binary), LUNCO_ASSET_ROOT=str(engine / "assets"),
+                      LUNCOSIM_EPHEMERAL_SETTINGS="1", LUNCOSIM_ISOLATED_RUN="1",
+                      LUNCOSIM_API_READY_TIMEOUT_S="240")
+    sys.path.insert(0, str(engine / "scripts/api"))
+    from runtime import ProductionSession
+
+    log_path = output / "dataset-provisioning.log"
+    with ProductionSession(port, log_path=log_path, windowed=True,
+                           extra_args=["--no-load-default-scene"]) as session:
+        def execute(name: str, params: dict | None = None) -> dict:
+            response = session.post({"type": "ExecuteCommand", "command": name,
+                                     "params": params or {}})
+            if response.get("error") or response.get("ok") is False:
+                raise RuntimeError(f"{name} rejected: {response}")
+            result = response.get("data")
+            if not isinstance(result, dict):
+                raise RuntimeError(f"{name} returned no typed result: {response}")
+            return result
+
+        execute("OpenTwin", {"path": str(twin)})
+        deadline = time.monotonic() + 60
+        while True:
+            workspace = execute("ReadActiveWorkspace")
+            if workspace.get("open") is True and Path(workspace.get("root", "")).resolve() == twin:
+                break
+            if time.monotonic() >= deadline:
+                raise RuntimeError(f"Twin source opening did not finish: {workspace}")
+            time.sleep(0.1)
+
+        def find_dataset(key: str) -> dict | None:
+            rows = execute("ListDatasets").get("datasets", [])
+            return next((row for row in rows
+                         if row.get("scope", "").startswith("twin:")
+                         and row.get("key") == key), None)
+
+        def wait_installed(key: str, timeout: float = 1200) -> dict:
+            deadline = time.monotonic() + timeout
+            last = None
+            while time.monotonic() < deadline:
+                last = find_dataset(key)
+                if last is not None:
+                    state = last.get("state", {})
+                    if state.get("kind") == "failed":
+                        raise RuntimeError(f"dataset {key} failed: {state.get('error', state)}")
+                    if state.get("kind") == "installed":
+                        return last
+                time.sleep(0.5)
+            raise RuntimeError(f"dataset {key} did not become ready within {timeout:g}s; last={last}")
+
+        def wait_processed(key: str, timeout: float = 1200) -> dict:
+            deadline = time.monotonic() + timeout
+            last = None
+            while time.monotonic() < deadline:
+                last = find_dataset(key)
+                if last is not None:
+                    state = last.get("state", {})
+                    if state.get("kind") == "failed":
+                        raise RuntimeError(f"dataset {key} processing failed: {state.get('error', state)}")
+                    if key == "nobile03_dem":
+                        outputs = (
+                            twin / ".cache/terrain/nobile03/materials/textures/heightmap.tif",
+                            twin / ".cache/terrain/nobile03/materials/textures/albedo.png",
+                            twin / ".cache/terrain/nobile03/materials/textures/coverage.png",
+                            twin / ".cache/terrain/nobile03/.bakekey",
+                        )
+                        if state.get("kind") == "installed" and all(
+                            path.is_file() and path.stat().st_size > 0 for path in outputs
+                        ):
+                            return last
+                time.sleep(0.5)
+            raise RuntimeError(f"dataset {key} outputs were not published within {timeout:g}s; last={last}")
+
+        for key in datasets:
+            deadline = time.monotonic() + 120
+            row = None
+            while time.monotonic() < deadline:
+                row = find_dataset(key)
+                if row is not None:
+                    break
+                time.sleep(0.25)
+            if row is None:
+                raise RuntimeError(f"Twin did not declare required dataset {key}")
+            if row.get("processed") is not True:
+                raise RuntimeError(f"dataset {key} has no native processing recipe")
+
+            if row.get("state", {}).get("kind") in {"missing", "failed", "cancelled"}:
+                execute("RequestDataset", {"id": row["id"]})
+            row = wait_installed(key)
+
+            print(f"Processing Twin dataset {key}", flush=True)
+            execute("ProcessDataset", {"id": row["id"], "force": False})
+            wait_processed(key)
+            print(f"Twin dataset ready: {key}", flush=True)
+
+
 def run_case(engine: Path, binary: Path, twin: Path, case: dict, mapping: dict,
              output: Path, port: int, env: dict[str, str]) -> dict:
     require_free_port(port)
@@ -196,7 +295,7 @@ def main() -> int:
     parser.add_argument("--twin", type=Path)
     parser.add_argument("--output", type=Path, default=ROOT / "runs/qualification")
     parser.add_argument("--api-port", type=int, default=4299)
-    parser.add_argument("--provision", action="store_true", help="Download/process declared datasets with the pinned native asset manager")
+    parser.add_argument("--provision", action="store_true", help="Download/process declared datasets with the pinned LunCoSim Nightly runtime")
     args = parser.parse_args()
     config = tomllib.loads(args.config.read_text(encoding="utf-8"))
     if config.get("schema_version") != 1:
@@ -226,17 +325,14 @@ def main() -> int:
             raise RuntimeError(f"invalid or unregistered qualification case: {case}")
     suffix = ".exe" if os.name == "nt" else ""
     binary = engine / "target/debug" / ("luncosim" + suffix)
-    manager = engine / "target/debug" / ("lunco-assets" + suffix)
-    if not binary.is_file() or not manager.is_file():
-        raise RuntimeError("build pinned luncosim and lunco-assets production binaries before qualification")
+    if not binary.is_file():
+        raise RuntimeError("install the pinned LunCoSim Nightly runtime before qualification")
     env = dict(os.environ, LUNCOSIM_BIN=str(binary), LUNCO_ASSET_ROOT=str(engine / "assets"),
                LUNCOSIM_EPHEMERAL_SETTINGS="1", LUNCOSIM_ISOLATED_RUN="1")
     source = source_digest(twin)
-    binaries = {str(path.relative_to(engine)): sha256(path) for path in (binary, manager)}
-    for dataset in config["datasets"]:
-        for action in (["download", "process", "verify"] if args.provision else ["verify"]):
-            subprocess.run([str(manager), action, "--twin", str(twin), "--asset", dataset],
-                           cwd=engine, env=env, check=True)
+    binaries = {str(binary.relative_to(engine)): sha256(binary)}
+    if args.provision:
+        provision_twin_datasets(engine, binary, twin, config["datasets"], output, args.api_port)
     scenes = {mapping["scene"] for mapping in mappings.values()} | {manifest["usd"]["default_scene"]}
     native_preflight(engine, binary, twin, output, args.api_port, expected, scenes, manifest["name"])
     results = []

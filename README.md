@@ -55,9 +55,10 @@ and [Twin overview](twins/astrobotic-griffin-1/README.md).
 
 ## Downloadable builds
 
-A push to `main` stages the Twin, builds the pinned engine and shared asset
-revision, prepares its declared terrain, and requires native preflight plus
-the registered release gates before publishing a ZIP and SHA-256 checksum.
+A push to `main` stages the Twin, downloads the published LunCoSim Nightly built
+from the pinned source revision, prepares its declared terrain, and requires
+native preflight plus the registered release gates before publishing a ZIP and
+SHA-256 checksum. The Twin workflow does not build LunCoSim.
 The archive records the Twin source commit and includes `QUALIFICATION.json`
 with the tested engine revision, binary hashes and individual runtime reports.
 Headless qualification does not establish visual acceptance.
@@ -66,8 +67,9 @@ The application and generated terrain cache are not included. The first open
 prepares missing terrain from `Assets.toml` and requires internet access.
 The download links point to the latest main revision that passed qualification.
 
-For local checks, build `luncosim` and `lunco-assets` from the clean pinned
-engine checkout, then run:
+For local checks, install the pinned Nightly's `luncosim` binary at
+`target/debug/luncosim` in a clean checkout of the exact engine revision, then
+run:
 
 ```sh
 python3 tools/validate_repository.py
@@ -75,6 +77,8 @@ python3 tools/qualification.py --engine /path/to/lunco-sim --provision --api-por
 ```
 
 The first command checks manifest structure and package-local references only.
-The second requires native Twin/SysML/scene preflight and bounded production
-verdicts. It rejects a mismatched or dirty engine and leaves evidence under
-`runs/qualification/`. It never builds, edits USD, or publishes a release.
+The second downloads and prepares assets through the Nightly app's native API,
+then requires native Twin/SysML/scene preflight and bounded production verdicts.
+It rejects a mismatched or dirty engine and leaves evidence under
+`runs/qualification/`. It never builds LunCoSim, edits USD, or publishes a
+release. On a headless host, run the second command under `xvfb-run`.
