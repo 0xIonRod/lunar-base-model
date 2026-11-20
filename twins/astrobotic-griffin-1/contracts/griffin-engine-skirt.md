@@ -8,7 +8,7 @@ flight skirt in this model.
 
 `GriffinEngineSkirtComponent` in `griffin_propulsion_requirements.sysml` owns
 the rail, tapered shell, adapter, apron and exhaust-opening dimensions. The
-3.44 m rail span, 60 mm lower inset, 1.02 m aperture apothem and 20 mm nozzle
+3.44 m rail span, 60 mm lower inset, 1.44 m aperture apothem and 20 mm nozzle
 exit recess remain packaging assumptions. Engine sizing assumptions and their
 limits are recorded in [the model review](griffin-model-audit-2026-10-21.md).
 
@@ -19,12 +19,33 @@ thermal conductivity or heat-protection qualification. The liner stock lies
 outside the exhaust aperture; the apron meets the shell's inner wall. The
 engine stations and outside skirt envelope are preserved.
 
-The apron uses the outer shell's shared MLI material. Its gold color is the
-requested presentation finish; the hardware reference is predominantly silver.
-The recessed liner uses the shared silver metal material. All three surfaces
+The apron uses its separate satin-gray finish. The outer shell uses the shared
+silver MLI material. The recessed liner uses the shared silver metal material. All three surfaces
 are single sided, with consistently outward-facing closed material volumes
 around an open central exhaust path. Their display meshes do not add mass or
 collision ownership.
+
+Figure D of the [NASA/JPL environmental-test gallery](https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
+shows diagonally folded silver panels, material returning below the rim and
+small amber sealing patches. The [Voyager acceptance-test video](https://www.linkedin.com/posts/voyg-acceleratingtheadvantage-missionready-ugcPost-7527007400839774208-Ottj/)
+at 57.5 seconds supplies a second low-angle view of the wrapped bay. The earlier
+[Astrobotic assembly photo](https://x.com/astrobotic/status/1981715211871469731/photo/1)
+shows the exposed hardware and its cleanroom support fixture.
+
+Eight side covers follow the mounted shell's taper. Eight apron covers turn
+under the rim and leave a strip of the inner lip visible. Offset folds vary
+across the panels and six amber patches follow individual foil facets. The
+side covers seat immediately below the rail. The 72 mm side and 28 mm apron
+relief controls, 2 mm cover thickness and finish values in
+`griffin_voyager_revision.sysml` are appearance estimates. The propulsion
+assembly's rail, shell, apron and opening provide the fitting datums.
+
+On 20 November 2026, the LunCoSim Editor (4e88c618) saved and reopened the
+skirt. An independent readback measured 55.45 mm maximum relief on the side
+covers, 25.88 mm below the apron and 26.4 mm minimum separation from the
+aperture edge planes. All 16 covers had positive closed volumes and render
+purpose. The production vehicle composed the revised skirt beside its seven
+modeled bells.
 
 GES-002 requires measured finite wall geometry. The production propulsion
 observer reads the composed mesh vertices, face indices and render-side
