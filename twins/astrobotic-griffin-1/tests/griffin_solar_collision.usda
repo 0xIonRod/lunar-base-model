@@ -24,12 +24,10 @@ def Xform "World"
     }
     def Xform "Panel0" (
         references = @../components/lander/griffin_solar_panel_visual.usda@
-        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (0.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool physics:kinematicEnabled = true
         def Sphere "ProbeTop" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
         )
@@ -66,12 +64,10 @@ def Xform "World"
     }
     def Xform "Panel1" (
         references = @../components/lander/griffin_solar_panel_starboard_visual.usda@
-        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (3.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool physics:kinematicEnabled = true
         def Sphere "ProbeTop" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
         )
@@ -108,12 +104,10 @@ def Xform "World"
     }
     def Xform "Panel2" (
         references = @../components/lander/griffin_solar_panel_port_visual.usda@
-        prepend apiSchemas = ["PhysicsRigidBodyAPI"]
     )
     {
         custom double3 xformOp:translate = (6.0, 0.0, 0.0)
         uniform token[] xformOpOrder = ["xformOp:translate"]
-        bool physics:kinematicEnabled = true
         def Sphere "ProbeTop" (
             prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysicsCollisionAPI"]
         )
