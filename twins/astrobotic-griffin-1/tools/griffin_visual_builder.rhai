@@ -3821,7 +3821,7 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
         [chamber-wall,neck_upper],[chamber-wall,chamber_lower],[throat-wall,neck_lower]];
     let ops = [
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Bell"}},
-        #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:(),reference_prim_path:""}},
+        #{AddPrim:#{edit_target:edit_target,parent_path:root,name:"Bell",type_name:"Mesh",reference:"lunco://components/propulsion/rocket_engine_visual.usda",reference_prim_path:"/Engine/Bell"}},
         #{RevolveProfileMesh:#{edit_target:edit_target,path:root+"/Bell",profile:profile,axis:[0.0,1.0,0.0],angular_segments:segments,normal_crease_angle_deg:crease,display_color:model.value(own+"bellDisplayColor"),collision_enabled:false}},
         #{SetAttribute:#{edit_target:edit_target,path:root+"/Bell",name:"purpose",type_name:"token",value:"\"render\""}},
         #{RemovePrim:#{edit_target:edit_target,path:root+"/Throat"}},
@@ -3830,7 +3830,7 @@ fn refine_griffin_engine_bell_component_plan(doc, edit_target, root) {
             display_color:sysml_requirements::model().value("GriffinVisualConfigurationRequirements::GriffinVisualConfiguration::silverDisplayColor"),collision_enabled:false}},
         #{SetAttribute:#{edit_target:edit_target,path:root+"/Throat",name:"purpose",type_name:"token",value:"\"render\""}}
     ];
-    // Reuse the inherited engine-library metal surface on both flow shells.
+    // Reuse the referenced engine-library metal surface on both flow shells.
     // Geometry dimensions stay in the Twin; no duplicate nozzle shader graph.
     for member in ["Bell","Throat"] {
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:root+"/"+member,
