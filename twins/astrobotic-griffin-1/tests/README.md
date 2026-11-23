@@ -5,23 +5,6 @@ verification cases to these scenes and their observers in `scenarios/tests/`.
 SysML owns acceptance criteria; Rhai observes the composed/runtime system and
 emits typed verdicts; Modelica owns continuous physics.
 
-`check_internal_physics_review.py` is a read-only Editor check of the initial
-vehicle. Mount the Twin and open `vehicles/griffin_1.usda`, then use the actual
-document id returned by `ListOpenDocuments`:
-
-```sh
-python3 tests/check_internal_physics_review.py --api-port 4201 --doc-id DOCUMENT_ID --root /Griffin1
-```
-
-It checks initial mass, centroid and diagonal inertia against the source-owned
-paired-tank study, independent inventory closure, all four visual tank subtrees
-for duplicate mass ownership, and all installed cell-row cap areas against the
-three photovoltaic areas. Row receipts must retain one document/stage snapshot.
-The companion `griffin_panel_physics_review::regression()` exercises non-square
-cell stock and rejects invalid gaps/clips in both axes. These checks do not
-integrate a trajectory or qualify flight properties. Use a runtime matching the
-current Twin tools and shared assets.
-
 `flip_motion.usda` checks forward/reverse motion, four-wheel render roll,
 physical stops and stationary dwell against `FlipMotionRequirements::MotionStudy`.
 It also bounds native panel tracking error and relative angular velocity during

@@ -44,7 +44,7 @@ package GriffinSolarRequirements {
          * overlap is a visual seating tolerance, not a structural engagement spec.
          * Current cell geometry and silhouette use the June 2026 source below;
          * these retained attachment stocks are still packaging estimates. */
-        attribute cellDisplayColor : Real[3] = (.018, .010, .014);
+        attribute cellDisplayColor : Real[3] = (.009, .012, .018);
         attribute cellMetallic : Real = .25;
         attribute cellRoughness : Real = .20;
         attribute frameThicknessM : Real = 0.03;
