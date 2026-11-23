@@ -125,15 +125,37 @@ fn panel_geometry(index) {
     for point in first_row.points {height=max(height,point[1]);}
     let model=sysml_requirements::model();
     height+=si(model,study()+"visibilitySampleOffset",[1,0,0,0,0,0,0]);
-    for row in 0..layout.rows {for column in geometry::solar_cell_row_columns(layout,row) {
+    let row_ends=[];
+    for row in 0..layout.rows {
+        for column in geometry::solar_cell_row_columns(layout,row) {
             centers.push([(-layout.columns/2.0+column+0.5)*layout.pitch_m/layout.scale_x,
-                height,
-                (-layout.rows/2.0+row+0.5)*layout.pitch_z_m]);
-    }}
-    if centers.len()<9 {throw("nine active-cell visibility strata required");}
-    let samples=[];
-    for i in 0..9 {samples.push(centers[((i+0.5)*centers.len().to_float()/9.0).floor().to_int()]);}
+                height,(-layout.rows/2.0+row+0.5)*layout.pitch_z_m]);
+        }
+        row_ends.push(centers.len());
+    }
+    // Equal weights in the native terrain-visibility probe. Stratify by active
+    // cell population, then use a base-two radical inverse across each row.
+    let lateral_rank=[0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15];
+    let samples=[];let row=0;let count=lateral_rank.len();
+    if centers.len()<count {throw("insufficient active cells for visibility sampling");}
+    for i in 0..count {
+        let ordinal=((i+0.5)*centers.len()/count).floor().to_int();
+        while ordinal>=row_ends[row] {row+=1;}
+        let first=if row==0 {0} else {row_ends[row-1]};
+        let width=row_ends[row]-first;
+        let col=((lateral_rank[i]+0.5)*width/count).floor().to_int();
+        samples.push(centers[first+col]);
+    }
     #{area:cell_area*centers.len().to_float(),cell_count:centers.len(),samples:samples}
+}
+
+fn visibility_points_op(edit,probe,samples) {
+    let points="[";
+    for i in 0..samples.len() {
+        if i>0 {points+=", ";}
+        let p=samples[i];points+="("+p[0]+", "+p[1]+", "+p[2]+")";
+    }
+    support::attribute(edit,probe,"points","point3f[]",points+"]")
 }
 
 fn _program(edit, parent, name, source) {
@@ -193,12 +215,7 @@ fn network_part_plan(doc, edit, root, part) {
             let probe=parent+"/PowerEnvironment";
             ops.push(support::add(edit,parent,"PowerEnvironment","Points"));
             ops.push(#{SetApiSchemas:#{edit_target:edit,path:probe,schemas:["LunCoEnvironmentProbeAPI"]}});
-            let points="[";
-            for i in 0..g.samples.len() {
-                if i>0 {points+=", ";}let p=g.samples[i];
-                points+="("+p[0]+", "+p[1]+", "+p[2]+")";
-            }
-            ops.push(support::attribute(edit,probe,"points","point3f[]",points+"]"));
+            ops.push(visibility_points_op(edit,probe,g.samples));
             ops.push(support::attribute(edit,probe,"visibility","token","\"invisible\""));
             ops+=support::outputs(edit,probe,["sun_irradiance_w_m2","sun_visibility","sun_mount_x","sun_mount_y","sun_mount_z"]);
             let pv=net+"/"+name;ops+=_program(edit,net,name,"Electrical/SolarPanel");

@@ -327,7 +327,7 @@ def Xform "Griffin1" (
             rel lunco:telemetry:target = </Griffin1/MainPropulsion>
         }
         def Scope "FuelTank" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            prepend apiSchemas = ["LunCoProgramAPI", "CollectionAPI:storageLocations"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"
@@ -349,9 +349,11 @@ def Xform "Griffin1" (
             custom double inputs:initial_mass_kg = 1000.0
             custom double inputs:nominal_pressure_pa = 2500000.0
             custom double inputs:pressure_headroom_pa = 500000.0
+            uniform token collection:storageLocations:expansionRule = "explicitOnly"
+            rel collection:storageLocations:includes = [</Griffin1/TankPX>, </Griffin1/TankNX>]
         }
         def Scope "OxidizerTank" (
-            prepend apiSchemas = ["LunCoProgramAPI"]
+            prepend apiSchemas = ["LunCoProgramAPI", "CollectionAPI:storageLocations"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"
@@ -373,6 +375,8 @@ def Xform "Griffin1" (
             custom double inputs:initial_mass_kg = 1000.0
             custom double inputs:nominal_pressure_pa = 2500000.0
             custom double inputs:pressure_headroom_pa = 500000.0
+            uniform token collection:storageLocations:expansionRule = "explicitOnly"
+            rel collection:storageLocations:includes = [</Griffin1/TankPZ>, </Griffin1/TankNZ>]
         }
         def Scope "NozzleDesign" (
             prepend apiSchemas = ["LunCoProgramAPI"]
@@ -5470,9 +5474,9 @@ def Xform "Griffin1" (
         }
         over "MountLinkNegativeX"
         {
-            custom double3 xformOp:translate = (-1.1020782848250001, -0.35000000000000014, 0.5804999999999999)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -25.784296918137873)
-            custom double3 xformOp:scale = (0.1, 0.7973994247473146, 0.04)
+            custom double3 xformOp:translate = (-1.094578284825, -0.35000000000000014, 0.5804999999999999)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -26.771373122390045)
+            custom double3 xformOp:scale = (0.1, 0.8040405363799474, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -5489,9 +5493,9 @@ def Xform "Griffin1" (
         }
         over "MountLinkPositiveX"
         {
-            custom double3 xformOp:translate = (1.1020782848250001, -0.35000000000000014, 0.5804999999999999)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 25.784296918137873)
-            custom double3 xformOp:scale = (0.1, 0.7973994247473146, 0.04)
+            custom double3 xformOp:translate = (1.011828284825, -0.35000000000000014, 0.5804999999999999)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 36.536150902612455)
+            custom double3 xformOp:scale = (0.1, 0.8912087219725855, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             uniform token purpose = "render"
             bool physics:collisionEnabled = false
@@ -5501,7 +5505,7 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["LunCoEnvironmentProbeAPI"]
         )
         {
-            point3f[] points = [(-0.5267500281333923, 0.010999999940395355, -0.7901250123977661), (0.07524999976158142, 0.010999999940395355, -0.6396250128746033), (0.6772500276565552, 0.010999999940395355, -0.48912501335144043), (-0.3762499988079071, 0.010999999940395355, -0.26337501406669617), (0.22574999928474426, 0.010999999940395355, -0.11287499964237213), (0.827750027179718, 0.010999999940395355, 0.03762499988079071), (-0.22574999928474426, 0.010999999940395355, 0.26337501406669617), (-0.5267500281333923, 0.010999999940395355, 0.48912501335144043), (-0.6772500276565552, 0.010999999940395355, 0.7901250123977661)]
+            point3f[] points = [(-0.827750027179718, 0.010999999940395355, -0.8653749823570251), (0.07524999976158142, 0.010999999940395355, -0.7901250123977661), (-0.3762499988079071, 0.010999999940395355, -0.6396250128746033), (0.5267500281333923, 0.010999999940395355, -0.5643749833106995), (-0.6772500276565552, 0.010999999940395355, -0.48912501335144043), (0.22574999928474426, 0.010999999940395355, -0.3386250138282776), (-0.22574999928474426, 0.010999999940395355, -0.26337501406669617), (0.6772500276565552, 0.010999999940395355, -0.18812499940395355), (-0.6772500276565552, 0.010999999940395355, -0.03762499988079071), (0.22574999928474426, 0.010999999940395355, 0.03762499988079071), (-0.22574999928474426, 0.010999999940395355, 0.11287499964237213), (0.6772500276565552, 0.010999999940395355, 0.26337501406669617), (-0.6772500276565552, 0.010999999940395355, 0.3386250138282776), (0.3762499988079071, 0.010999999940395355, 0.48912501335144043), (-0.3762499988079071, 0.010999999940395355, 0.6396250128746033), (0.827750027179718, 0.010999999940395355, 0.8653749823570251)]
             token visibility = "invisible"
             double outputs:sun_irradiance_w_m2 = 0.0
             double outputs:sun_visibility = 0.0
@@ -5534,12 +5538,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 0.7973994247473144, 0.04)
+            custom double3 xformOp:scale = (0.1, 0.7832510983205127, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-0.5659562248335603, -0.12793097166414363, 0.5805)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 70.78429691813788)
+            custom double3 xformOp:translate = (-0.5584562248335604, -0.12793097166414363, 0.5805)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 70.41369218537928)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -5559,12 +5563,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 0.3112975437482987, 0.04)
+            custom double3 xformOp:scale = (0.1, 0.3187584017116609, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (1.0026220599919027, -0.12793097166414358, 0.5805)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 28.555732141122675)
+            custom double3 xformOp:translate = (0.9951220599919026, -0.12793097166414358, 0.5805)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, 31.083303974304417)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -5572,7 +5576,7 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["LunCoEnvironmentProbeAPI"]
         )
         {
-            point3f[] points = [(-0.3762499988079071, 0.010999999940395355, -0.7901250123977661), (-0.5267500281333923, 0.010999999940395355, -0.5643749833106995), (-0.827750027179718, 0.010999999940395355, -0.3386250138282776), (0.3762499988079071, 0.010999999940395355, -0.18812499940395355), (-0.3762499988079071, 0.010999999940395355, 0.11287499964237213), (-0.5267500281333923, 0.010999999940395355, 0.3386250138282776), (0.3762499988079071, 0.010999999940395355, 0.48912501335144043), (0.5267500281333923, 0.010999999940395355, 0.6396250128746033), (0.827750027179718, 0.010999999940395355, 0.7901250123977661)]
+            point3f[] points = [(-0.827750027179718, 0.010999999940395355, -0.8653749823570251), (-0.22574999928474426, 0.010999999940395355, -0.7148749828338623), (-0.5267500281333923, 0.010999999940395355, -0.6396250128746033), (0.22574999928474426, 0.010999999940395355, -0.48912501335144043), (-0.6772500276565552, 0.010999999940395355, -0.3386250138282776), (-0.07524999976158142, 0.010999999940395355, -0.26337501406669617), (-0.3762499988079071, 0.010999999940395355, -0.11287499964237213), (0.5267500281333923, 0.010999999940395355, 0.03762499988079071), (-0.5267500281333923, 0.010999999940395355, 0.18812499940395355), (0.22574999928474426, 0.010999999940395355, 0.26337501406669617), (-0.07524999976158142, 0.010999999940395355, 0.413875013589859), (0.6772500276565552, 0.010999999940395355, 0.48912501335144043), (-0.5267500281333923, 0.010999999940395355, 0.5643749833106995), (0.3762499988079071, 0.010999999940395355, 0.7148749828338623), (-0.07524999976158142, 0.010999999940395355, 0.7901250123977661), (0.827750027179718, 0.010999999940395355, 0.8653749823570251)]
             token visibility = "invisible"
             double outputs:sun_irradiance_w_m2 = 0.0
             double outputs:sun_visibility = 0.0
@@ -7917,12 +7921,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 0.3112975437482987, 0.04)
+            custom double3 xformOp:scale = (0.1, 0.3187584017116609, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (-1.0026220599919027, -0.12793097166414358, 0.5805)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -28.555732141122675)
+            custom double3 xformOp:translate = (-0.9951220599919026, -0.12793097166414358, 0.5805)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -31.083303974304417)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -7942,12 +7946,12 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
-            custom double3 xformOp:scale = (0.1, 0.7973994247473144, 0.04)
+            custom double3 xformOp:scale = (0.1, 0.7832510983205127, 0.04)
             uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
             double size = 1.0
             bool physics:collisionEnabled = false
-            custom double3 xformOp:translate = (0.5659562248335603, -0.12793097166414363, 0.5805)
-            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -70.78429691813788)
+            custom double3 xformOp:translate = (0.5584562248335604, -0.12793097166414363, 0.5805)
+            custom double3 xformOp:rotateXYZ = (0.0, 0.0, -70.41369218537928)
             uniform token purpose = "render"
             color3f[] primvars:displayColor = [(0.10000000149011612, 0.12999999523162842, 0.18000000715255737)]
         }
@@ -7955,7 +7959,7 @@ def Xform "Griffin1" (
             prepend apiSchemas = ["LunCoEnvironmentProbeAPI"]
         )
         {
-            point3f[] points = [(0.07524999976158142, 0.010999999940395355, -0.7901250123977661), (-0.07524999976158142, 0.010999999940395355, -0.5643749833106995), (-0.3762499988079071, 0.010999999940395355, -0.3386250138282776), (0.827750027179718, 0.010999999940395355, -0.18812499940395355), (-0.3762499988079071, 0.010999999940395355, 0.11287499964237213), (-0.827750027179718, 0.010999999940395355, 0.3386250138282776), (0.07524999976158142, 0.010999999940395355, 0.48912501335144043), (0.5267500281333923, 0.010999999940395355, 0.6396250128746033), (0.827750027179718, 0.010999999940395355, 0.7901250123977661)]
+            point3f[] points = [(-0.3762499988079071, 0.010999999940395355, -0.8653749823570251), (0.22574999928474426, 0.010999999940395355, -0.7148749828338623), (-0.07524999976158142, 0.010999999940395355, -0.6396250128746033), (0.6772500276565552, 0.010999999940395355, -0.48912501335144043), (-0.22574999928474426, 0.010999999940395355, -0.3386250138282776), (0.3762499988079071, 0.010999999940395355, -0.26337501406669617), (0.07524999976158142, 0.010999999940395355, -0.11287499964237213), (0.5267500281333923, 0.010999999940395355, 0.03762499988079071), (-0.5267500281333923, 0.010999999940395355, 0.18812499940395355), (-0.07524999976158142, 0.010999999940395355, 0.26337501406669617), (-0.3762499988079071, 0.010999999940395355, 0.413875013589859), (0.3762499988079071, 0.010999999940395355, 0.48912501335144043), (-0.5267500281333923, 0.010999999940395355, 0.5643749833106995), (0.3762499988079071, 0.010999999940395355, 0.7148749828338623), (-0.07524999976158142, 0.010999999940395355, 0.7901250123977661), (0.827750027179718, 0.010999999940395355, 0.8653749823570251)]
             token visibility = "invisible"
             double outputs:sun_irradiance_w_m2 = 0.0
             double outputs:sun_visibility = 0.0

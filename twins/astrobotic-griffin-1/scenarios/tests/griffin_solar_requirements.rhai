@@ -1,3 +1,4 @@
+import "twin://astrobotic-griffin-1/tools/griffin_geometry.rhai" as geometry;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
 import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Reconstructed Griffin solar-array geometry. Flight installation and transit
@@ -228,7 +229,7 @@ fn squared_distance(left, right) {
     d.x*d.x + d.y*d.y + d.z*d.z
 }
 
-fn support_endpoint_error(record, rail, scale_x, frame_width, sign, overlap) {
+fn support_endpoint_error(record, rail, scale_x, panel_x, overlap) {
     if record == () || rail == () || record.type_name != "Cube" || record.attrs == ()
         || record.attrs["size"] != 1.0
         || record.attrs["xformOpOrder"] != ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"] { return (); }
@@ -237,7 +238,7 @@ fn support_endpoint_error(record, rail, scale_x, frame_width, sign, overlap) {
     let s = record.attrs["xformOp:scale"];
     if !array_is(t) || t.len()!=3 || !array_is(r) || r.len()!=3 || !array_is(s) || s.len()!=3 { return (); }
     let lower = vec3(rail.x / scale_x, rail.y, rail.z);
-    let upper = vec3(sign * frame_width / 2.0, 0.0, rail.z);
+    let upper = vec3(panel_x, 0.0, rail.z);
     let delta = upper - lower;
     let length = sqrt(delta.x*delta.x + delta.y*delta.y + delta.z*delta.z);
     if length <= 0.0 { return (); }
@@ -633,12 +634,15 @@ fn on_tick(me, ctx) {
             if negative_rail!=() && positive_rail!=() {
                 let rail=if side=="NegativeX" {negative_rail} else {positive_rail};
                 let sign=if side=="NegativeX" {-1.0} else {1.0};
+                let panel_x=geometry::solar_frame_seat_x(layout,frame_width,
+                    sysml_requirements::number(source,own("frameThicknessM")),rail.z,sign);
+                if panel_x==() {throw("Support datum misses the stepped frame: "+link_path);}
                 let link = composed[link_path];
                 checks.push(required_check(model,"GSA-008-"+name+side+"-link-endpoints","gsa008",
                     "GSAC008_SupportLinkEndpoints",[["maximumEndpointErrorSquaredM2",
-                        usd_geometry_inspection::measurement(support_endpoint_error(link,rail,layout.scale_x,frame_width,sign,mount_overlap),
+                        usd_geometry_inspection::measurement(support_endpoint_error(link,rail,layout.scale_x,panel_x,mount_overlap),
                             link,"composed support link endpoint unavailable")]], [visual("geometryVerificationToleranceM")]));
-                let panel_x=sign*frame_width/2.0;let rail_x=rail.x/layout.scale_x;
+                let rail_x=rail.x/layout.scale_x;
                 let dx=panel_x-rail_x;let dy=-rail.y;
                 let height=sqrt(dx*dx+dy*dy)+2.0*mount_overlap;
                 let dims=[sysml_requirements::number(source,own("mountBracketWidthM"))/layout.scale_x,height,sysml_requirements::number(source,own("mountLinkDepthM"))];

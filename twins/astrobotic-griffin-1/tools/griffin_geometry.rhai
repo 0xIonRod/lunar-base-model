@@ -308,9 +308,13 @@ fn solar_cell_row_columns(layout, row) {
 // One row of thin, corner-clipped solar cells. Native extrusion owns topology;
 // a row is one render mesh, rather than one entity/draw per cell.
 fn solar_cell_row_geometry(layout, row, center_y, thickness, gap, corner) {
-    if layout==() || row<0 || row>=layout.rows || gap<=0.0
-        || gap>=layout.pitch_z_m || corner<=0.0
-        || corner*2.0>=layout.pitch_z_m-gap || thickness<=0.0 {
+    if layout==() || row<0 || row>=layout.rows {return #{ok:false,error:"solar row outside source field"};}
+    for dimension in [layout.pitch_m,layout.pitch_z_m,layout.scale_x,gap,corner,thickness] {
+        if !scalar_is_finite(dimension) || dimension<=0.0 {
+            return #{ok:false,error:"solar cell pitches, scale, gap, clip and thickness must be positive and finite"};
+        }
+    }
+    if !scalar_is_finite(center_y) || corner*2.0>=min(layout.pitch_m,layout.pitch_z_m)-gap {
         return #{ok:false,error:"solar row dimensions incomplete"};
     }
     let sx=layout.scale_x;let half_x=(layout.pitch_m-gap)/2.0;
@@ -369,7 +373,7 @@ fn solar_contour_geometry(layout, width, center_y, thickness) {
     merge_mesh_geometries(pieces)
 }
 
-fn solar_contour_frame_geometry(layout, width, section) {
+fn solar_contour_frame_stations(layout, width, section) {
     let stations=[];let cell_width=layout.local_cell_width_m;
     for point in layout.contour {
         let x=-cell_width/2.0+point.x*cell_width/layout.columns;
@@ -380,7 +384,25 @@ fn solar_contour_frame_geometry(layout, width, section) {
         if point.z==layout.rows.to_float() {z=layout.frame_depth_m/2.0-section/2.0;}
         stations.push(vec3(x,0.0,z));
     }
-    perimeter_beam_geometry(stations,[0.0],section)
+    stations
+}
+
+fn solar_contour_frame_geometry(layout, width, section) {
+    perimeter_beam_geometry(solar_contour_frame_stations(layout,width,section),[0.0],section)
+}
+
+// Intersect the mount plane with the stepped frame centerlines. A nominal
+// rectangular width can put the end of a support in the leg cutout.
+fn solar_frame_seat_x(layout,width,section,z,sign) {
+    let stations=solar_contour_frame_stations(layout,width,section);
+    let best=();
+    for i in 0..stations.len() {
+        let a=stations[i];let b=stations[(i+1)%stations.len()];
+        if a.z==b.z || z<min(a.z,b.z) || z>max(a.z,b.z) {continue;}
+        let x=a.x+(b.x-a.x)*(z-a.z)/(b.z-a.z);
+        if best==() || x*sign>best*sign {best=x;}
+    }
+    best
 }
 
 // Observe the rendered mesh itself: a closed Cone cap cannot pass this gate.

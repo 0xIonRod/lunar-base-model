@@ -157,7 +157,10 @@ fn _solar_panel_geometry_ops(doc,edit_target,path,index,group) {
             }
             if local==() {return support::plan_error("griffin_visual_component_assembly", "solar bus attachment datum unavailable");}
             let side=if endpoint==0 {"NegativeX"} else {"PositiveX"};let sign=if endpoint==0 {-1.0} else {1.0};
-            let rail_x=local.x/sx;let panel_x=sign*griffin_spec::solar_panel_frame_width_m()/2.0;
+            let rail_x=local.x/sx;
+            let panel_x=griffin_geometry::solar_frame_seat_x(layout,griffin_spec::solar_panel_frame_width_m(),
+                _solar_number("frameThicknessM"),local.z,sign);
+            if panel_x==() {return support::plan_error("griffin_visual_component_assembly","rail does not cross the stepped solar frame");}
             let bracket=_component_cube_visual_ops(doc,edit_target,path,"MountBracket"+side,[rail_x,local.y,local.z],(),
                 [_solar_number("mountBracketWidthM")/sx,_solar_number("mountBracketThicknessM"),_solar_number("mountBracketDepthM")],[0.12,0.15,0.20]);
             if !bracket.ok {return bracket;}for op in bracket.ops {plan.ops.push(op);}

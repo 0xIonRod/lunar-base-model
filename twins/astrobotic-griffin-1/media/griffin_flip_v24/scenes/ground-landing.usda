@@ -1,0 +1,50 @@
+#usda 1.0
+(
+    defaultPrim = "Griffin1SurfaceOps"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+}
+
+def Xform "Griffin1SurfaceOps" (
+    references = [@twin://astrobotic-griffin-1/media/griffin_flip_v13/scenes/landing.usda@</Griffin1SurfaceOps>, @twin://astrobotic-griffin-1/scenes/griffin_1_surface_ops.usda@</Griffin1SurfaceOps>]
+)
+{
+    over "FilmRecordingUI"
+    {
+        uniform string info:sourceCode = "fn select(facts) {[]}"
+    }
+    over "FLIP"
+    {
+        custom string lunco:ui:surfaceId = ""
+    }
+    over Scope "FilmCapture" (
+        active = false
+    )
+    {
+    }
+    def Scope "V24Capture" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/media/griffin_flip_v24/scenarios/capture.rhai@
+        custom string film:scene = "ground-landing"
+        custom int film:frames = 270
+        custom int film:pre_steps = 0
+        custom string film:camera = "GroundTouchdown"
+        custom double film:rate = 1.0
+        custom double film:clock_scale = 1.0
+    }
+    over "Scenario"
+    {
+        over "Mission" (
+            active = false
+        )
+        {
+        }
+    }
+}

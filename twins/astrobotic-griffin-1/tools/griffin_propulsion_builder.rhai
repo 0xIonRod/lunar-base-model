@@ -243,6 +243,33 @@ fn _propellant_group(model, attribute, names, stations) {
     #{ok:true,centroid:c,specific_inertia:spread}
 }
 
+// Expose the same station identities used by the paired mass calculation on
+// each solved reservoir. Explicit membership leaves tank visuals massless.
+fn propellant_storage_plan(doc,edit,root) {
+    let model=sysml_requirements::model();
+    let own="GriffinPropulsionRequirements::GriffinPropellantMassStudy::";
+    let ops=[];let used=[];
+    for group in [["FuelTank","fuelTankInstances"],["OxidizerTank","oxidizerTankInstances"]] {
+        let path=root+"/MainPropulsion/"+group[0];
+        let reservoir=assembly_builder::composed_query(doc,#{path:path,schemas:true,attrs:[]});
+        if !support::query_ok(reservoir) || !array_is(reservoir.api_schemas)
+            || !reservoir.api_schemas.contains("LunCoProgramAPI") {throw("Missing solved reservoir: "+path);}
+        let members=model.value(own+group[1]);let targets=[];
+        if !array_is(members) || members.len()!=2 {throw("Expected two assigned tank stations");}
+        for member in members {
+            let target=root+"/"+member.literal;
+            if used.contains(target) || !support::component_query(doc,target).ok {throw("Invalid storage station: "+target);}
+            targets.push(target);used.push(target);
+        }
+        let schemas=reservoir.api_schemas;
+        if !schemas.contains("CollectionAPI:storageLocations") {schemas.push("CollectionAPI:storageLocations");}
+        ops.push(#{SetApiSchemas:#{edit_target:edit,path:path,schemas:schemas}});
+        ops.push(support::attribute(edit,path,"collection:storageLocations:expansionRule","token","\"explicitOnly\""));
+        ops.push(#{SetRelationship:#{edit_target:edit,path:path,name:"collection:storageLocations:includes",targets:targets}});
+    }
+    #{ok:true,ops:ops}
+}
+
 fn griffin_propellant_mass_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     if !sysml_model_is(model) {return support::plan_error("griffin_propulsion_assembly", "propellant mass source unavailable");}

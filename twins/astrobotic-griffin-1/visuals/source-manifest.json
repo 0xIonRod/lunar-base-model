@@ -1,0 +1,35 @@
+{
+  "schema": "lunco.freecad-visual-source.v1",
+  "selection_policy": "newest project-owned .FCStd by filesystem modification time; path breaks ties",
+  "twin": "astrobotic-griffin-1",
+  "sources": {
+    "flip": {
+      "model": "flip",
+      "source": "freecad/FLIP_Rover.FCStd",
+      "source_mtime_ns": 1788255789923940700,
+      "source_mtime_iso": "2026-09-01T16:43:09",
+      "source_size_bytes": 106348,
+      "visual_asset": "visuals/flip_freecad.glb",
+      "exporter": "FreeCAD Mesh.export -> Blender glTF GLB",
+      "units": "millimetres converted to metres",
+      "source_up_axis": "y",
+      "target_up_axis": "y",
+      "coordinate_transform": "Z-up sources rotate +90 degrees about X; Y-up sources are unchanged",
+      "physics_boundary": "visual payload only; USD/Modelica physics remains authoritative"
+    },
+    "griffin_1": {
+      "model": "griffin_1",
+      "source": "griffin_1_lander.FCStd",
+      "source_mtime_ns": 1788255329723575700,
+      "source_mtime_iso": "2026-09-01T16:35:29",
+      "source_size_bytes": 437216,
+      "visual_asset": "visuals/griffin_1_freecad.glb",
+      "exporter": "FreeCAD Mesh.export -> Blender glTF GLB",
+      "units": "millimetres converted to metres",
+      "source_up_axis": "z",
+      "target_up_axis": "y",
+      "coordinate_transform": "Z-up sources rotate +90 degrees about X; Y-up sources are unchanged",
+      "physics_boundary": "visual payload only; USD/Modelica physics remains authoritative"
+    }
+  }
+}
