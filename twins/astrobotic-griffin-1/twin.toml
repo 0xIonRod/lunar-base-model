@@ -443,5 +443,5 @@ usd_path = "/World/WinchPower"
 "numerics.solver.residual_abs" = 0.000000001
 "ui.camera_status" = false
 "ui.mission_notifications" = false
-"ui.vehicle_controls" = false
+"ui.vehicle_controls" = true
 "usd.runtime_persistence" = false
