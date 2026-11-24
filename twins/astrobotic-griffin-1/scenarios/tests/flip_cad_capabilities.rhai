@@ -21,10 +21,26 @@ fn on_start(me,ctx) {
     this.time=0.0;this.phase="settle";this.done=false;this.solar_seen=false;this.checks=[];
     this.initial_soc=value(R,"battery_soc");
     this.minimum_soc=this.initial_soc;this.maximum_solar=0.0;
+    let hinge=query("QueryUsdPrim",#{path:R+"/PanelHinge",
+        attrs:["physics:lowerLimit","physics:upperLimit"]});
+    let lower_deg=hinge.attrs["physics:lowerLimit"];
+    let upper_deg=hinge.attrs["physics:upperLimit"];
+    if hinge.type_name!="PhysicsRevoluteJoint" || lower_deg==() || upper_deg==()
+        || !lower_deg.is_finite() || !upper_deg.is_finite() || lower_deg>=upper_deg {
+        throw("Authored panel hinge limits are unavailable or invalid");
+    }
+    this.controller_lower_limit=lower_deg*0.017453292519943295;
+    this.controller_upper_limit=upper_deg*0.017453292519943295;
+    this.controller_angle_in_bounds=true;
     brake(find_path(R));
 }
 fn on_tick(me,ctx) {
     if this.done {return;}this.time+=dt();
+    let controller_angle=value(R+"/SolarMechanism/Controller","angle");
+    this.controller_angle_in_bounds=this.controller_angle_in_bounds
+        && controller_angle.is_finite()
+        && controller_angle>=this.controller_lower_limit
+        && controller_angle<=this.controller_upper_limit;
     let soc=value(R,"battery_soc");
     let power=value(R,"solar_power");
     let voltage=value(R,"bus_voltage");
@@ -48,6 +64,7 @@ fn on_tick(me,ctx) {
         this.checks.push(t_true(soc>0.0 && soc<1.0,"battery SOC remains within physical bounds"));
         this.checks.push(t_true(voltage>0.0 && voltage<40.0,"finite battery supplies the bus"));
         this.checks.push(t_true(this.solar_seen,"moving CAD panel generates electrical power from its environment probe"));
+        this.checks.push(t_true(this.controller_angle_in_bounds,"panel controller output remains finite inside the native hinge hard stops"));
         brake(find_path(R));this.done=true;
         print("CAD EPS/PANEL: stowed="+this.stowed+" deployed="+deployed+" soc_initial="+this.initial_soc+" soc_min="+this.minimum_soc+" solar_max_w="+this.maximum_solar);
         report_verdict(this.checks,"FLIP CAD CAPABILITIES","FLIP_CAD_CAPABILITIES");

@@ -91,7 +91,7 @@ observer and starts the avatar near the rover in the terrain frame.
 `scenarios/tests/flip_cad_capabilities.rhai`, verdict `FLIP_CAD_CAPABILITIES`.
 It commands the native panel hinge through stow and deployment, observes solar
 generation from the moving panel's environment probe, and requires finite
-battery discharge under driving load. The 26-second gate has seven assertions.
+battery discharge under driving load. The 26-second gate has eight assertions.
 
 See `contracts/flip-cad-runtime-2026-10-26.md` for the CAD acceptance evidence.
 Older proxy requirements fixtures retain their original geometry assumptions.
