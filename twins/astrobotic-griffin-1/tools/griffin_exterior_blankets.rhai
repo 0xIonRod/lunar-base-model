@@ -51,6 +51,25 @@ fn drape(doc,index,parameters) {
     b.position[2]+=b.normal[2]*outset;
     let phase=index.to_float()*1.618;
     let mesh=wrapping::bus_surface(b.scale[0],bottom,top,phase,parameters);
+    // Keep the top rail and side seams seated. Draw the lower foil into a
+    // sloping pleat between the restraint points on the three aft bays.
+    if index>=3 && index<=5 {
+        let columns=parameters.BusColumns.to_int();
+        let rows=parameters.BusRows.to_int();
+        let skin=(columns+1)*(rows+1);
+        for i in 0..skin {
+            let u=(i%(columns+1)).to_float()/columns;
+            let v=(i/(columns+1)).to_float()/rows;
+            let hem=sin(acos(-1.0)*u)*(1.0-v);
+            let crest=1.0-min(1.0,abs(u-(0.29+0.37*v+0.07*(index-4)))*3.4);
+            let lift=parameters.AftPleatDepthM*hem*crest;
+            let drop=parameters.AftHemDropM*hem*(0.30+0.70*crest);
+            for vertex in [i,i+skin] {
+                mesh.points[vertex][1]-=drop;
+                mesh.points[vertex][2]+=lift;
+            }
+        }
+    }
     #{bay:b,bottom:bottom,top:top,phase:phase,mesh:mesh}
 }
 fn patch_specs(d,index,parameters) {
@@ -103,7 +122,8 @@ fn face_plan(doc,index) {
     let name="Blanket"+index;
     let path=root()+"/"+name;
     let ops=[];
-    if query("QueryUsdPrim",#{doc_id:doc,path:path,attrs:[]}).type_name!=() {
+    let existing=query("QueryUsdPrim",#{doc_id:doc,path:path,attrs:[]}).type_name;
+    if existing!=() && existing!="Mesh" {
         ops.push(#{RemovePrim:#{edit_target:"@root@",path:path}});
     }
     for suffix in ["A","B"] {
@@ -112,11 +132,19 @@ fn face_plan(doc,index) {
             ops.push(#{RemovePrim:#{edit_target:"@root@",path:old}});
         }
     }
+    // Keep the existing mesh prim and its mounted fittings when refitting a bay.
     for op in wrapping::mesh_plan(root(),name,d.mesh.points,d.mesh.counts,d.mesh.indices,"/GriffinBus/Looks/ExteriorPanels") {
-        ops.push(op);
+        if existing!="Mesh" || op.AddPrim==() {ops.push(op);}
     }
     ops=harness::append(ops,builder::place_plan("@root@",path,d.bay.position,d.bay.rotation,[1.0,1.0,1.0]));
-    for spec in patch_specs(d,index,parameters) {ops=geometry::cube(ops,root(),spec);}
+    for spec in patch_specs(d,index,parameters) {
+        let patch=root()+"/"+spec.name;
+        if query("QueryUsdPrim",#{doc_id:doc,path:patch,attrs:[]}).type_name=="Cube" {
+            ops=harness::append(ops,builder::place_plan("@root@",patch,spec.position,spec.rotation,spec.scale));
+        } else {
+            ops=geometry::cube(ops,root(),spec);
+        }
+    }
     for op in wrapping::foil_ops("/GriffinBus/Looks/ExteriorPanels/Surface",parameters) {ops.push(op);}
     #{doc_id:doc,generation:q.generation,ops:ops}
 }

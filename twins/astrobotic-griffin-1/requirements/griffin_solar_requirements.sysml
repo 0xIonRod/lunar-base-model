@@ -53,8 +53,12 @@ package GriffinSolarRequirements {
          * cells over a warm inter-cell substrate. Use source-owned pitch-coordinate contours for the visible edge
          * steps, equipment recess and leg opening. This
          * is a conservative visual clearance envelope; exact asymmetric edge
-         * and equipment contours are not released. Cell gaps 5 mm and 7 mm
-         * corner clips approximate the visible shape; colors/roughness below
+         * and equipment contours are not released. The 5 mm gaps and 7 mm
+         * equivalent corner clip set the study's active area. Astrobotic's
+         * June 15 photo 1348 resolves two pronounced diagonally opposite cuts.
+         * The smaller pair is one quarter of the equivalent clip; the larger
+         * pair takes the remaining clipped area. The fine pale marks at the
+         * midpoints of the cell edges are represented as visual contacts; colors/roughness below
          * describe appearance, not engineering material properties. */
         attribute cellPitchAspectRatio : Real = 2.0;
         attribute cellGapM : Real = 0.005;

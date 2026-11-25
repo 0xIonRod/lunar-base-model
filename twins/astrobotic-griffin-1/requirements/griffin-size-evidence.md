@@ -102,7 +102,7 @@ all metric sizes and mounting datums remain estimates.
 See [appearance analysis](griffin-appearance-analysis.md) for source photos.
 
 The local walking surface is now Y2.12 (nominal landed height 2.56 m), below
-the Y2.8535 array tops. The 3.60 m bus accommodates the study rover's
+the Y2.3535 array tops after the November 25 front-shock fit. The 3.60 m bus accommodates the study rover's
 2.60 x 2.28 m wheel envelope without enlarging it. Retaining the span avoids
 turning a layout error into an unsupported overall rescale. Uncertainty remains
 3.2-4.0 m; the historical 4.5 m envelope belongs to another configuration.
@@ -1474,7 +1474,7 @@ raised footpad pose are excluded from the lunar vehicle.
 | Nominal broad field: 13 columns × 24 rows, horizontal/vertical pitch ratio 2:1 | Approximate count and cell aspect from the frontal photos; clipped/stepped rows have fewer cells. Supplier count and dimensions are unavailable. |
 | Broad frame: 1.866 × 1.727077 m | Retain the existing estimated rail-fitted width, with 30 mm border. Active width 1.806 m / 13 yields 138.923 mm horizontal pitch; half that yields 69.462 mm vertical pitch. Twenty-four rows plus two borders determines height. This is packaging reconstruction, not photogrammetric scale. |
 | Chamfer frame: 0.856920 m wide, five columns at the same metric pitch | Existing corner-post span minus the source edge allowance caps the face. Whole-column fitting leaves edge clearance. The actual flight bus facets and panel interface may differ; this narrow chamfer is a retained packaging approximation. |
-| Panel centre Y: 1.851038 m; lower edge Y: 0.9875 m | Keep the original bus lower-edge datum: raise the old 1.34 m centre by half the difference between the new frame height and 0.705 m installation datum. Retain rail sockets and derive links in the panel frame. |
+| Earlier panel centre Y: 1.851038 m; earlier lower edge Y: 0.9875 m | Keep the original bus lower-edge datum: raise the old 1.34 m centre by half the difference between the new frame height and 0.705 m installation datum. Retain rail sockets and derive links in the panel frame. |
 | Distinct front/chamfer/side silhouettes | SysML vertices are in cell-pitch coordinates. Front face has upper-left steps and a right equipment recess; the chamfer has a lower leg opening; the side has a lower corner opening. Shape and face assignment adapt the photographs to the retained octagonal bus. Unseen contours and exact dimensions remain estimates. |
 | Clipped corners, 5 mm gaps, 7 mm corner clips | Approximate the photographed rounded cell tiles with a simple eight-corner profile. These are visual approximations, not cell manufacturing specifications. |
 | Dark cells, copper-colored gaps, silver frames | Photographic appearance only. Source RGB/metallic/roughness values select standard USD materials; they do not assert substrate alloy, electrical efficiency or thermal properties. |

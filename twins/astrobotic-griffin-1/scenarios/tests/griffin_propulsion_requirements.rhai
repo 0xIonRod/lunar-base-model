@@ -1,7 +1,7 @@
-import "twin://astrobotic-griffin-1/tools/griffin_geometry.rhai" as griffin_geometry;
+import "../../tools/griffin_geometry.rhai" as griffin_geometry;
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
-import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
-import "twin://astrobotic-griffin-1/tools/griffin_skirt_verification.rhai" as griffin_skirt_verification;
+import "../../tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+import "../../tools/griffin_skirt_verification.rhai" as griffin_skirt_verification;
 // Standalone Griffin main-propulsion visual verification.  Thrust and
 // collision remain owned by the flight model; this observer checks only the
 // replaceable bell/throat presentation components.
@@ -660,7 +660,7 @@ fn on_tick(me, ctx) {
     let photometry_consumes_engine_state = plume_observations_available;
     for index in 0..names.len() {
         if !photometry_consumes_engine_state { break; }
-        let engine = (propulsion_path + "/" + names[index]) + ".outputs:";
+        let engine = propulsion_path + "/" + names[index] + "/Chamber.outputs:";
         let record = record_at(observed_photometry, photometry_paths[index]);
         photometry_consumes_engine_state = record != ()
             && has_single_connection(record, "inputs:thrust_n", engine + "thrust_n")

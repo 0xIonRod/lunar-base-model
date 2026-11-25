@@ -7,7 +7,7 @@ import "griffin_tank_finish" as finish;
 fn settings() {
     let model = sysml_model("twin://astrobotic-griffin-1/requirements/griffin_photo_wrapping.sysml");
     let values = #{};
-    for name in ["BusColumns", "BusRows", "BusOutsetM", "BusLowerOverhangM",
+    for name in ["BusColumns", "BusRows", "AftHemDropM", "AftPleatDepthM", "BusOutsetM", "BusLowerOverhangM",
                  "BusFoldDepthM", "BusEdgeGatherM", "ShellThicknessM",
                  "UpperCoverAllowanceM", "UpperCoverEndAllowanceM",
                  "UpperCoverSegments", "UpperCoverFoldDepthM", "FoilCrinklePerM",

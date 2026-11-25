@@ -2,8 +2,8 @@
 
 The blanket work planned in this review was implemented on 18 November.
 See the [completion and verification record](../handover/griffin-blankets-2026-11-18.md)
-for the saved geometry and results for GVREF-NOV08-01 through -03. The remaining
-equipment, leg, harness and configuration rows below retain their planned scope.
+for the saved geometry and results for GVREF-NOV08-01 through -03. The 25 November update below covers the aft fittings, lower blanket folds and
+solar-panel faces. Other equipment, legs, harnesses and configurations remain open.
 
 ## Scope and selected reference
 
@@ -80,3 +80,62 @@ Downloaded inspection copies are in the local ignored/untracked
 portable reference register. The older exposed-structure photograph used for the
 previous border draft is supporting historical evidence, not the selected outer
 blanket silhouette target for this pass.
+
+## Rear and solar-panel update, 25 November 2026
+
+Voyager’s November 24 X video shows the installed panel bank in the Pittsburgh
+clean room. The November 13 acceptance film shows exposed rear and side
+equipment, diagonal folds in the lower blankets and the lander in several test
+configurations. The public LinkedIn feed also carried the acceptance update.
+The clearest still of the two rimmed openings and divided rectangular plate
+was the first image in Voyager’s October 28 LinkedIn gallery. The recent
+November 24 article’s lead image is a lunar rendering. [November 24 footage](https://x.com/voyagertech_/status/2125227956477825107) · [November 13 footage](https://x.com/voyagertech_/status/2121241713356194023) · [Voyager’s LinkedIn gallery](https://www.linkedin.com/posts/voyg-acceleratingtheadvantage-missionready-ugcPost-7521194558664134656-sxOp/) · [Voyager’s November 24 article](https://voyagertechnologies.com/insights/testing-like-we-fly/)
+
+For the collecting face, Astrobotic’s June 15 photo 1348 resolves the clipped
+opposite cell corners, pale marks along the cell edges, and tapered silver
+cheeks around the central leg opening. NASA/JPL’s acoustic-test photograph
+gives a second view of the hardware on the exposed belt. The three existing
+array footprints set the installation datums. The fitted dimensions, finishes
+and orientation of hidden hardware remain study estimates. [Astrobotic photo 1348](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg) · [NASA/JPL Figure D](https://www.nasa.gov/wp-content/uploads/2026/10/e2b-pia26708-fig-d-griffin-acoustic-crop.jpg)
+
+The bus now has fitted lower hems on the three aft blanket bays, two recessed
+inserts in metal rims and a divided plate on the adjacent chamfer. The solar
+assets retain 255 central and 230 cells on each side. All 715 cells have an
+edge contact and an asymmetric corner profile with the original collecting
+area. The forward panel has two tapered metal cheeks with circular seats.
+
+The native solar geometry fixture passed all 170 checks and the panel collision
+fixture passed. The three aft blanket checks passed, and a fresh load of the
+Griffin-and-FLIP scene resolved the new panel meshes. [Native Editor views](../twins/astrobotic-griffin-1/handover/griffin-rear-and-solar-2026-11-25.jpg)
+
+## November 25 installed underside, front shock and RCS
+
+At 57.5 seconds Voyager’s acceptance-test camera looks up past the landing
+leg. Broad foil folds hang below the rim and turn underneath. The cleanroom
+fixture hides the center of the bay. The model uses that visible skirt
+profile and treats the facing around the seven bell mounts as reconstructed
+detail. [Voyager footage on X](https://x.com/voyagertech_/status/2121241713356194023) · [Acceptance footage on LinkedIn](https://www.linkedin.com/posts/voyg-acceleratingtheadvantage-missionready-ugcPost-7527007400839774208-Ottj/) · [NASA/JPL hardware gallery](https://www.jpl.nasa.gov/images/pia26708-voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
+
+In photo 1348 the front shock appears between the tapered silver cheeks.
+Lowering the complete solar bank by 0.50 m puts the visible barrel in the
+cutout. Each panel’s two support links were refitted at their original bus rails. In the unloaded pose, the wrapped barrel clears the projected frame
+and cheek edges by at least 57 mm. A second check swept all 53 front-leg
+render and collision bounds through the modeled −50 to +20 mm travel.
+The smallest conservative separation from the panel frame was 61 mm. Its
+depth behind the outline explains why the gap changes in oblique views. [Astrobotic photograph 1348](https://www.astrobotic.com/wp-content/uploads/2026/06/26.06.15_Griffin-1_PressConference_1348_Edit-scaled.jpg)
+
+The A110 product photograph shows a dark bell, a metal flange at the top
+of the chamber, and paired feed fittings. The hot-fire photograph resolves
+the heated hardware. The tint and falloff of the simulated exhaust remain
+appearance estimates. The four pods sit farther outboard and higher to
+clear the panels. The closest forward saddle has 32 mm of vertical clearance
+above the side frame. Each jet keeps its own exhaust direction and responds
+to delivered thrust. [Agile Space Industries A110 imagery](https://agilespaceindustries.com/press-kit) · [Native simulation views](../twins/astrobotic-griffin-1/handover/griffin-underside-and-rcs-2026-11-25.jpg)
+
+In a native yaw command the two rear jets delivered 95.8 N and 96.6 N.
+After release, all twelve reported zero thrust. The fixed-pose RCS fixture
+passed 37 checks across the six signed commands, including the clearance
+of each forward saddle. Dry regeneration of all twelve stations preserved
+their individual plume seeds. Standalone file validation produced the same
+diagnostics on the edited files and their HEAD versions after normalizing
+source offsets.

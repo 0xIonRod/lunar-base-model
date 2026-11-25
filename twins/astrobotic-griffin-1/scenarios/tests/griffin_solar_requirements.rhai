@@ -1,5 +1,5 @@
 import "lunco://scripting/tools/sysml_requirement_checks" as sysml_requirement_checks;
-import "twin://astrobotic-griffin-1/tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
+import "../../tools/usd_geometry_inspection.rhai" as usd_geometry_inspection;
 // Reconstructed Griffin solar-array geometry. Flight installation and transit
 // qualification remain separate from this composed-geometry gate.
 

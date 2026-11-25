@@ -315,10 +315,17 @@ fn solar_cell_row_geometry(layout, row, center_y, thickness, gap, corner) {
     }
     let sx=layout.scale_x;let half_x=(layout.pitch_m-gap)/2.0;
     let half_z=(layout.pitch_z_m-gap)/2.0;
-    let profile=[vec2((-half_x+corner)/sx,-half_z),vec2((half_x-corner)/sx,-half_z),
-        vec2(half_x/sx,-half_z+corner),vec2(half_x/sx,half_z-corner),
-        vec2((half_x-corner)/sx,half_z),vec2((-half_x+corner)/sx,half_z),
-        vec2(-half_x/sx,half_z-corner),vec2(-half_x/sx,-half_z+corner)];
+    // The integration close-up shows one pronounced diagonal corner pair.
+    // Redistribute the existing clipped area so the power model's active
+    // area and the fitted pitch are preserved on all three facets.
+    let small = corner / 4.0;
+    let large = sqrt(2.0 * corner * corner - small * small);
+    let profile = [
+        vec2((-half_x+large)/sx,-half_z), vec2((half_x-small)/sx,-half_z),
+        vec2(half_x/sx,-half_z+small), vec2(half_x/sx,half_z-large),
+        vec2((half_x-large)/sx,half_z), vec2((-half_x+small)/sx,half_z),
+        vec2(-half_x/sx,half_z-small), vec2(-half_x/sx,-half_z+large)
+    ];
     let cell=extrude_profile(profile,thickness,profile_plane_xz());let pieces=[];
     let z=-layout.cell_depth_m/2.0+(row+0.5)*layout.pitch_z_m;
     for column in solar_cell_row_columns(layout,row) {

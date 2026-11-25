@@ -314,8 +314,8 @@ package GriffinPropulsionRequirements {
          * estimates, not an ICD. The contour and shell are visual estimates.
          * Twelve retained scalar force identities form four triples. Shared
          * library exhaust follows delivered thrust; no Twin flame proxies.
-         * Mounts remain packaging estimates from bus chamfer midpoint, 200 mm
-         * above the payload walking plane, 60 mm outward and +/-120 mm tangent spacing, using
+         * Mounts remain packaging estimates from bus chamfer midpoint, 360 mm
+         * above the payload walking plane, 260 mm outward and +/-120 mm tangent spacing, using
          * https://www.pghtech.org/UserFiles/Image/OnRAMP/Astrobotic/griffin.png
          * and https://www.astrobotic.com/griffin-1-lunar-lander-unveiled-ahead-of-environmental-testing/.
          * Symmetric mount offsets retain a pure requested attitude wrench.
@@ -369,19 +369,18 @@ package GriffinPropulsionRequirements {
         // plume class 3 is a heuristic hypergolic palette, not spectrometry.
         attribute plumeFuelFamily : Real = 3;
         /* Four retained physical three-jet pods follow the payload-frame datum
-         * at +200 mm. After moving the arrays away from the exits, this source
-         * lowers the pods with the deck instead of preserving the rejected high
-         * platform. Each 20 mm plate bridges the frame chamfer with 40 mm overlap.
+         * at +360 mm. Outboard standoff places the corner nozzles above or
+         * outside the forward arrays. Each 20 mm plate bridges the frame chamfer with 40 mm overlap.
          * Stock and twelve-jet topology remain study estimates. Astrobotic's
          * current product page confirms four attitude clusters, but neither a
          * mounting ICD nor a verified current count of jets per cluster is public:
          * https://www.astrobotic.com/lunar-delivery/landers/griffin-lander/ .
          * Current photos inform exposed corner hardware; complete plume/panel
          * interaction is not validated by a geometric attachment check. */
-        attribute mountHeightAbovePayloadDeckM : Real = .20;
+        attribute mountHeightAbovePayloadDeckM : Real = .36;
         attribute podMountPlateThicknessM : Real = .02;
         attribute podMountPlateOverlapM : Real = .04;
-        attribute mountStandoffM : Real = .06;
+        attribute mountStandoffM : Real = .26;
         attribute memberTangentOffsetM : Real = .12;
         // Render-only saddle reconstruction. Clamps seat on the A110 chamber,
         // with an open bore and native station/orientation. Stock/overlap are

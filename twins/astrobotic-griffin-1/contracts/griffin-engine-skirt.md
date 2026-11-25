@@ -88,3 +88,15 @@ Current receipts, before/after logs and source hashes are under the USD
 checkout's `.cache/codex-evidence/griffin-resume-20261022/`. This qualifies the
 skirt geometry observation on the named executable, not a rebuild of the
 current USD source or the full Twin's appearance, flight fidelity or speed.
+
+The November 25 underside review used all seven installed bells. The side
+covers now hang between the corner seams and turn under the lip. Both skins
+meet at the fold, with zero positional residual across the saved seam
+vertices. The closest cover remains 26.4 mm outside its aperture edge plane.
+Eight shallow facings sit against the recessed adapter. Their innermost
+edges clear the projected bell envelopes by at least 36 mm. The photos show
+the outside foil. The facings inside the engine bay are a visual reconstruction.
+
+The reusable plans are `skirt_style_plan`, `skirt_plan`, `skirt_apron_plan`
+and `adapter_panel_plan` in `griffin_voyager_detail.rhai`.
+[Native underside and RCS views](../handover/griffin-underside-and-rcs-2026-11-25.jpg)

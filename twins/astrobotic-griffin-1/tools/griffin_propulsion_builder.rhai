@@ -3,6 +3,7 @@ import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "lunco://scripting/tools/pressure_fed_engine" as pressure_fed_engine;
+import "griffin_voyager_detail" as detail;
 import "griffin_spec" as griffin_spec;
 import "griffin_assembly_support" as support;
 
@@ -523,6 +524,21 @@ fn _griffin_rcs_mount_frame(record, jet) {
     #{ok:true,position:position,force:force,sx:sx,sz:sz,arm_x:arm_x,arm_z:arm_z}
 }
 
+// Refit the existing actuator in place. The force owner, ordered station
+// identity, live connections and per-emitter shader seed travel with it.
+fn griffin_rcs_refit_plan(doc, root, index) {
+    let jets=griffin_spec::rcs_port_mapping();
+    if index<0 || index>=jets.len() {return support::plan_error("griffin_propulsion_assembly","RCS station index invalid");}
+    let jet=jets[index];
+    let path=root+"/"+jet.model_name.sub_string(0,jet.model_name.len()-5);
+    let record=assembly_builder::composed_query(doc,#{path:path,attrs:["xformOp:translate"]});
+    let frame=_griffin_rcs_mount_frame(record,jet);
+    if !frame.ok {return frame;}
+    let ops=[#{SetTranslate:#{edit_target:"@root@",path:path,value:frame.position}}];
+    ops+=detail::rcs_optics_ops("@root@",path+"/Nozzle");
+    #{ok:true,ops:ops}
+}
+
 fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
     let jets=griffin_spec::rcs_port_mapping();
     if index<0 || index>=jets.len() {return support::plan_error("griffin_propulsion_assembly", "RCS station index invalid");}
@@ -543,12 +559,12 @@ fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
         #{SetApiSchemas:#{edit_target:edit_target,path:path,schemas:["LunCoForceActuatorAPI"]}},
         #{SetTranslate:#{edit_target:edit_target,path:path,value:position}},
         #{SetRotate:#{edit_target:edit_target,path:path,value:record.attrs["xformOp:rotateXYZ"]}},
-        #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:direction",type_name:"float3",value:_color3_literal(record.attrs["lunco:forceActuator:direction"])}},
+        #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:direction",type_name:"float3",value:support::color3_literal(record.attrs["lunco:forceActuator:direction"])}},
         #{SetAttribute:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:maxForce",type_name:"double",value:force.to_string()}},
         #{SetRelationship:#{edit_target:edit_target,path:path,name:"lunco:forceActuator:commandSource",targets:[root+"/AttitudeActuation.outputs:"+jet.valve_port]}},
         #{SetConnection:#{edit_target:edit_target,path:path,name:"inputs:force_command",type_name:"float",sources:[root+"/AttitudePropulsion.outputs:"+jet.thrust_port]}},
         #{AddPrim:#{edit_target:edit_target,parent_path:path,name:"Nozzle",type_name:"Xform",
-            reference:component_asset("lander/griffin_rcs_bell_visual.usda"),reference_prim_path:"/World"}},
+            reference:support::component_asset("lander/griffin_rcs_bell_visual.usda"),reference_prim_path:"/World"}},
         // Force is local -Y; the nozzle's exhaust must point local +Y.
         #{SetRotate:#{edit_target:edit_target,path:path+"/Nozzle",value:[180.0,0.0,0.0]}}];
     let core=assembly_builder::composed_query(doc,#{path:root+"/"+name+"Core"});
@@ -556,6 +572,13 @@ fn griffin_rcs_nozzle_station_plan(doc, edit_target, root, index) {
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:model,name:"inputs:f_nom_n",type_name:"float",value:force.to_string()}});
     for op in engine_exhaust::connection_ops(edit_target,path+"/Nozzle",model,
         #{intensity:"light_intensity",radius:"light_radius"}) {ops.push(op);}
+    ops+=detail::rcs_optics_ops(edit_target,path+"/Nozzle");
+    let shader=path+"/Nozzle/Exhaust/Looks/Flame_Mat/Surface";
+    let previous=assembly_builder::composed_query(doc,#{path:shader,attrs:["inputs:seed"]});
+    if support::query_ok(previous) && previous.attrs["inputs:seed"]!=() {
+        ops.push(#{SetAttribute:#{edit_target:edit_target,path:shader,name:"inputs:seed",
+            type_name:"float",value:previous.attrs["inputs:seed"].to_string()}});
+    }
     #{ok:true,ops:ops,path:path,model:model}
 }
 

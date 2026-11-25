@@ -1,4 +1,4 @@
-import "twin://astrobotic-griffin-1/tools/griffin_rcs_mounts.rhai" as mounts;
+import "../../tools/griffin_rcs_mounts.rhai" as mounts;
 // Observe the production geometry-derived allocator and Newton-valued jet outputs.
 // The fixture disables rigid-body motion so each signed demand can be inspected
 // in the same authored body frame; no substitute propulsion equations are used.
@@ -56,6 +56,17 @@ fn on_tick(me,ctx) {
     if this.clamp_index<12{
         let geometry=mounts::installed_clamp(this.geometry_doc,"/World/Griffin1",this.clamp_index);
         let ring=geometry.measurements[0];this.failures.push(t_true(ring.passes,"A110 clamp, inboard support and chamber bore: "+ring.path));
+        // In this upright, fixed-pose fixture the saddle spans the solar plane.
+        // Compare both installed meshes in the same canonical stage frame.
+        if ring.path.contains("PZ/") {
+            let face=if ring.path.contains("PXPZ/") {"SolarPanelFrontStarboard"} else {"SolarPanelFrontPort"};
+            let panel=query("QueryUsdPrim",#{doc_id:this.geometry_doc,path:"/World/Griffin1/"+face+"/Frame",geometry_bounds:true});
+            let saddle_path=ring.path;
+            saddle_path.replace("Clamp","Saddle");
+            let beam=query("QueryUsdPrim",#{doc_id:this.geometry_doc,path:saddle_path,geometry_bounds:true});
+            this.failures.push(t_true(panel.geometry_bounds!=() && beam.geometry_bounds!=()
+                && beam.geometry_bounds.min[1]>panel.geometry_bounds.max[1],"RCS saddle clears "+face+": "+ring.path));
+        }
         this.clamp_index+=1;return;
     }
     this.elapsed+=dt();if this.elapsed<this.settling {return;}

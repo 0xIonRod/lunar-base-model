@@ -16,6 +16,10 @@ package GriffinPhotoWrapping {
         attribute BusOutsetM : Real = 0.018;
         attribute BusLowerOverhangM : Real = 0.12;
         attribute BusFoldDepthM : Real = 0.070;
+        /* Voyager's November 13 acceptance film shows a loose lower hem
+         * pulled into diagonal folds between the aft frame attachments. */
+        attribute AftHemDropM : Real = 0.16;
+        attribute AftPleatDepthM : Real = 0.095;
         attribute BusEdgeGatherM : Real = 0.018;
         attribute ShellThicknessM : Real = 0.003;
         attribute UpperCoverAllowanceM : Real = 0.035;

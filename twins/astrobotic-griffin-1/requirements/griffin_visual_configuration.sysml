@@ -404,10 +404,13 @@ package GriffinVisualConfigurationRequirements {
             * (1.0 + solarBankDiagonalFactor);
         attribute solarBankSideZM : Real = solarBankFrontZM
             - solarBankPanelWidthM / 2.0 * solarBankDiagonalFactor;
+        // Photo 1348 shows the shock barrel inside the lower notch. Lower the
+        // complete bank together while keeping the fitted plan clearance at the ramps.
+        attribute solarBeltDatumYM : Real = .84;
         attribute solarStations : Position[3] =
-            ((0.0, 1.34, solarBankFrontZM),
-             (solarBankSideXM, 1.34, solarBankSideZM),
-             (-solarBankSideXM, 1.34, solarBankSideZM));
+            ((0.0, solarBeltDatumYM, solarBankFrontZM),
+             (solarBankSideXM, solarBeltDatumYM, solarBankSideZM),
+             (-solarBankSideXM, solarBeltDatumYM, solarBankSideZM));
         attribute solarMountRails : GriffinFrameRailNode[6] =
             ("FrameRailFrontPort", "FrameRailFrontStarboard", "FrameRailFrontStarboard", "FrameRailStarboardFront", "FrameRailPortFront", "FrameRailFrontPort");
         /* X is panel tilt; negative signed Z values below name the clockwise
