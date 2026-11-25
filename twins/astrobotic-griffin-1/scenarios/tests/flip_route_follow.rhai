@@ -46,7 +46,7 @@ fn _gesture(doc, x, z) {
 }
 
 fn _route_point_count(doc) {
-    let read = waypoint_editor::route_positions(doc, ROUTE);
+    let read = waypoint_editor::live_route_snapshot(doc, ROUTE);
     if read == () || read.ok != true { return (); }
     read.paths.len()
 }
@@ -147,6 +147,7 @@ fn on_tick(me, ctx) {
         this.doc = doc;
         this.origin = origin;
         this.initial_empty = _route_point_count(doc) == 0;
+        this.document_generation = usd_document_generation(doc);
         let ordinary = _gesture(doc, origin[0], origin[2]);
         if ordinary != () {
             ordinary.modifiers.alt = false;
@@ -160,10 +161,9 @@ fn on_tick(me, ctx) {
         return;
     }
     if this.phase == "add" {
-        let snapshot = waypoint_editor::route_positions(this.doc, ROUTE);
+        let snapshot = waypoint_editor::live_route_snapshot(this.doc, ROUTE);
         if snapshot == () || snapshot.ok != true {
-            // Point edits commit before their document projection. Only the
-            // owner's explicit pending status may defer this phase.
+            // Wait only for the active route owner's admitted snapshot.
             if snapshot != () && snapshot.retryable == true && this.elapsed < 10.0 { return; }
             this.done = true;
             report_verdict([t_true(false, "FlipRoute point query failed: " + snapshot.to_string())],
@@ -194,7 +194,7 @@ fn on_tick(me, ctx) {
         return;
     }
     if this.phase == "start" {
-        // Let the runtime-layer edits project, then press the action control.
+        // Wait for the native waypoint admissions, then press the action control.
         if this.elapsed < 0.5 { return; }
         this.point_count = _route_point_count(this.doc);
         let action = cmd("SimulateIntentEdge", #{target:this.flip, intent:"action", edge:"pulse"});
@@ -299,8 +299,9 @@ fn on_tick(me, ctx) {
         "all four gearbox heat paths reach the thermal participant while driving"));
     failures.push(t_true(this.gear_heat_passive,"gearbox heat never creates mechanical energy"));
     failures.push(t_true(this.thermal_rise_seen,"drivetrain losses warm the authored thermal bank"));
-    failures.push(t_true(this.initial_empty, "runtime waypoints were restored at test start"));
+    failures.push(t_true(this.initial_empty, "the live route starts empty"));
     failures.push(t_true(this.negative_ok, "ordinary click changed the route"));
+    failures.push(t_true(usd_document_generation(this.doc) == this.document_generation, "live route edits never change USD generation"));
     failures.push(t_true(this.hud_dispatch_ok && this.hud_start_ok && this.hud_stop_ok,
         "the vessel HUD program action did not start and stop the route"));
     failures.push(t_true(this.manual_ok, "manual driving did not take over from the route"));
