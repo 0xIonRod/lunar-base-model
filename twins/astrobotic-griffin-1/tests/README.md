@@ -81,6 +81,26 @@ exactly `GLL-008-contact-ownership` to fail, all 188 other checks to pass and
 zero errors; a readiness timeout is not rejection evidence. Remove the
 trial after retaining its receipts. The 22 October qualification and source
 hashes are recorded in `contracts/griffin-model-audit-2026-10-22.md`.
+## Manual steering
+
+From the Twin directory, run the wheel-load, pivot and moving-turn requirements with the production runner.
+
+```sh
+"$LUNCOSIM_BIN" test --scene tests/flip_steering.usda --verification FlipMotionRequirements::Verify_FLIPSteering --max-ticks 3000
+```
+
+The observer emits `FLIP_WHEEL_FORCE_TRACE` at 10 Hz with native wheel loads, longitudinal and lateral forces, drive torque, lateral slip speed, slip angle, estimated sinkage, and chassis motion. The terminal `FLIP_STEERING` report binds four wheel observations and both
+directions of each maneuver to FMR-002 through FMR-004. The
+[motion contract](../contracts/flip-motion-runtime.md#manual-steering-and-lateral-wheel-force)
+gives the force measurements, study tolerances and open FLIP validation requirement.
+
+From the matching simulator checkout, run the prescribed wheel-force tests
+for contact subdivision, held-out WES loads and low-speed soil response.
+
+```sh
+cargo test -p lunco-mobility --lib soil_tire::tests
+```
+
 ## CAD FLIP v5 acceptance
 
 The operator route and motion fixtures now reference `vehicles/flip_v5.usda`.

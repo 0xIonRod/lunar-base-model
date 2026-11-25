@@ -836,7 +836,11 @@ are runtime edits and are not saved (`usd.runtime_persistence` is false).
 
 The controller's configured bindings command lander pitch, roll, yaw, thrust
 and release, or FLIP drive, skid-turn, brake and route action. The vehicle HUD
-shows the current input hints. Manual driving takes over from route guidance;
+shows the current input hints. A/D alone pivots FLIP. Hold W or S with A/D
+to turn while driving. Faster travel widens the turn, and releasing A/D
+settles the yaw. Space brakes the wheels. See the [steering and wheel-force
+model](contracts/flip-motion-runtime.md#manual-steering-and-lateral-wheel-force).
+Manual driving takes over from route guidance;
 the mission route remains a visible phase after adapter release.
 Deployment binds the local operator and camera to FLIP. Starting or stopping
 its operator route also retires automatic mission driving, so the mission

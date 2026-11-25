@@ -48,7 +48,7 @@ def Xform "SouthPoleSurrogate" (
         }
     }
     def Xform "Terrain" (
-        prepend apiSchemas = ["LunCoTerrainAPI", "MaterialBindingAPI"]
+        prepend apiSchemas = ["LunCoTerrainAPI", "MaterialBindingAPI", "LunCoSoilAPI"]
     )
     {
         string lunco:assetMode = "layered"
@@ -63,6 +63,11 @@ def Xform "SouthPoleSurrogate" (
         custom string lunco:terrain:verticalDatum = "LROC source datum normalized by -5187.322 m into scene-local height"
         custom asset lunco:terrain:processedAsset = @terrain/nobile03@
         rel material:binding = </SouthPoleSurrogate/Looks/RegolithSurface>
+        custom double lunco:soil:pressureGradient = 980000.0
+        custom double lunco:soil:cohesion = 760.0
+        custom double lunco:soil:frictionAngleDeg = 38.5
+        custom double lunco:soil:unitWeight = 2468.88
+        custom double lunco:soil:shearLength = 0.025
         def Xform "dem" (
             prepend apiSchemas = ["LunCoTerrainLayerAPI"]
         )

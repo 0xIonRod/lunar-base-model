@@ -1657,6 +1657,55 @@ package GriffinRequirementSources {
         ref sources = (source_flip_motion_study);
     }
 
+    part source_astrolab_flip_mobility : EvidenceSource {
+        doc /* Walker, Randell and Shar, LPSC 2026, abstract 1874. Four-wheel skid-steer architecture. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874.pdf";
+    }
+    part source_venturi_flip_mass : EvidenceSource {
+        doc /* FLIP vehicle entry. Nominal mass 450 kg and maximum speed 20 km/h. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://venturi.space/en/rovers/";
+    }
+    part source_wes_yawed_wheel : EvidenceSource {
+        doc /* Green, WES M-71-7, Table 2, tests 25, 27, 31, 32, 35 and 36. Towed Apollo wheel on terrestrial simulant. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://ntrs.nasa.gov/api/citations/19750021903/downloads/19750021903.pdf#page=41";
+    }
+    part source_wheel_soil_side_force : EvidenceSource {
+        doc /* Ishigami et al. (2007). Measured wheel side force and skid-steering response on loose soil. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://doi.org/10.1002/rob.20187";
+    }
+    part source_skid_steer_kinematics : EvidenceSource {
+        doc /* Yi et al., IEEE Transactions on Robotics (2009). Wheel slip in four-wheel skid steering. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://jingangyi.rutgers.edu/pdfs/IEEETRO_2009.pdf";
+    }
+    part source_reduced_gravity_wheels : EvidenceSource {
+        doc /* Niksirat, Daca and Skonieczny (2020). Effect of soil gravity at matched wheel load. */
+        attribute role : EvidenceSourceRole = "Reference";
+        attribute locator : SourceLocator = "https://doi.org/10.1177/0278364920913945";
+    }
+    part evidence_fmr_002 : RequirementEvidence {
+        ref targetRequirement = FlipMotionRequirements::fmr002;
+        ref sources = (source_venturi_flip_mass, source_wes_yawed_wheel, source_wheel_soil_side_force, source_reduced_gravity_wheels, source_flip_motion_study);
+    }
+    part evidence_fmr_003 : RequirementEvidence {
+        ref targetRequirement = FlipMotionRequirements::fmr003;
+        ref sources = (source_astrolab_flip_mobility, source_skid_steer_kinematics, source_flip_motion_study);
+    }
+    part evidence_fmr_004 : RequirementEvidence {
+        ref targetRequirement = FlipMotionRequirements::fmr004;
+        ref sources = (source_astrolab_flip_mobility, source_skid_steer_kinematics, source_flip_motion_study);
+    }
+
+    part evidence_fmr_005 : RequirementEvidence {
+        ref targetRequirement = FlipMotionRequirements::fmr005;
+        ref sources = (source_astrolab_flip_mobility, source_wes_yawed_wheel,
+            source_reduced_gravity_wheels, source_flip_motion_study);
+    }
+
     part source_griffin_winch_study : EvidenceSource {
         doc /* Assumed actuator ratings and lumped thermal path selected for
          * this integration study; no flight hardware identification. */

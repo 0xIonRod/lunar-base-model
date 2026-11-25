@@ -27,7 +27,7 @@ def Xform "FLIP" (
     float outputs:battery_soc.connect = </FLIP/Battery.outputs:soc_out>
     float outputs:battery_drained
     float outputs:battery_drained.connect = </FLIP/Battery.outputs:drained>
-    rel collection:components:includes = [</FLIP/Drivetrain>, </FLIP/Battery>, </FLIP/SolarMechanism/Photovoltaics>, </FLIP/Motor_FL>, </FLIP/TorqueSource_FL>, </FLIP/Gearbox_FL>, </FLIP/Shaft_FL>, </FLIP/Motor_FR>, </FLIP/TorqueSource_FR>, </FLIP/Gearbox_FR>, </FLIP/Shaft_FR>, </FLIP/Motor_RL>, </FLIP/TorqueSource_RL>, </FLIP/Gearbox_RL>, </FLIP/Shaft_RL>, </FLIP/Motor_RR>, </FLIP/TorqueSource_RR>, </FLIP/Gearbox_RR>, </FLIP/Shaft_RR>, </FLIP/SolarCharger>, </FLIP/Equipment>]
+    rel collection:components:includes = [</FLIP/ManualSteering>, </FLIP/Drivetrain>, </FLIP/Battery>, </FLIP/SolarMechanism/Photovoltaics>, </FLIP/Motor_FL>, </FLIP/TorqueSource_FL>, </FLIP/Gearbox_FL>, </FLIP/Shaft_FL>, </FLIP/Motor_FR>, </FLIP/TorqueSource_FR>, </FLIP/Gearbox_FR>, </FLIP/Shaft_FR>, </FLIP/Motor_RL>, </FLIP/TorqueSource_RL>, </FLIP/Gearbox_RL>, </FLIP/Shaft_RL>, </FLIP/Motor_RR>, </FLIP/TorqueSource_RR>, </FLIP/Gearbox_RR>, </FLIP/Shaft_RR>, </FLIP/SolarCharger>, </FLIP/Equipment>]
     custom double outputs:solar_power
     double outputs:solar_power.connect = </FLIP/SolarCharger.outputs:output_power_w>
     custom double outputs:solar_available_power
@@ -95,13 +95,15 @@ def Xform "FLIP" (
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
             float physics:dynamicFriction = 0.6000000238418579
+            float2 physxVehicleTire:lateralStiffnessGraph = (1.0, 371.0)
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FL.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -467,13 +469,15 @@ def Xform "FLIP" (
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
             float physics:dynamicFriction = 0.6000000238418579
+            float2 physxVehicleTire:lateralStiffnessGraph = (1.0, 371.0)
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FR.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -839,13 +843,15 @@ def Xform "FLIP" (
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
             float physics:dynamicFriction = 0.6000000238418579
+            float2 physxVehicleTire:lateralStiffnessGraph = (1.0, 371.0)
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RL.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -1225,13 +1231,15 @@ def Xform "FLIP" (
             float physics:mass = 18.0
             float3 physics:diagonalInertia = (1.946025013923645, 1.090612530708313, 1.090612530708313)
             float physics:dynamicFriction = 0.6000000238418579
+            float2 physxVehicleTire:lateralStiffnessGraph = (1.0, 371.0)
             float physxVehicleTire:restLoad = 182.25
             uniform token purpose = "proxy"
             float[] primvars:displayOpacity = [0.0]
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel/soil approximation: mu=0.6 nominal, sensitivity 0.4-0.8. Not a measured FLIP/soil coefficient; no soil sinkage or wheel deformation."
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RR.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -2619,6 +2627,29 @@ def Xform "FLIP" (
             token visibility = "invisible"
             bool physics:collisionEnabled = false
         }
+    }
+    def Scope "ManualSteering" (
+        prepend apiSchemas = ["LunCoProgramAPI"]
+    )
+    {
+        uniform token info:implementationSource = "sourceAsset"
+        uniform asset info:sourceAsset = @twin://astrobotic-griffin-1/components/rover/flip_v5/models/FlipManualSteering.mo@
+        float outputs:demand
+        float inputs:steer
+        float inputs:steer.connect = </FLIP.inputs:steer>
+        float inputs:program_active
+        float inputs:program_active.connect = </FLIP.inputs:program_active>
+        double inputs:velocity_x
+        double inputs:velocity_x.connect = </FLIP.inputs:autopilot_velocity_x>
+        double inputs:velocity_z
+        double inputs:velocity_z.connect = </FLIP.inputs:autopilot_velocity_z>
+        float inputs:yaw_rate
+        float inputs:yaw_rate.connect = </FLIP.inputs:autopilot_yaw_rate>
+    }
+    over "Drivetrain"
+    {
+        float inputs:steer
+        float inputs:steer.connect = </FLIP/ManualSteering.outputs:demand>
     }
     over "Motor_FL"
     {

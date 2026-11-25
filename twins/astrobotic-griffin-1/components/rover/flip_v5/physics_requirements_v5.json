@@ -16,13 +16,19 @@
     "wheel_inertia_kg_m2": "0.5 * wheel_mass_kg * wheel_radius_m^2",
     "static_normal_load_n": "vehicle_mass_kg * lunar_gravity_m_s2 / wheel_count",
     "suspension_force_n": "spring_rate_n_m * compression_m + damper_rate_n_s_m * compression_rate_m_s",
-    "contact_friction_limit_n": "friction_coefficient * normal_load_n",
+    "contact_friction_limit_n": "friction_coefficient * contact_normal_load_n limits combined tread shear; passive side pressure on soil is separate",
+    "rigid_lateral_force_n": "Oppose slip using the stiffness graph at total wheel load. Distribute stiffness by each contact normal-load share before combined-shear saturation.",
+    "soil_rolling_lateral_force_n": "Oppose slip using the signed interpolation of the authored WES side-force/load curve multiplied by contact normal load.",
+    "soil_pivot": "Blend rolling total side force with quasi-steady soil shear and passive side resistance. Calculate shallow-footprint sinkage from total wheel load; master-step normal support remains native rigid contact.",
+    "rolling_calibration": "WES M-71-7 Table 2. Mean side-force/load ratios at 5 and 10 degrees over three loads near 1.3 m/s. A towed Apollo wheel supplies the surrogate data.",
+    "source": "https://ntrs.nasa.gov/api/citations/19750021903/downloads/19750021903.pdf#page=41",
     "drive_force_n": "drive_torque_nm / wheel_radius_m"
   },
   "tunable_parameters": {
     "spring_rate_n_m": {"value": 12000.0, "status": "tunable_assumption"},
     "damper_rate_n_s_m": {"value": 1800.0, "status": "tunable_assumption"},
-    "friction_coefficient": {"value": 0.65, "status": "tunable_assumption"},
+    "friction_coefficient": {"value": 0.60, "status": "tunable_assumption"},
+    "lateral_stiffness_n_per_rad": {"value": 371.0, "status": "rigid-support fallback at nominal load; soil surfaces select the measured rolling curve"},
     "max_drive_torque_nm": {"value": 250.0, "status": "tunable_assumption"},
     "suspension_travel_m": {"value": 0.12, "status": "tunable_assumption"}
   },

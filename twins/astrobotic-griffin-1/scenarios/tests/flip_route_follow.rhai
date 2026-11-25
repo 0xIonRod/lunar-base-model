@@ -17,7 +17,7 @@ const ROUTE_TIMEOUT_S = 150.0;
 const MINIMUM_UPRIGHT_Y = 0.906307787;
 fn simulation_dependencies(me, ctx) {
     let flip = find_path(FLIP_PATH);
-    #{ modelica_entities: [flip, find_path(FLIP_PATH+"/Thermal")], entity_reads: [flip], entity_writes: [],
+    #{ modelica_entities: [flip, find_path(FLIP_PATH+"/Thermal")], entity_reads: [flip], entity_writes: [flip],
        query_reads: ["QueryUsdPrim", "QueryUsdPrims", "QueryPhysicsState", "ResolveUsdTarget",
                      "InspectSelection", "InspectUsdSelection", "TerrainHeight"],
        required_inputs: [] }
@@ -85,10 +85,11 @@ fn on_start(me, ctx) {
         && assembly.attrs["lunco:ui:surfaceId"] == "vessel-hud";
     // The operator possesses FLIP from the avatar; the control link carries
     // the action key's semantic edges to the route program.
-    let avatar = find_path(ROOT + "/Avatar");
-    let acquired = if avatar < 0 { #{ ok: false } }
-        else { cmd("AcquireControl", #{ target: this.flip, source: avatar, bind_camera: false }) };
+    let acquired = cmd("AcquireControl", #{ target: this.flip, bind_camera: true });
     this.control_ok = acquired.ok;
+    for name in ["route_started", "route_stopped", "route_completed"] {
+        subscribe_from(name, find_path(ROUTE));
+    }
 }
 
 fn on_event(me, evt, ctx) {
@@ -196,17 +197,8 @@ fn on_tick(me, ctx) {
         // Let the runtime-layer edits project, then press the action control.
         if this.elapsed < 0.5 { return; }
         this.point_count = _route_point_count(this.doc);
-        // A key press spans frames; the controller samples held state per frame.
-        let pressed = cmd("SimulateIntent", #{ target: this.flip, intent: "action", held: true });
-        this.action_ok = pressed.ok;
-        this.phase = "release";
-        this.elapsed = 0.0;
-        return;
-    }
-    if this.phase == "release" {
-        if this.elapsed < 0.2 { return; }
-        let released = cmd("SimulateIntent", #{ target: this.flip, intent: "action", held: false });
-        this.action_ok = this.action_ok && released.ok;
+        let action = cmd("SimulateIntentEdge", #{target:this.flip, intent:"action", edge:"pulse"});
+        this.action_ok = action.ok;
         this.phase = "drive";
         this.elapsed = 0.0;
         return;
