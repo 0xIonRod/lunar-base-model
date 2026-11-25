@@ -61,6 +61,12 @@ reload retires that optimization proof for the loaded Shader asset's lifetime;
 use a fresh simulator process for performance acceptance after shader editing.
 
 
+The production scene includes the rail-mounted METAL imager on FLIP and the
+LandCam-X camera on Griffin. Select `METALContextCamera` to see the ground
+alongside the rover or `LandCamXContextCamera` to look down and outward from
+the lander. Both provide ordinary rendered views. The [instrument review](contracts/science-imaging-payloads.md)
+shows the installed hardware and records the optical and mounting assumptions.
+
 ## Current FLIP rover — 2026-10-26
 
 **14 November validated controlled egress:** DEPLOY FLIP requests landing qualification,
@@ -283,19 +289,20 @@ not qualify a one-hour flight/terrain replay or measured flight temperatures.
 
 ## Current public mission baseline
 
-The latest primary-source baseline used for this package is:
+Reviewed on 25 November 2026.
 
-- NASA describes Griffin-1 / Moon Base II as a 2026 mission to the lunar
-  South-Pole region, carrying more than 499 kg of cargo including
-  Astrolab's FLIP rover to Nobile Crater.
-- NASA's [13 October 2026 JPL report](https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
-  says Griffin-1 completed nearly three months of environmental testing in late
-  September and returned to Pittsburgh for final assembly. A late-2026 launch
-  remains a plan, not an authored simulation timestamp.
-- Astrobotic's current manifest lists the destination as Nobile Region 2026,
-  while NASA describes launch as planned later this year. Neither publishes a
-  surface landing timestamp. The scene's JD 2461395.5 TDB is therefore a
-  deterministic study epoch, not a flight schedule.
+- Voyager targets January 2027 for Griffin-1. Its landing system combines
+  terrain-relative navigation, lidar hazard detection and avoidance, and
+  navigation Doppler lidar. LandCam-X is a separate imaging payload.
+  [Voyager, 24 November](https://voyagertechnologies.com/insights/testing-like-we-fly/) · [ESA, 12 October](https://www.esa.int/articles/about-us/directorates/human-and-robotic-exploration/moon/lunar-science-tech-demos/landcam-x)
+- Griffin completed its environmental campaign at JPL in late September and
+  returned to Pittsburgh for final assembly. The striped mass simulator visible
+  atop the lander in the test photographs stood in for FLIP.
+  [NASA/JPL photo set](https://science.nasa.gov/photojournal/voyager-technologies-griffin-1-completes-environmental-testing-at-nasa-jpl/)
+- Voyager describes the target as near Mons Mouton. The Twin uses its existing
+  NOBILE03 regional terrain and JD 2461395.5 TDB as a reproducible study site
+  and epoch. The public site-selection account gives no precise touchdown
+  coordinates or time. [Voyager site selection](https://voyagertechnologies.com/insights/how-voyager-chose-griffins-lunar-landing-site/)
 - Astrobotic's Griffin-1 solar post records three arrays, transit Sun-pointing,
   and a surface Sun path contained in one mission quadrant. The June 2026
   integration image shows upright panels across adjacent lander faces in one

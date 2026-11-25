@@ -2541,6 +2541,13 @@ def Xform "FLIP" (
         )
         {
             custom rel material:binding = </FLIP/PresentationLooks/Frame>
+            def Xform "METAL" (
+                prepend references = @twin://astrobotic-griffin-1/components/rover/flip_metal_imager.usda@</METAL>
+            )
+            {
+                custom double3 xformOp:translate = (-0.49, 0.131, -0.23)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
         }
         over "LanderMount0" (
             prepend apiSchemas = ["MaterialBindingAPI"]

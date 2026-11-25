@@ -25,6 +25,13 @@ def Xform "GriffinBus" (
         custom token[] xformOpOrder = ["xformOp:translate"]
         bool physics:collisionEnabled = false
         custom rel material:binding = </GriffinBus/Looks/FrameMetal>
+        def Xform "LandCamX" (
+            prepend references = @twin://astrobotic-griffin-1/components/lander/griffin_landcam_x.usda@</LandCamX>
+        )
+        {
+            custom double3 xformOp:translate = (-1.271, -0.18, -2.25)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
     }
     def Cube "AvionicsDeck"
     {
