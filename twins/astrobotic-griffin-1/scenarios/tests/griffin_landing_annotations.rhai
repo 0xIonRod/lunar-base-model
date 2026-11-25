@@ -49,11 +49,16 @@ fn on_tick(me, ctx) {
         ],"GRIFFIN HEADLESS ANNOTATIONS","GRIFFIN_HEADLESS_ANNOTATIONS");
         return;
     }
-    if this.landed && !this.presented {
-        let frame=griffin_surface_ops::landed_surface_route_frame();
-        this.plan=griffin_surface_ops::surface_route_presentation_plan(frame);
-        let result=griffin_surface_ops::present_surface_route(frame);
-        if result.ok!=true {throw "Landed route presentation failed: "+result;}
+    if !this.presented {
+        let stage=query("QueryUsdPrim",#{path:TARGET});
+        this.doc=stage.doc_id; this.generation=usd_document_generation(this.doc);
+        if this.landed {
+            let frame=griffin_surface_ops::landed_surface_route_frame();
+            this.plan=griffin_surface_ops::surface_route_presentation_plan(frame);
+            griffin_surface_ops::apply_surface_route_presentation(this.plan);
+        } else {
+            this.plan=griffin_surface_ops::present_descent_surface_route();
+        }
         this.presented=true;return;
     }
     if this.attached_entry {
@@ -67,6 +72,8 @@ fn on_tick(me, ctx) {
     }
     this.done=true;
     let checks=[];
+    checks.push(t_true(usd_document_generation(this.doc)==this.generation,
+        "placing terrain and deck markers preserves USD generation"));
     checks.push(t_true(find_path(PAD)<0,
         "operations scene leaves the lunar landing surface unobstructed"));
     let mark=query("QueryUsdPrim",#{path:TARGET+"/SurfaceMark",attrs:["visibility"]});
@@ -81,8 +88,9 @@ fn on_tick(me, ctx) {
     for name in ["RoverRampApproach", "RoverRampExit", "RoverTarget1", "RoverTarget2", "BaseSite"] {
         let path=if this.attached_entry && name=="RoverRampApproach" {ROOT+"/Lander/CompactEgress/RouteEntryAnnotation"} else {ROOT+"/"+name};
         let p=world_pos3(find_path(path));let h=terrain_height(p.x,p.z);
+        let matching=false;for point in this.plan.points {if point.path==path {matching=vlen(p-vec3_from(point.expected_position_m))<0.03;}}
         let marker=query("QueryUsdPrim",#{path:path,attrs:["lunco:billboard"]});
-        checks.push(t_true(h!=() && p.y-h>=0.049
+        checks.push(t_true(matching && h!=() && p.y-h>=0.049
             && marker.attrs["lunco:billboard"]==false,
             name+" remains a hidden navigation datum without a billboard"));
     }
@@ -92,7 +100,8 @@ fn on_tick(me, ctx) {
         checks.push(t_true(vlen(entry-vec3_from(this.plan.points[0].expected_position_m))<0.03
             && entry.y-griffin_surface_ops::surface_route_entry_height(entry)>=0.049,
             "landed entry follows the payload deck while other markers follow terrain"));
-        if this.attached_entry {checks.push(t_true(this.entry_local_delta<0.001,
+        if this.attached_entry {checks.push(t_true(this.entry_local_delta<0.001
+            && get(this.plan.entry,"Visibility").to_string().contains("Hidden"),
             "landed entry remains fixed to the moving payload deck"));}
     }
     let rejected=false;

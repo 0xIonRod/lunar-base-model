@@ -23,7 +23,7 @@ publication remains separate from the Griffin push.
   applies the frozen landed ramp frame and places the entry on the payload deck.
   SysML owns the 150 m label fade range; the authoring planner consumes it.
 - USD edits were made through `OpenFile`, typed operations, `SaveDocument`, and
-  readback. Runtime marker placement uses the disposable view layer.
+  readback. The route controller positions admitted navigation markers with interactive moves in the active frame. The compact deck entry follows its parent. Live visibility hides the displaced reference marker.
 
 ## Verification
 

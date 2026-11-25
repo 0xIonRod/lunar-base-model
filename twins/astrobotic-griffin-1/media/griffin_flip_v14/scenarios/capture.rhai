@@ -19,8 +19,12 @@ fn on_event(me,event,unused) {
  if event.name=="film-maneuver-finished" && this.config.scene=="drive-slope" {this.finished=shot_frame();}
  if event.name=="route-comparison-finished" {
   this.finished=shot_frame();cmd("StepSimulation",#{hold:true});
-  let hidden=cmd("ApplyUsdOps",#{doc_id:this.doc,label:"Hide the observation inset for the measured result",ops:[#{SetAttribute:#{edit_target:"@runtime@",path:ROOT+"/MissionMoonView",name:"lunco:ui:surfaceId",type_name:"string",value:""}}]});
-  if hidden.ok!=true {throw "The result view could not hide its native observation UI";}
+  let generation=usd_document_generation(this.doc);
+  let hidden=cmd("SetRuntimeHudVisibility",#{id:"film-map",visible:false});
+  if hidden.status!="applied" || usd_document_generation(this.doc)!=generation {
+   throw "Could not hide the film-map HUD without editing the route document: "+hidden;
+  }
+  this.inset_hidden=true;
   cmd("SetUserCamera",#{name:"ResultView"});
   cmd("CameraPathTransport",#{path:ROOT+"/ResultOrbit",action:"Rewind"});
   cmd("CameraPathTransport",#{path:ROOT+"/ResultOrbit",action:"Play"});
@@ -74,6 +78,9 @@ fn on_tick(me,unused) {
   }
   if this.config.scene=="landing" {cmd("CameraPathTransport",#{path:ROOT+"/HeroTripod",action:"Rewind"});cmd("CameraPathTransport",#{path:ROOT+"/HeroTripod",action:"Play"});}
   if this.config.scene=="routes" {
+   let hud=cmd_data("InspectRuntimeHuds",#{}).huds; this.inset_enabled=();
+   for row in hud {if row.id=="film-map" {this.inset_enabled=row.enabled;}}
+   if this.inset_enabled==() {throw "Route capture requires the film-map runtime HUD";}
    let r=cmd("SetCameraFeed",#{source:find_path_in_document(this.doc,ROOT+"/MissionMoonView"),label:"Mission location",width:600,height:600,minimum_scene_items:1});if r.ok!=true {throw "Mission camera selection failed";}
   }
   this.phase=2;return;
@@ -109,7 +116,18 @@ fn on_tick(me,unused) {
  let end=if this.finished==() {f>=this.config.frames}else{f>=this.finished+this.config.postroll_frames};
  if end {
   if this.config.scene=="routes" && this.finished==() {throw "V14 route did not reach its qualified parked result";}
-  cmd("StepSimulation",#{hold:true});cmd("StopOfflineRecording",#{});cmd("SetCelestialClock",#{scale:1.0});cmd("SetTerrainOverlay",#{enabled:false});this.phase=9;
+  if this.inset_hidden==true {
+   let hidden=false;for row in cmd_data("InspectRuntimeHuds",#{}).huds {
+    if row.id=="film-map" && row.enabled==false && row.rendered==false {hidden=true;}
+   }
+   if !hidden {throw "Route result still displays the observation inset";}
+  }
+  cmd("StepSimulation",#{hold:true});cmd("StopOfflineRecording",#{});
+  if this.inset_hidden==true {
+   let restored=cmd("SetRuntimeHudVisibility",#{id:"film-map",visible:this.inset_enabled});
+   if restored.status!="applied" {throw "Could not restore the capture HUD: "+restored;}
+  }
+  cmd("SetCelestialClock",#{scale:1.0});cmd("SetTerrainOverlay",#{enabled:false});this.phase=9;
   print("V14_CAPTURE_PASS|"+this.config.scene+"|"+f+"|"+tick);
  }
 }

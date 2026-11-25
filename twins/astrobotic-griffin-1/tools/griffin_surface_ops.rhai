@@ -1471,7 +1471,7 @@ fn surface_route_entry_height(point) {
 }
 // This is the one production presentation plan, also inspected by the gate.
 // The entry belongs to the payload walking plane; other gates follow terrain.
-// @view@ edits never overwrite the authored reference-scene route datums.
+// The marker poses are in the active simulation frame.
 fn surface_route_presentation_plan(frame) {
     surface_route_presentation_plan(frame, true)
 }
@@ -1489,18 +1489,16 @@ fn surface_route_presentation_plan(frame, entry_on_deck) {
     }
     let clearance=griffin_spec::_sysml_attribute("surfaceRouteMarkerClearanceM");
     if clearance==() || !clearance.is_finite() || clearance<=0.0{throw("Route annotation clearance is invalid");}
-    let record=query("QueryUsdPrim",#{path:"/Griffin1SurfaceOps/"+names[0],attrs:[]});
-    if record==() || record.doc_id==(){throw("Route presentation document unavailable");}
-    let ops=[];let points=[];
+    let points=[];
     let preview_entry="/Griffin1SurfaceOps/"+names[0];
     let deck_entry="/Griffin1SurfaceOps/Lander/CompactEgress/RouteEntryAnnotation";
     let attached_entry=entry_on_deck && griffin_compact_egress::enabled();
-    if attached_entry {
-        if find_path(deck_entry)<0 {throw("Deck entry annotation is unavailable");}
-        ops.push(#{SetAttribute:#{edit_target:"@view@",path:preview_entry,name:"visibility",type_name:"token",value:"\"invisible\""}});
-    }
+    let preview=find_path(preview_entry);
+    if preview<0 {throw("Route entry is unavailable: "+preview_entry);}
     for i in 0..names.len(){
         let path=if i==0 && attached_entry {deck_entry}else{"/Griffin1SurfaceOps/"+names[i]};
+        let entity=find_path(path);
+        if entity<0 {throw("Route marker is unavailable: "+path);}
         let point=surface_route_target(vec3(x[i],0.0,z[i]),frame);let terrain=point.y;
         if i==0 && entry_on_deck{point=vec3(point.x,max(terrain,surface_route_entry_height(point)),point.z);}
         point=vec3(point.x,point.y+clearance,point.z);
@@ -1510,20 +1508,28 @@ fn surface_route_presentation_plan(frame, entry_on_deck) {
             let deck_y=griffin_spec::visual_payload_adapter_center_y_m()
                 +griffin_spec::visual_payload_adapter_thickness_m()/2.0+clearance;
             expected=world_pos3(lander)+qrot(world_rotation_quat(lander),vec3(x[0],deck_y,z[0]));
-            point=world_pos3(find_path(path));
-        } else {
-            ops.push(#{SetTranslate:#{edit_target:"@view@",path:path,value:vec3_array(point)}});
-            ops.push(#{SetAttribute:#{edit_target:"@view@",path:path,name:"lunco:billboard",type_name:"bool",value:"false"}});
+            point=world_pos3(entity);
         }
-        points.push(#{path:path,position_m:vec3_array(point),expected_position_m:vec3_array(expected),terrain_y_m:terrain,
+        points.push(#{path:path,entity:entity,move_marker:!(i==0 && attached_entry),
+            position_m:vec3_array(point),expected_position_m:vec3_array(expected),terrain_y_m:terrain,
             clearance_m:point.y-terrain,surface:if i==0 && entry_on_deck{"payload_deck"}else{"terrain"}});
     }
-    #{ok:true,doc_id:record.doc_id,parent_gen:usd_document_generation(record.doc_id),ops:ops,points:points}
+    #{entry:preview,attached_entry:attached_entry,points:points}
+}
+fn apply_surface_route_presentation(plan) {
+    for point in plan.points {
+        if point.move_marker {
+            let result=cmd("MoveEntity",#{entity_id:point.entity,translation:point.position_m,intent:"Interactive"});
+            if result.status!="applied" {throw("Cannot position "+point.path+": "+result);}
+        }
+    }
+    let visibility=if plan.attached_entry {#{Bool:#{value:false}}}else{"Clear"};
+    let shown=cmd("SetSceneView",#{batches:[#{target:plan.entry,writes:[#{property:"visibility",value:visibility}]}]});
+    if shown.status!="applied" {throw("Cannot present route entry: "+shown);}
+    shown
 }
 fn present_surface_route(frame) {
-    let plan=surface_route_presentation_plan(frame);
-    cmd("ApplyUsdTransientOps",#{doc_id:plan.doc_id,parent_gen:plan.parent_gen,
-        label:"Present terrain-fitted Griffin route",ops:plan.ops})
+    apply_surface_route_presentation(surface_route_presentation_plan(frame))
 }
 
 // Before landing, the reference route is a terrain-supported mission preview.
@@ -1535,9 +1541,7 @@ fn present_descent_surface_route() {
     let forward=qrot(rotation,vec3(1.0,0.0,0.0));
     let lateral=qrot(rotation,vec3(0.0,0.0,1.0));
     let plan=surface_route_presentation_plan(#{origin:position,forward:forward,lateral:lateral},false);
-    let result=cmd("ApplyUsdTransientOps",#{doc_id:plan.doc_id,parent_gen:plan.parent_gen,
-        label:"Present terrain-supported descent route",ops:plan.ops});
-    if result==() || result.ok!=true {throw("Descent route presentation rejected: "+result);}
+    apply_surface_route_presentation(plan);
     plan
 }
 

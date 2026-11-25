@@ -22,3 +22,5 @@ The current landing comparison uses `drop-low-refresh.usda` and
 `drop-high-refresh.usda`: one- and two-metre engine-off releases. Obsolete cold-start
 experiments are not part of this package. Capture prims are disarmed after each
 take; loading a saved scene must not overwrite an old recording.
+
+The route result hides the scene's `film-map` HUD through `SetRuntimeHudVisibility`. The capture checks that the inset has left the rendered frame and restores its previous display setting after recording.
