@@ -117,13 +117,15 @@ package FlipMotionRequirements {
         in peakYawRadPerS : Real;
         in peakSideMps : Real;
         in releaseYawRadPerS : Real;
+        in peakPivotForwardMps : Real;
         opposedPeakYawRadPerS < 0.02 and signedEndYawRadPerS > 0.12
-            and peakYawRadPerS < 0.35 and peakSideMps < 0.15 and releaseYawRadPerS < 0.025;
+            and peakYawRadPerS < 0.35 and peakSideMps < 0.15
+            and peakPivotForwardMps < 0.20 and releaseYawRadPerS < 0.025;
     }
     requirement def FMR003_ManualPivot {
         doc /* On the Griffin steering fixture, opposed keys held for 1 s shall
          * cancel. With throttle released, A and D separately shall yaw left
-         * and right within the pivot envelope over 3 s. Residual yaw shall
+         * and right within the pivot envelope over 3 s, with bounded forward creep. Residual yaw shall
          * meet the release limit after 2 s without applying the brake. */
         require FMR003_PivotEnvelope;
     }
@@ -131,6 +133,7 @@ package FlipMotionRequirements {
 
     constraint def FMR004_MovingTurnEnvelope {
         in signedEntryMps : Real;
+        in entryAcquisitionS : Real;
         in straightYawRadPerS : Real;
         in signedExitMps : Real;
         in signedEndYawRadPerS : Real;
@@ -139,13 +142,14 @@ package FlipMotionRequirements {
         in straightenedYawRadPerS : Real;
         in straightenedSideMps : Real;
         in brakedPlanarComponentMps : Real;
-        signedEntryMps > 3.0 and straightYawRadPerS < 0.035 and signedExitMps > 3.0
+        signedEntryMps > 3.0 and entryAcquisitionS <= 6.02 and straightYawRadPerS < 0.035 and signedExitMps > 3.0
             and signedEndYawRadPerS > 0.015 and peakYawRadPerS < 0.13 and peakSideMps < 0.50
             and straightenedYawRadPerS < 0.03 and straightenedSideMps < 0.15
             and brakedPlanarComponentMps < 0.05;
     }
     requirement def FMR004_ManualMovingTurn {
-        doc /* After 4 s of straight drive, retain travel direction and turn
+        doc /* After at least 4 s of straight drive, establish above 3 m/s within 6 s.
+         * Retain travel direction and turn
          * toward the commanded nose direction during a 3 s W+D or S+A arc.
          * Bound chassis lateral speed throughout each arc. Release steering
          * while driving forward for 2 s, then brake for 8 s before reversing.

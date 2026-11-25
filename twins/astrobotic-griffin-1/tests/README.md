@@ -89,13 +89,13 @@ From the Twin directory, run the wheel-load, pivot and moving-turn requirements 
 "$LUNCOSIM_BIN" test --scene tests/flip_steering.usda --verification FlipMotionRequirements::Verify_FLIPSteering --max-ticks 3000
 ```
 
-The observer emits `FLIP_WHEEL_FORCE_TRACE` at 10 Hz with native wheel loads, longitudinal and lateral forces, drive torque, lateral slip speed, slip angle, estimated sinkage, and chassis motion. The terminal `FLIP_STEERING` report binds four wheel observations and both
+The observer emits `FLIP_WHEEL_FORCE_TRACE` at 10 Hz with native wheel loads, longitudinal and lateral forces, drive torque, lateral slip speed, slip angle, estimated sinkage, rolling-resistance moment, and chassis motion. The terminal `FLIP_STEERING` report binds four wheel observations and both
 directions of each maneuver to FMR-002 through FMR-004. The
 [motion contract](../contracts/flip-motion-runtime.md#manual-steering-and-lateral-wheel-force)
 gives the force measurements, study tolerances and open FLIP validation requirement.
 
 From the matching simulator checkout, run the prescribed wheel-force tests
-for contact subdivision, held-out WES loads and low-speed soil response.
+for contact subdivision, held-out WES loads, low-speed soil response, combined-slip high yaw, torque-mode continuity and axle/compaction work.
 
 ```sh
 cargo test -p lunco-mobility --lib soil_tire::tests

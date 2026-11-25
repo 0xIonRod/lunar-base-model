@@ -19,8 +19,8 @@
     "contact_friction_limit_n": "friction_coefficient * contact_normal_load_n limits combined tread shear; passive side pressure on soil is separate",
     "rigid_lateral_force_n": "Oppose slip using the stiffness graph at total wheel load. Distribute stiffness by each contact normal-load share before combined-shear saturation.",
     "soil_rolling_lateral_force_n": "Oppose slip using the signed interpolation of the authored WES side-force/load curve multiplied by contact normal load.",
-    "soil_pivot": "Blend rolling total side force with quasi-steady soil shear and passive side resistance. Calculate shallow-footprint sinkage from total wheel load; master-step normal support remains native rigid contact.",
-    "rolling_calibration": "WES M-71-7 Table 2. Mean side-force/load ratios at 5 and 10 degrees over three loads near 1.3 m/s. A towed Apollo wheel supplies the surrogate data.",
+    "soil_pivot": "Evaluate the Modelica law at each implicit axle trial with the actual signed hub and tread velocities. Blend measured total side force with mobilized soil shear and passive resistance. Include pressure-work rolling moment once; master-step normal support remains native rigid contact.",
+    "rolling_calibration": "WES M-71-7 Table 2. Mean side-force/load ratios at 5, 10, 15, 25 and 40 degrees near 1.3 m/s, plus the single 65, 85 and 90 degree observations. A towed Apollo wheel supplies the surrogate data.",
     "source": "https://ntrs.nasa.gov/api/citations/19750021903/downloads/19750021903.pdf#page=41",
     "drive_force_n": "drive_torque_nm / wheel_radius_m"
   },

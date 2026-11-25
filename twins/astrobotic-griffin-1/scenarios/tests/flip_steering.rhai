@@ -25,6 +25,7 @@ fn on_start(me, ctx) {
     this.time = 0.0;
     this.start_tick = sim_tick();
     this.samples = #{};
+    this.entry_at_four = #{};
     this.tires = #{};
     for station in ["FL","FR","RL","RR"] {
         this.tires[station] = #{peakPivotSideN:0.0, peakPivotTorqueNm:0.0,
@@ -35,6 +36,7 @@ fn on_start(me, ctx) {
     this.support_time = 0.0;
     this.peak_yaw = 0.0;
     this.peak_side = 0.0;
+    this.peak_forward = 0.0;
     try {
         let acquire = cmd("AcquireControl", #{target:find_path(ROOT), bind_camera:true});
         if acquire.ok != true { throw("FLIP control unavailable: " + acquire); }
@@ -91,12 +93,13 @@ fn finish() {
         checks.push(requirement_check(model, "003", "PivotEnvelope", key, #{
             opposedPeakYawRadPerS:samples["opposed keys"].peak_yaw,
             signedEndYawRadPerS:sign * pivot.right_rate, peakYawRadPerS:pivot.peak_yaw,
-            peakSideMps:pivot.peak_side, releaseYawRadPerS:abs(samples["release " + key].right_rate)
+            peakSideMps:pivot.peak_side, peakPivotForwardMps:pivot.peak_forward, releaseYawRadPerS:abs(samples["release " + key].right_rate)
         }, this.start_tick));
         let entry = if key == "right" { samples.straight } else { samples.reverse };
         let arc = if key == "right" { samples["forward right"] } else { samples["reverse left"] };
         checks.push(requirement_check(model, "004", "MovingTurnEnvelope", key, #{
-            signedEntryMps:sign * entry.forward, straightYawRadPerS:abs(entry.right_rate),
+            signedEntryMps:sign * entry.forward, entryAcquisitionS:entry.elapsed_s,
+            straightYawRadPerS:abs(entry.right_rate),
             signedExitMps:sign * arc.forward, signedEndYawRadPerS:sign * arc.right_rate,
             peakYawRadPerS:arc.peak_yaw, peakSideMps:arc.peak_side,
             straightenedYawRadPerS:abs(samples.straighten.right_rate),
@@ -131,7 +134,7 @@ fn trace_forces(phase, chassis) {
         let force = get(wheel, "WheelForceSample");
         if force == () { throw("Missing native wheel-force sample at " + station); }
         for name in ["normal_n","longitudinal_n","lateral_n","lateral_speed_mps",
-                "slip_angle_rad","sinkage_m","drive_torque_nm","lateral_dissipation_w"] {
+                "slip_angle_rad","sinkage_m","drive_torque_nm","rolling_moment_nm","lateral_dissipation_w"] {
             if force[name] == () || !force[name].is_finite() { throw("Invalid " + station + " " + name); }
         }
         let stats = this.tires[station];
@@ -163,6 +166,7 @@ fn run_tick() {
     if sim_tick() % 6 == 0 { this.trace_forces(phase, s); }
     this.peak_yaw = max(this.peak_yaw, abs(s.right_rate));
     this.peak_side = max(this.peak_side, abs(s.side));
+    this.peak_forward = max(this.peak_forward, abs(s.forward));
     if phase == "settle" && this.time >= 2.0 {
         for station in ["FL","FR","RL","RR"] {
             let wheel = find_path(ROOT + "/Suspension_" + station + "/Wheel_" + station);
@@ -172,10 +176,23 @@ fn run_tick() {
     }
     this.time += dt();
     if this.time < durations[this.phase] { return; }
-    let detail = phase + " " + s + " peak yaw=" + this.peak_yaw + " peak lateral=" + this.peak_side;
+    if phase == "straight" || phase == "reverse" {
+        let signed_speed = if phase == "straight" { s.forward } else { -s.forward };
+        if !this.entry_at_four.contains(phase) {
+            this.entry_at_four[phase] = signed_speed;
+            print("FLIP " + phase + " speed at four seconds m/s: " + signed_speed);
+        }
+        // Steering starts from a measured rolling condition. Acceleration is
+        // recorded separately; a six-second acquisition cap prevents a slow
+        // or immobilized rover from passing by waiting indefinitely.
+        if signed_speed <= 3.0 && this.time < 6.0 { return; }
+    }
+    s.elapsed_s = this.time;
+    let detail = phase + " " + s + " peak yaw=" + this.peak_yaw + " peak lateral=" + this.peak_side + " peak forward=" + this.peak_forward;
     print("FLIP steering " + detail);
     s.peak_yaw = this.peak_yaw;
     s.peak_side = this.peak_side;
+    s.peak_forward = this.peak_forward;
     this.samples[phase] = s;
     switch phase {
         "settle" => {
@@ -223,6 +240,7 @@ fn run_tick() {
     this.phase += 1;
     this.peak_yaw = 0.0;
     this.peak_side = 0.0;
+    this.peak_forward = 0.0;
     this.time = 0.0;
 }
 

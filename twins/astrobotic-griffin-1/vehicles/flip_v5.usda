@@ -102,8 +102,8 @@ def Xform "FLIP" (
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
-            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a coupled Modelica tread shear and passive soil resistance model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195), (15.0, 0.481), (25.0, 0.517), (40.0, 0.533), (65.0, 0.809), (85.0, 1.266), (90.0, 1.107)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FL.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -476,8 +476,8 @@ def Xform "FLIP" (
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
-            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a coupled Modelica tread shear and passive soil resistance model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195), (15.0, 0.481), (25.0, 0.517), (40.0, 0.533), (65.0, 0.809), (85.0, 1.266), (90.0, 1.107)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_FR.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -850,8 +850,8 @@ def Xform "FLIP" (
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
-            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a coupled Modelica tread shear and passive soil resistance model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195), (15.0, 0.481), (25.0, 0.517), (40.0, 0.533), (65.0, 0.809), (85.0, 1.266), (90.0, 1.107)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RL.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -1238,8 +1238,8 @@ def Xform "FLIP" (
             custom rel material:binding = None
             uniform token proxyVisibility = "invisible"
             float physics:staticFriction = 0.6000000238418579
-            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a reduced shear and passive earth-pressure model. Other supports use the nominal rigid tire."
-            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195)]
+            custom string documentation = "Rigid wheel geometry. On authored soil the tire uses a WES rolling curve and a coupled Modelica tread shear and passive soil resistance model. Other supports use the nominal rigid tire."
+            custom double2[] lunco:tire:soilSideForceCurve = [(0.0, 0.0), (5.0, 0.24496), (10.0, 0.37195), (15.0, 0.481), (25.0, 0.517), (40.0, 0.533), (65.0, 0.809), (85.0, 1.266), (90.0, 1.107)]
             def Xform "CADVisuals" (
                 references = @twin://astrobotic-griffin-1/components/rover/flip_v5/FLIP_visual_RR.usdc@</World>
                 prepend apiSchemas = ["VisibilityAPI"]
@@ -2645,11 +2645,18 @@ def Xform "FLIP" (
         double inputs:velocity_z.connect = </FLIP.inputs:autopilot_velocity_z>
         float inputs:yaw_rate
         float inputs:yaw_rate.connect = </FLIP.inputs:autopilot_yaw_rate>
+        custom float outputs:throttle_demand = 0.0
+        custom float inputs:throttle
+        float inputs:throttle.connect = </FLIP.inputs:throttle>
+        custom float inputs:yaw
+        float inputs:yaw.connect = </FLIP.inputs:autopilot_yaw>
     }
     over "Drivetrain"
     {
         float inputs:steer
         float inputs:steer.connect = </FLIP/ManualSteering.outputs:demand>
+        float inputs:throttle
+        float inputs:throttle.connect = </FLIP/ManualSteering.outputs:throttle_demand>
     }
     over "Motor_FL"
     {

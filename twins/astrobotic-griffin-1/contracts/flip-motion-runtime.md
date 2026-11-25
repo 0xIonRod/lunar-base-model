@@ -68,8 +68,8 @@ and [Astrolab mission paper](https://www.hou.usra.edu/meetings/lpsc2026/pdf/1874
 | Requirement | Input and expected response |
 | --- | --- |
 | FMR-002 · Wheel loading and grip | Brake for 3 s. Over the last second, the mean sum of the four wheel normal reactions shall be within 5% of 729 N. Each wheel shall develop lateral force during rolling, oppose lateral slip in a pivot under drive torque, and show positive modelled sinkage. Individual wheel loads may differ on a grade or during a turn. |
-| FMR-003 · Pivot, cancellation and release | With throttle released, hold A+D together for 1 s. Peak absolute yaw rate shall stay below 0.02 rad/s. Hold D or A separately for 3 s. The nose shall turn toward that key, exceed 0.12 rad/s in the commanded direction at the endpoint, and stay below 0.35 rad/s peak yaw and 0.15 m/s peak chassis lateral speed. At 2 s after key release, absolute yaw rate shall be below 0.025 rad/s. |
-| FMR-004 · Moving turn and recovery | After 4 s of W or S, enter a 3 s W+D or S+A turn above 3 m/s with absolute entry yaw below 0.035 rad/s. Exit above 3 m/s in the same travel direction and above 0.015 rad/s yaw in the commanded nose direction. During the arc, peak absolute yaw shall stay below 0.13 rad/s and peak chassis lateral speed below 0.50 m/s. Two seconds after D release with W held, absolute yaw shall be below 0.03 rad/s and lateral speed below 0.15 m/s. After braking for 8 s, both longitudinal and lateral speed components shall be below 0.05 m/s in magnitude. |
+| FMR-003 · Pivot, cancellation and release | With throttle released, hold A+D together for 1 s. Peak absolute yaw rate shall stay below 0.02 rad/s. Hold D or A separately for 3 s. The nose shall turn toward that key, exceed 0.12 rad/s in the commanded direction at the endpoint, and stay below 0.35 rad/s peak yaw and 0.15 m/s peak chassis lateral speed and 0.20 m/s peak absolute forward speed. At 2 s after key release, absolute yaw rate shall be below 0.025 rad/s. |
+| FMR-004 · Moving turn and recovery | After at least 4 s of W or S, establish an entry speed above 3 m/s within 6 s and enter a 3 s W+D or S+A turn with absolute entry yaw below 0.035 rad/s. Exit above 3 m/s in the same travel direction and above 0.015 rad/s yaw in the commanded nose direction. During the arc, peak absolute yaw shall stay below 0.13 rad/s and peak chassis lateral speed below 0.50 m/s. Two seconds after D release with W held, absolute yaw shall be below 0.03 rad/s and lateral speed below 0.15 m/s. After braking for 8 s, both longitudinal and lateral speed components shall be below 0.05 m/s in magnitude. |
 | FMR-005 · Physical validation, open | Before claiming FLIP-specific handling accuracy, compare independent representative wheel-force and vehicle-motion data with predictions under matched conditions and predeclared error bands. The measurements needed are listed below. |
 
 Steering release commands zero yaw and allows the rover to coast. Space brakes
@@ -77,38 +77,60 @@ the wheels. In reverse, A still commands the nose to turn left. The manual
 controller requests at most 0.30 rad/s at low speed and 0.30 m/s² divided by
 speed above 1 m/s. At 4 m/s this gives 0.075 rad/s, or a nominal 53 m turn
 radius if the rover tracks the command in steady motion with negligible
-sideslip. The motors and ground reactions determine the achieved turn.
+sideslip. The Modelica yaw controller uses proportional and bounded integral
+feedback during a held steering command. Release removes the integral
+contribution and damps measured yaw before returning to coast. The common
+drive demand is reduced when necessary to preserve the requested differential
+within the two motor command limits. During A/D with zero throttle, a
+second proportional-integral loop uses the chassis heading and velocity
+to regulate signed forward speed to zero. It releases that longitudinal
+hold when the steering command ends. The motors and terrain reactions
+determine the achieved turn.
 
 ### Wheel force on regolith
 
-The Twin authors a rolling side-force/load curve on each wheel and soil
-properties on the NOBILE03 surface. The two rolling knots are 0.24496 at 5°
-and 0.37195 at 10°. They are the mean measured side-force/load ratios at each
-angle from the three load groups below. At 182.25 N normal load and negligible
-drive slip, rolling predictions are **44.6 N at 5°** and **67.8 N at 10°**. At
-277 N and 5°, the prediction is **67.9 N**, compared with **71.4 N measured**.
-The wheels share longitudinal and lateral tread traction. A wheel contacting
-a rigid ramp uses the ordinary rigid-tire curve. [Green, Table 2](https://ntrs.nasa.gov/api/citations/19750021903/downloads/19750021903.pdf#page=41)
+The current engineering-study model uses the Modelica
+`LunCo.Mobility.RegolithWheelContact` law in the simulator's native implicit
+wheel solve. Each contact carries a share of the whole wheel load, and
+the model uses the actual support-relative hub and tread velocities.
+Its shear-mobilization law is independent of commanded drive torque.
+The native solver calls the same prepared algebraic Modelica kernel for
+trial axle speeds and for the accepted reaction.
 
-At low longitudinal speed the soil model estimates a shallow footprint from
-wheel load, radius, width and an effective linear pressure gradient. Available
-soil shear depends on cohesion and internal friction. Lateral slip over the
-estimated contact residence time mobilizes that shear and the passive resistance
-of soil displaced by the side face. The two total force laws blend continuously
-with speed. The low-speed residence time is regularized using the 1.07 m/s
-lower rolling-speed bound. Above the last measured 10° knot the rolling branch transitions to the soil law
-by 90°. High-angle forces and turns above the calibration speeds are extrapolations.
-The geometric sinkage estimate supplies force
-parameters while Avian carries the normal load. The ground mesh stays rigid.
+| Geometric yaw | Side force / normal load |
+| --- | ---: |
+| 0° | 0 |
+| 5° | 0.24496 |
+| 10° | 0.37195 |
+| 15° | 0.481 |
+| 25° | 0.517 |
+| 40° | 0.533 |
+| 65° | 0.809 |
+| 85° | 1.266 |
+| 90° | 1.107 |
 
-The WES soil values are 0.98 MN/m³ penetration-resistance gradient, 760 Pa
-cohesion, 38.5° internal friction angle and 1,524 kg/m³ dry bulk density.
-Using the penetration gradient for wheel pressure, scaling unit weight by
-1.62 m/s², and choosing 0.025 m as the shear-displacement scale are **study
-assumptions**. The empirical rolling force already includes displaced soil,
-so only the mechanistic branch adds a separate passive side force.
-[Green, soil description](https://ntrs.nasa.gov/api/citations/19750021903/downloads/19750021903.pdf)
-and [Ishigami et al., wheel-soil side force](https://doi.org/10.1002/rob.20187)
+These are averages of the measured WES side-force/load ratios at each
+angle near 1.3 m/s, with single observations at 65°, 85° and 90°.
+The high-angle measurements are calibration data. Only the tread share
+of the empirical total enters the combined-shear limit. Additional
+side resistance represents soil displacement. The slower mechanistic
+branch mobilizes soil shear and side resistance continuously using the
+same relative velocities. The 0.1 m/s contact-renewal regularization is
+a study assumption. [Green, Table 2](https://ntrs.nasa.gov/api/citations/19750021903/downloads/19750021903.pdf#page=41)
+
+The model also estimates a resisting axle moment from the pressure work
+of compacting the footprint. The axle solve and native contact wrench
+include this signed moment once. Native contact still supplies normal
+reaction. Estimated sinkage is a quasi-steady force-law parameter;
+the DEM does not deform or carry rut history.
+
+The WES soil proxies are 0.98 MN/m³ penetration-resistance gradient,
+760 Pa cohesion, 38.5° internal friction angle and 1,524 kg/m³ dry bulk
+density. Using the penetration gradient for wheel pressure, scaling unit
+weight by 1.62 m/s², and choosing 0.025 m as the shear-displacement scale
+are study assumptions. See the [expanded investigation](flip-wheel-soil-investigation.md)
+for the shortcomings of the previous law and the remaining physical
+validation. [Ishigami et al.](https://doi.org/10.1002/rob.20187)
 
 ### Baseline calibration and diagnosis
 
@@ -197,7 +219,7 @@ velocity time histories. Establish the allowed prediction error for the intended
 use before comparing held-out trials. Surface-test or flight telemetry with a
 known initial state would support that comparison.
 
-### Measured response on Griffin terrain
+### Previous measured response on Griffin terrain
 
 The production steering fixture sampled chassis motion at 60 Hz. These are
 the measured results on the same maneuver sequence. The middle column records
@@ -251,3 +273,38 @@ The trace includes chassis yaw rate and velocity from the same observation.
 FMR-002 checks support and contact response. FMR-003 and FMR-004 check chassis
 motion under the manual controller. FMR-005 tracks validation against independent
 measurements on hardware.
+
+
+### Prepared Modelica contact and controller verification (25 November 2026)
+
+The headless simulator built from the tutorials worktree ran the final
+steering fixture at 60 Hz. All eight requirement evaluations passed.
+
+| Observation | Measured | Acceptance |
+| --- | ---: | ---: |
+| A+D peak absolute yaw | 0.00083 rad/s | < 0.02 |
+| D pivot peak absolute yaw | 0.226 rad/s | < 0.35 |
+| D pivot peak forward speed | 0.091 m/s | < 0.20 |
+| D pivot peak lateral speed | 0.097 m/s | < 0.15 |
+| D release yaw at 2 s | 0.000020 rad/s | < 0.025 |
+| A pivot peak absolute yaw | 0.216 rad/s | < 0.35 |
+| A pivot peak forward speed | 0.098 m/s | < 0.20 |
+| W+D peak lateral speed | 0.226 m/s | < 0.50 |
+| Forward lateral speed 2 s after D release | 0.026 m/s | < 0.15 |
+| Settled support of four wheels | 729.6 N | 692.55–765.45 N |
+
+The initial Modelica-contact run with yaw feedback alone reached 0.375 m/s
+and 0.435 m/s forward speed during the two nominal pivots. The additional
+longitudinal regulator reduced both peaks below 0.10 m/s. A full-drive
+reverse entry was 2.789 m/s at four seconds and surpassed 3 m/s at 4.45 s.
+The previous fixed-duration fixture failed the acceleration observation
+on the new model. FMR-004 now specifies a measured entry speed above
+3 m/s after at least four seconds of drive, with a six-second acquisition
+deadline (one tick tolerance in the constraint). The observer retains
+the four-second speed separately. All moving-turn yaw, speed, release
+and stopping bounds are retained.
+
+The force histories contain 1,544 wheel observations at 10 Hz and include
+the actual committed rolling moment. Peak absolute wheel rolling moment
+during W+D was 10.10 N·m. The trace shows lateral dissipation remained
+nonnegative in the pivot and moving-turn phases.
