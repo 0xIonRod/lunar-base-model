@@ -1,9 +1,11 @@
-// Stimulus/verdict only. Tank availability, feed flow, combustion and plume are
-// solved by the production Griffin Modelica network. Fixture boundary outputs
-// expose Engine01's plume as the representative per-engine observation without
-// creating separate physics models; cluster thrust and activity are summed.
+// Stimulus/verdict only. Tank availability, feed flow and combustion are solved
+// by the production Griffin propulsion network; each engine's presentation
+// network solves its plume. Fixture boundary outputs on Engine01's presentation
+// root expose its plume as the representative per-engine observation; cluster
+// thrust and activity are summed.
 fn simulation_dependencies(me,ctx) {
     #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion"),
+          find_path(griffin_propulsion_builder::main_engine_presentation_network("/World/Griffin1","Engine01")),
           find_path("/World/Griffin1/AttitudeActuation"),find_path("/World/Griffin1/AttitudePropulsion")],
       entity_reads:[],
       entity_writes:[],query_reads:[],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
@@ -11,6 +13,7 @@ fn simulation_dependencies(me,ctx) {
 fn on_start(me,ctx) {
     this.griffin=find_path("/World/Griffin1");
     this.main=find_path("/World/Griffin1/MainPropulsion");
+    this.presentation=find_path(griffin_propulsion_builder::main_engine_presentation_network("/World/Griffin1","Engine01"));
     this.rcs=find_path("/World/Griffin1/AttitudePropulsion");
     this.allocator=find_path("/World/Griffin1/AttitudeActuation");
     this.elapsed=0.0;this.empty_since=();this.burn_seen=false;this.rcs_burn_seen=false;this.done=false;
@@ -19,7 +22,7 @@ fn on_start(me,ctx) {
 }
 fn on_tick(me,ctx) {
     if this.done {return;}this.elapsed+=dt();
-    let thrust=griffin_spec::main_engine_total(this.main,"thrust_n");let light=get(this.main,"test_intensity");
+    let thrust=griffin_spec::main_engine_total(this.main,"thrust_n");let light=get(this.presentation,"test_intensity");
     if thrust!=() && thrust>1.0 && light>0.0 {this.burn_seen=true;}
     if get(this.rcs,"yaw_pos_a_thrust_n")>1.0 && get(this.rcs,"test_rcs_intensity")>0.0 {
         this.rcs_burn_seen=true;
@@ -55,8 +58,8 @@ fn on_tick(me,ctx) {
         "the opposite reactant feed must remain available"));
     failures.push(t_true(thrust==0.0 && griffin_spec::main_engine_total(this.main,"activity")==0.0,
         "engine continued combustion without both reactants"));
-    failures.push(t_true(light==0.0 && get(this.main,"test_length")==0.0
-        && get(this.main,"test_plume_activity")==0.0,"inactive engine left a plume"));
+    failures.push(t_true(light==0.0 && get(this.presentation,"test_length")==0.0
+        && get(this.presentation,"test_plume_activity")==0.0,"inactive engine left a plume"));
     failures.push(t_true(get(this.rcs,"test_rcs_intensity")!=(),"RCS light telemetry unavailable"));
     failures.push(t_true(this.rcs_burn_seen,"RCS never fired with available propellant"));
     failures.push(t_true(get(this.allocator,"yaw_pos_a_valve")>0.0,

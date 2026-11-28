@@ -51,6 +51,32 @@ fn has_single_connection(record, input_name, expected_source) {
         && sources[0] == expected_source
 }
 
+// Follow single-source boundary forwards (a network root's `inputs:` or
+// `outputs:` port that is itself connected) to the producing property. A
+// missing hop, fan-in, or cycle returns unit instead of a guessed producer.
+fn resolved_producer(record, input_name) {
+    if record == () || record.connections == () { return (); }
+    let sources = record.connections[input_name];
+    if sources == () || !array_is(sources) || sources.len() != 1 { return (); }
+    let source = sources[0];
+    for hop in 0..4 {
+        let split = source.index_of(".");
+        if split < 1 { return (); }
+        let owner = query("QueryUsdPrim", #{ path: source.sub_string(0, split),
+            children: false, position: false, connections: true });
+        if owner == () || owner.connections == () { return source; }
+        let next = owner.connections[source.sub_string(split + 1)];
+        if next == () || !array_is(next) || next.len() == 0 { return source; }
+        if next.len() != 1 { return (); }
+        source = next[0];
+    }
+    ()
+}
+
+fn consumes_producer(record, input_name, expected_source) {
+    resolved_producer(record, input_name) == expected_source
+}
+
 fn has_single_relationship_target(record, relationship, expected_target) {
     if record == () || record.relationships == () { return false; }
     let targets = record.relationships[relationship];
@@ -505,7 +531,7 @@ fn on_tick(me, ctx) {
     checks.push(sysml_requirement_checks::source_list_count("GPP-005-stations", "engine", "gpp005", VERIFICATION, visual("engineStations"), parent("engineCount")));
     for name in names {
         checks.push(attribute("GPP-001-" + name + "-photometry-engine-count", "gpp001",
-            (propulsion_path + "/" + name) + "Plume", "parameters:engine_count", 1, 0.0));
+            griffin_propulsion_builder::main_engine_plume_path(vehicle_root, name), "parameters:engine_count", 1, 0.0));
     }
     checks.push(attribute("GPP-006-nozzle-design-exit-radius", "gpp006",
         nozzle_design_path, "inputs:exit_radius",
@@ -591,7 +617,7 @@ fn on_tick(me, ctx) {
     let observed_lights = query("QueryUsdPrims", #{paths: light_paths,
         connections: true});
     let photometry_paths = [];
-    for name in names { photometry_paths.push((propulsion_path + "/" + name) + "Plume"); }
+    for name in names { photometry_paths.push(griffin_propulsion_builder::main_engine_plume_path(vehicle_root, name)); }
     let observed_photometry = query("QueryUsdPrims", #{
         paths: photometry_paths, connections: true});
     let snapshots = [
@@ -663,20 +689,20 @@ fn on_tick(me, ctx) {
         let engine = propulsion_path + "/" + names[index] + "/Chamber.outputs:";
         let record = record_at(observed_photometry, photometry_paths[index]);
         photometry_consumes_engine_state = record != ()
-            && has_single_connection(record, "inputs:thrust_n", engine + "thrust_n")
-            && has_single_connection(record, "inputs:maximum_thrust_n", engine + "maximum_thrust_n")
-            && has_single_connection(record, "inputs:propellant_flow_kgs", engine + "propellant_flow")
-            && has_single_connection(record, "inputs:exhaust_velocity_mps", engine + "exhaust_velocity_mps")
-            && has_single_connection(record, "inputs:mixture_ratio", engine + "mixture_ratio")
-            && has_single_connection(record, "inputs:gas_gamma",
+            && consumes_producer(record, "inputs:thrust_n", engine + "thrust_n")
+            && consumes_producer(record, "inputs:maximum_thrust_n", engine + "maximum_thrust_n")
+            && consumes_producer(record, "inputs:propellant_flow_kgs", engine + "propellant_flow")
+            && consumes_producer(record, "inputs:exhaust_velocity_mps", engine + "exhaust_velocity_mps")
+            && consumes_producer(record, "inputs:mixture_ratio", engine + "mixture_ratio")
+            && consumes_producer(record, "inputs:gas_gamma",
                 nozzle_design_path + ".outputs:gamma_out")
-            && has_single_connection(record, "inputs:nozzle_exit_mach",
+            && consumes_producer(record, "inputs:nozzle_exit_mach",
                 nozzle_design_path + ".outputs:exit_mach")
-            && has_single_connection(record, "inputs:exit_lip_angle_rad",
+            && consumes_producer(record, "inputs:exit_lip_angle_rad",
                 nozzle_design_path + ".outputs:exit_lip_angle_rad")
-            && has_single_connection(record, "inputs:nozzle_exit_radius_m",
+            && consumes_producer(record, "inputs:nozzle_exit_radius_m",
                 nozzle_design_path + ".outputs:exit_radius_m")
-            && has_single_connection(record, "inputs:nozzle_exit_area_m2",
+            && consumes_producer(record, "inputs:nozzle_exit_area_m2",
                 nozzle_design_path + ".outputs:exit_area");
     }
     let plume_requirement_bindings = _required_constraint_bindings(source_model,

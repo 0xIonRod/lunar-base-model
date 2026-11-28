@@ -325,7 +325,7 @@ realized feature, and evidence result.
 
 ### Main-engine plume runtime status
 
-Each `MainPropulsion/EngineNNPlume` declares the typed `PlumePhotometry`
+Each `MainEnginePresentation/EngineNN/Plume` declares the typed `PlumePhotometry`
 outputs its bell's field, bounds, bounded transported phase and local light consume.
 The shared Modelica model closes mass, stagnation energy and pressure thrust;
 its optical coefficients in `GriffinPlumeStudy` remain uncalibrated. This is a

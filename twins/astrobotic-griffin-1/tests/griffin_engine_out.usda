@@ -14,7 +14,7 @@ def Xform "World"
     def Scope "Scenario"
     {
         def Scope "Test" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"
@@ -28,8 +28,6 @@ def Xform "World"
         bool physics:rigidBodyEnabled = false
         def "MainPropulsion"
         {
-            custom float outputs:test_failed_plume_intensity
-            float outputs:test_failed_plume_intensity.connect = </World/Griffin1/MainPropulsion/Engine03Plume.outputs:intensity>
             def "FuelTank"
             {
             }
@@ -39,6 +37,14 @@ def Xform "World"
         }
         def Scope "AttitudePropulsion"
         {
+        }
+        over "MainEnginePresentation"
+        {
+            over "Engine03"
+            {
+                custom float outputs:test_failed_plume_intensity
+                float outputs:test_failed_plume_intensity.connect = </World/Griffin1/MainEnginePresentation/Engine03/Plume.outputs:intensity>
+            }
         }
     }
 }

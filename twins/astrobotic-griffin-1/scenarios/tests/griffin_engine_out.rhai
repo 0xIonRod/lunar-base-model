@@ -9,12 +9,17 @@ const SETTLE_S = 2.0;
 // engines keep their flow; 3% covers valve and chamber settling.
 const CLUSTER_SHARE_TOLERANCE = 0.03;
 // A commanded-closed valve decays exponentially (0.08 s response), so after
-// the settle time the failed engine's plume is extinguished, not exactly zero:
-// below this fraction of its nominal light it renders nothing.
-const EXTINGUISHED_PLUME_FRACTION = 1.0e-9;
+// the settle time the failed engine's plume is extinguished, not exactly zero.
+// The live solver integrates with relative and absolute tolerance 1e-6; a tail
+// below that fraction of nominal is numerical zero and renders nothing.
+const EXTINGUISHED_PLUME_FRACTION = 1.0e-6;
 
 fn simulation_dependencies(me,ctx) {
-    #{modelica_entities:[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion")],
+    let entities=[find_path("/World/Griffin1"),find_path("/World/Griffin1/MainPropulsion")];
+    for name in griffin_spec::main_engine_names() {
+        entities.push(find_path(griffin_propulsion_builder::main_engine_presentation_network("/World/Griffin1",name)));
+    }
+    #{modelica_entities:entities,
       entity_reads:[],entity_writes:[],query_reads:["QueryUsdPrim","QueryUsdPrims"],required_inputs:[#{owner: "sysml.twin-analysis", identity: twin_source_identity()}]}
 }
 
@@ -35,6 +40,19 @@ fn topology_checks(main) {
     let checks=[];
     let network=query("QueryUsdPrim",#{path:main,attrs:[],rels:["collection:components:includes"]});
     let members=network.relationships["collection:components:includes"];
+    let vehicle="/World/Griffin1";
+    for name in griffin_spec::main_engine_names() {
+        let presentation=griffin_propulsion_builder::main_engine_presentation_network(vehicle,name);
+        let shown=query("QueryUsdPrim",#{path:presentation,attrs:[],rels:["collection:components:includes"]})
+            .relationships["collection:components:includes"];
+        let plume=griffin_propulsion_builder::main_engine_plume_path(vehicle,name);
+        let wall=griffin_propulsion_builder::main_engine_wall_path(vehicle,name);
+        let plume_record=query("QueryUsdPrim",#{path:plume,attrs:[],connections:true});
+        checks.push(t_true(!members.contains(plume) && !members.contains(wall)
+            && shown.contains(plume) && shown.contains(wall)
+            && plume_record.connections["inputs:thrust_n"]==[presentation+".inputs:"+griffin_spec::main_engine_port(name,"thrust_n")],
+            name+" plume and nozzle wall must be members of the engine's own presentation network"));
+    }
     for name in griffin_spec::main_engine_names() {
         let root=main+"/"+name;
         let fuel=root+"/FuelValve";let oxidizer=root+"/OxidizerValve";let chamber=root+"/Chamber";
@@ -72,6 +90,7 @@ fn topology_checks(main) {
 fn on_start(me,ctx) {
     this.griffin=find_path("/World/Griffin1");
     this.main=find_path("/World/Griffin1/MainPropulsion");
+    this.presentation=find_path(griffin_propulsion_builder::main_engine_presentation_network("/World/Griffin1",FAILED_ENGINE));
     this.elapsed=0.0;this.phase="nominal";this.done=false;
     this.topology=topology_checks("/World/Griffin1/MainPropulsion");
     // This static propulsion bench is an authored command producer. Program
@@ -88,7 +107,7 @@ fn on_tick(me,ctx) {
     if this.phase=="nominal" {
         this.nominal=_engine_thrusts(this.main);
         this.nominal_total=griffin_spec::main_engine_total(this.main,"thrust_n");
-        this.nominal_plume=get(this.main,"test_failed_plume_intensity");
+        this.nominal_plume=get(this.presentation,"test_failed_plume_intensity");
         let failed=cmd("SetPorts",#{target:this.main,
             writes:[[griffin_spec::main_engine_port(FAILED_ENGINE,"enabled"),0.0]]});
         this.failure_ok=failed.ok;
@@ -114,7 +133,7 @@ fn on_tick(me,ctx) {
     failures.push(t_true(get(this.main,griffin_spec::main_engine_port(FAILED_ENGINE,"activity"))
         <=EXTINGUISHED_PLUME_FRACTION,
         FAILED_ENGINE+" kept combustion activity after failing"));
-    let failed_plume=get(this.main,"test_failed_plume_intensity");
+    let failed_plume=get(this.presentation,"test_failed_plume_intensity");
     failures.push(t_true(failed_plume!=() && this.nominal_plume!=()
         && failed_plume<=this.nominal_plume*EXTINGUISHED_PLUME_FRACTION,
         FAILED_ENGINE+" kept a plume after failing"));

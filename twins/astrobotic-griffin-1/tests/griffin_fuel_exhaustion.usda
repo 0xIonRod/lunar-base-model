@@ -14,7 +14,7 @@ def Xform "World"
     def Scope "Scenario"
     {
         def Scope "Test" (
-            prepend apiSchemas = "LunCoProgramAPI"
+            prepend apiSchemas = ["LunCoProgramAPI"]
         )
         {
             uniform token info:implementationSource = "sourceAsset"
@@ -32,12 +32,6 @@ def Xform "World"
             float outputs:test_fuel_mass.connect = </World/Griffin1/MainPropulsion/FuelTank.outputs:mass_kg>
             custom float outputs:test_oxidizer_mass
             float outputs:test_oxidizer_mass.connect = </World/Griffin1/MainPropulsion/OxidizerTank.outputs:mass_kg>
-            custom float outputs:test_intensity
-            float outputs:test_intensity.connect = </World/Griffin1/MainPropulsion/Engine01Plume.outputs:intensity>
-            custom float outputs:test_length
-            float outputs:test_length.connect = </World/Griffin1/MainPropulsion/Engine01Plume.outputs:length>
-            custom float outputs:test_plume_activity
-            float outputs:test_plume_activity.connect = </World/Griffin1/MainPropulsion/Engine01Plume.outputs:render_throttle>
             def "FuelTank"
             {
                 double inputs:initial_mass_kg = 5.0
@@ -51,6 +45,18 @@ def Xform "World"
         {
             custom float outputs:test_rcs_intensity
             float outputs:test_rcs_intensity.connect = </World/Griffin1/AttitudePropulsion/RcsYawPosModel.outputs:light_intensity>
+        }
+        over "MainEnginePresentation"
+        {
+            over "Engine01"
+            {
+                custom float outputs:test_intensity
+                float outputs:test_intensity.connect = </World/Griffin1/MainEnginePresentation/Engine01/Plume.outputs:intensity>
+                custom float outputs:test_length
+                float outputs:test_length.connect = </World/Griffin1/MainEnginePresentation/Engine01/Plume.outputs:length>
+                custom float outputs:test_plume_activity
+                float outputs:test_plume_activity.connect = </World/Griffin1/MainEnginePresentation/Engine01/Plume.outputs:render_throttle>
+            }
         }
     }
 }

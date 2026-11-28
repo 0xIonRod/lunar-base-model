@@ -40,7 +40,7 @@ y = 250.0
 x = 2688.0
 y = 250.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine01/Plume"]
 x = 2104.0
 y = 250.0
 
@@ -48,7 +48,7 @@ y = 250.0
 x = 1000.0
 y = 1605.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine01/Wall"]
 x = 3160.0
 y = 250.0
 
@@ -68,7 +68,7 @@ y = 250.0
 x = 3538.0
 y = 250.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine02/Plume"]
 x = 2954.0
 y = 250.0
 
@@ -76,7 +76,7 @@ y = 250.0
 x = 1850.0
 y = 1605.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine02/Wall"]
 x = 4010.0
 y = 250.0
 
@@ -96,7 +96,7 @@ y = 250.0
 x = 4388.0
 y = 250.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine03/Plume"]
 x = 3804.0
 y = 250.0
 
@@ -104,7 +104,7 @@ y = 250.0
 x = 2700.0
 y = 1605.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine03/Wall"]
 x = 4860.0
 y = 250.0
 
@@ -124,7 +124,7 @@ y = 250.0
 x = 5238.0
 y = 250.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine04/Plume"]
 x = 4654.0
 y = 250.0
 
@@ -132,7 +132,7 @@ y = 250.0
 x = 3550.0
 y = 1605.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine04/Wall"]
 x = 5710.0
 y = 250.0
 
@@ -152,7 +152,7 @@ y = 850.0
 x = 2688.0
 y = 850.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine05/Plume"]
 x = 2104.0
 y = 850.0
 
@@ -160,7 +160,7 @@ y = 850.0
 x = 1000.0
 y = 2205.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine05/Wall"]
 x = 3160.0
 y = 850.0
 
@@ -180,7 +180,7 @@ y = 850.0
 x = 3538.0
 y = 850.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine06/Plume"]
 x = 2954.0
 y = 850.0
 
@@ -188,7 +188,7 @@ y = 850.0
 x = 1850.0
 y = 2205.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine06/Wall"]
 x = 4010.0
 y = 850.0
 
@@ -208,7 +208,7 @@ y = 850.0
 x = 4388.0
 y = 850.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07Plume"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine07/Plume"]
 x = 3804.0
 y = 850.0
 
@@ -216,7 +216,7 @@ y = 850.0
 x = 2700.0
 y = 2205.0
 
-[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07Wall"]
+[views."01 Propellant feed".positions."/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine07/Wall"]
 x = 4860.0
 y = 850.0
 
@@ -247,9 +247,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine01/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine01/Wall",
 ]
 
 [views."01 Propellant feed".groups."feed:Engine02"]
@@ -259,9 +259,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine02/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine02/Wall",
 ]
 
 [views."01 Propellant feed".groups."feed:Engine03"]
@@ -271,9 +271,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine03/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine03/Wall",
 ]
 
 [views."01 Propellant feed".groups."feed:Engine04"]
@@ -283,9 +283,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine04/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine04/Wall",
 ]
 
 [views."01 Propellant feed".groups."feed:Engine05"]
@@ -295,9 +295,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine05/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine05/Wall",
 ]
 
 [views."01 Propellant feed".groups."feed:Engine06"]
@@ -307,9 +307,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine06/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine06/Wall",
 ]
 
 [views."01 Propellant feed".groups."feed:Engine07"]
@@ -319,9 +319,9 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine07/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine07/Wall",
 ]
 
 [views."Full Griffin systems"]
@@ -1099,51 +1099,51 @@ members = [
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine01/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine01Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine01/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine02/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine02Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine02/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine03/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine03Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine03/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine04/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine04Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine04/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine05/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine05Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine05/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine06/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine06Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine06/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07/Chamber",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07/FuelValve",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07/OxidizerValve",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07Plume",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine07/Plume",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07ThrustTelemetry",
-    "/Griffin1SurfaceOps/Lander/MainPropulsion/Engine07Wall",
+    "/Griffin1SurfaceOps/Lander/MainEnginePresentation/Engine07/Wall",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/FuelRemainingTelemetry",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/FuelTank",
     "/Griffin1SurfaceOps/Lander/MainPropulsion/NozzleDesign",

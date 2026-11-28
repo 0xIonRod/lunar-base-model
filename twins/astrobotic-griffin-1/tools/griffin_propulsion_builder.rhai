@@ -3,6 +3,7 @@ import "lunco://scripting/tools/assembly_builder" as assembly_builder;
 import "lunco://scripting/tools/assembly_edit" as assembly_edit;
 import "lunco://scripting/tools/sysml_requirements" as sysml_requirements;
 import "lunco://scripting/tools/pressure_fed_engine" as pressure_fed_engine;
+import "lunco://scripting/tools/network_boundary" as network_boundary;
 import "griffin_voyager_detail" as detail;
 import "griffin_spec" as griffin_spec;
 import "griffin_assembly_support" as support;
@@ -11,11 +12,46 @@ import "griffin_assembly_support" as support;
 // and guidance authority. USD owns installed connections; Modelica owns state.
 
 fn main_engine_model_path(root, name) { root + "/MainPropulsion/" + name + "/Chamber" }
-fn main_engine_plume_path(root, name) { root + "/MainPropulsion/" + name + "Plume" }
+// Plume photometry and nozzle-wall glow feed only rendering. Each engine's
+// pair forms its own network root under one grouping scope, so the seven
+// independent presentation solvers run beside the MainPropulsion physics
+// network instead of at every one of its RK stages.
+fn main_engine_presentation_path(root) { root + "/MainEnginePresentation" }
+fn main_engine_presentation_network(root, name) { main_engine_presentation_path(root) + "/" + name }
+fn main_engine_plume_path(root, name) { main_engine_presentation_network(root, name) + "/Plume" }
+fn main_engine_wall_path(root, name) { main_engine_presentation_network(root, name) + "/Wall" }
+// The presentation root's boundary input for one MainPropulsion producer.
+// Chamber signals arrive through the MainPropulsion root's published
+// `<engine>_<output>` ports: the chamber inherits its outputs from
+// `CombustionChamber`, so the generated wrapper does not alias them per
+// member. NozzleDesign declares its outputs directly and is read as itself.
+// Any other producer is outside the presentation contract and has no name.
+fn main_engine_presentation_input(source_prim, source_property) {
+    if !source_property.starts_with("outputs:") {return "";}
+    let output=source_property.sub_string("outputs:".len());
+    if source_prim.ends_with("/MainPropulsion/NozzleDesign") {return "nozzle_"+output;}
+    if source_prim.ends_with("/MainPropulsion") {
+        for name in griffin_spec::main_engine_names() {
+            if output.starts_with(griffin_spec::main_engine_port(name,"")) {return output;}
+        }
+    }
+    ""
+}
+// Connect one presentation member input to a MainPropulsion producer through
+// its engine presentation network's boundary input for that producer.
+fn _presentation_input_ops(edit_target, presentation, member, input, type_name, source) {
+    let split=source.index_of(".");
+    let boundary=main_engine_presentation_input(source.sub_string(0,split),source.sub_string(split+1));
+    if boundary=="" {throw source+": producer has no main-engine presentation boundary";}
+    [#{SetConnection:#{edit_target:edit_target,path:presentation,name:"inputs:"+boundary,
+        type_name:type_name,sources:[source]}},
+     #{SetConnection:#{edit_target:edit_target,path:member,name:input,
+        type_name:type_name,sources:[presentation+".inputs:"+boundary]}}]
+}
 // Root signals republished per engine for actuators, HUD, telemetry and tests.
 fn main_engine_root_outputs() {
     ["thrust_n","maximum_thrust_n","activity","chamber_pressure_pa","propellant_flow",
-     "fuel_flow_kgs","oxidizer_flow_kgs","mixture_efficiency"]
+     "fuel_flow_kgs","oxidizer_flow_kgs","mixture_efficiency","exhaust_velocity_mps","mixture_ratio"]
 }
 
 fn _engine_parameters(model) {
@@ -43,7 +79,8 @@ fn _engine_parameters(model) {
 
 // Each reusable USD engine assembly exposes two valves and one chamber as
 // members of the single MainPropulsion solver. One engine is one authoring
-// batch; the final feed plan admits all members together.
+// batch; the final feed plan admits all physics members together and the
+// presentation plan admits each engine's plume and wall programs.
 fn _engine_parameter_ops(edit_target, assembly, parameters) {
     let ops=[];
     for item in parameters {
@@ -86,6 +123,8 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
     let main=root+"/MainPropulsion";
     let nozzle=main+"/NozzleDesign";
     let engine=main_engine_model_path(root,name);
+    let group=main_engine_presentation_path(root);
+    let presentation=main_engine_presentation_network(root,name);
     let plume=main_engine_plume_path(root,name);
     let visual=root+"/Nozzle/MainEngineCluster/"+name;
     if !support::exists(doc,visual) {return support::plan_error("griffin_propulsion_assembly", visual+": engine bell has not composed");}
@@ -100,9 +139,17 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
         ops.push(#{SetAttribute:#{edit_target:edit_target,path:part.path,name:"ui:displayName",
             type_name:"string",value:part.label}});
     }
-    for prim in [#{path:plume,name:name+"Plume",asset:"PlumePhotometry.mo"}] {
+    if !support::exists(doc,group) {
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:root,name:"MainEnginePresentation",
+            type_name:"Scope",reference:(),reference_prim_path:()}});
+    }
+    if !support::exists(doc,presentation) {
+        ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:group,name:name,
+            type_name:"Scope",reference:(),reference_prim_path:()}});
+    }
+    for prim in [#{path:plume,name:"Plume",asset:"PlumePhotometry.mo"}] {
         if !support::exists(doc,prim.path) {
-            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:main,name:prim.name,
+            ops.push(#{AddPrim:#{edit_target:edit_target,parent_path:presentation,name:prim.name,
                 type_name:"Scope",reference:(),reference_prim_path:()}});
         }
         ops.push(#{SetApiSchemas:#{edit_target:edit_target,path:prim.path,schemas:["LunCoProgramAPI"]}});
@@ -132,28 +179,28 @@ fn griffin_main_engine_plan(doc, edit_target, root, name) {
                 type_name:connection.kind,sources:[connection.source]}});
         }
     }
-    for connection in [
-        #{path:engine,name:"inputs:effective_exhaust_velocity_mps",source:nozzle+".outputs:ideal_exhaust_velocity_mps",kind:"float"},
-        #{path:plume,name:"inputs:thrust_n",source:engine+".outputs:thrust_n",kind:"double"},
-        #{path:plume,name:"inputs:maximum_thrust_n",source:engine+".outputs:maximum_thrust_n",kind:"double"},
-        #{path:plume,name:"inputs:propellant_flow_kgs",source:engine+".outputs:propellant_flow",kind:"double"},
-        #{path:plume,name:"inputs:exhaust_velocity_mps",source:engine+".outputs:exhaust_velocity_mps",kind:"double"},
-        #{path:plume,name:"inputs:mixture_ratio",source:engine+".outputs:mixture_ratio",kind:"double"},
-        #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"double"},
-        #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"},
-        #{path:plume,name:"inputs:nozzle_exit_mach",source:nozzle+".outputs:exit_mach",kind:"double"},
-        #{path:plume,name:"inputs:gas_gamma",source:nozzle+".outputs:gamma_out",kind:"double"},
-        #{path:plume,name:"inputs:exit_lip_angle_rad",source:nozzle+".outputs:exit_lip_angle_rad",kind:"double"}] {
-        ops.push(#{SetConnection:#{edit_target:edit_target,path:connection.path,name:connection.name,
-            type_name:connection.kind,sources:[connection.source]}});
-    }
+    // Publish the engine boundary first: presentation inputs read these ports.
     for output in main_engine_root_outputs() {
         ops.push(#{SetConnection:#{edit_target:edit_target,path:main,
             name:"outputs:"+griffin_spec::main_engine_port(name,output),type_name:"double",
             sources:[engine+".outputs:"+output]}});
     }
-    ops.push(#{SetConnection:#{edit_target:edit_target,path:main+"/"+name+"Wall",
-        name:"inputs:propellant_flow_kgs",type_name:"double",sources:[engine+".outputs:propellant_flow"]}});
+    ops.push(#{SetConnection:#{edit_target:edit_target,path:engine,name:"inputs:effective_exhaust_velocity_mps",
+        type_name:"float",sources:[nozzle+".outputs:ideal_exhaust_velocity_mps"]}});
+    for connection in [
+        #{path:plume,name:"inputs:thrust_n",source:main+".outputs:"+griffin_spec::main_engine_port(name,"thrust_n"),kind:"double"},
+        #{path:plume,name:"inputs:maximum_thrust_n",source:main+".outputs:"+griffin_spec::main_engine_port(name,"maximum_thrust_n"),kind:"double"},
+        #{path:plume,name:"inputs:propellant_flow_kgs",source:main+".outputs:"+griffin_spec::main_engine_port(name,"propellant_flow"),kind:"double"},
+        #{path:plume,name:"inputs:exhaust_velocity_mps",source:main+".outputs:"+griffin_spec::main_engine_port(name,"exhaust_velocity_mps"),kind:"double"},
+        #{path:plume,name:"inputs:mixture_ratio",source:main+".outputs:"+griffin_spec::main_engine_port(name,"mixture_ratio"),kind:"double"},
+        #{path:plume,name:"inputs:nozzle_exit_radius_m",source:nozzle+".outputs:exit_radius_m",kind:"double"},
+        #{path:plume,name:"inputs:nozzle_exit_area_m2",source:nozzle+".outputs:exit_area",kind:"float"},
+        #{path:plume,name:"inputs:nozzle_exit_mach",source:nozzle+".outputs:exit_mach",kind:"double"},
+        #{path:plume,name:"inputs:gas_gamma",source:nozzle+".outputs:gamma_out",kind:"double"},
+        #{path:plume,name:"inputs:exit_lip_angle_rad",source:nozzle+".outputs:exit_lip_angle_rad",kind:"double"},
+        #{path:main_engine_wall_path(root,name),name:"inputs:propellant_flow_kgs",source:main+".outputs:"+griffin_spec::main_engine_port(name,"propellant_flow"),kind:"double"}] {
+        for op in _presentation_input_ops(edit_target,presentation,connection.path,connection.name,connection.kind,connection.source) {ops.push(op);}
+    }
     ops.push(#{RemoveAttribute:#{edit_target:edit_target,path:plume,name:"inputs:engine_count"}});
     ops.push(#{SetAttribute:#{edit_target:edit_target,path:plume,name:"parameters:engine_count",
         type_name:"int",value:"1"}});
@@ -315,7 +362,7 @@ fn griffin_propellant_mass_plan(doc, edit_target, root) {
 }
 
 // Admit every engine into the MainPropulsion network: shared throttle, tank
-// outlets, nozzle design, and the explicit member collection.
+// outlets, nozzle design, and the explicit physics member collection.
 fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     let model=sysml_requirements::model();
     if !sysml_model_is(model) {return support::plan_error("griffin_propulsion_assembly", "main-engine source unavailable");}
@@ -353,10 +400,8 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     let fuel_inlets=[];
     let oxidizer_inlets=[];
     for name in names {
-        let plume=main_engine_plume_path(root,name);
         let assembly=main+"/"+name;
         let required=pressure_fed_engine::component_members(assembly);
-        required.push(plume);required.push(main+"/"+name+"Wall");
         for member in required {
             if !support::exists(doc,member) {return support::plan_error("griffin_propulsion_assembly", member+": required propulsion member has not composed");}
             members.push(member);
@@ -387,6 +432,34 @@ fn griffin_main_engine_feed_plan(doc, edit_target, root) {
     #{ok:true,kind:"griffin_main_engine_feed",engine_count:count,ops:ops,no_op:false}
 }
 
+// Admit one engine's plume photometry and nozzle-wall thermal programs into
+// that engine's presentation network. Each MainPropulsion producer they read
+// enters through one boundary input; no presentation output feeds a physics
+// member, and the engines' presentation networks are mutually independent.
+fn griffin_main_engine_presentation_plan(doc, edit_target, root, name) {
+    if !griffin_spec::main_engine_names().contains(name) {return support::plan_error("griffin_propulsion_assembly", "unknown main-engine identity");}
+    let presentation=main_engine_presentation_network(root,name);
+    if !support::exists(doc,presentation) {
+        return support::plan_error("griffin_propulsion_assembly", presentation+": presentation network has not composed");
+    }
+    let members=[main_engine_plume_path(root,name),main_engine_wall_path(root,name)];
+    for member in members {
+        if !support::exists(doc,member) {return support::plan_error("griffin_propulsion_assembly", member+": required presentation member has not composed");}
+    }
+    let ops=[
+        #{SetApiSchemas:#{edit_target:edit_target,path:presentation,schemas:["CollectionAPI:components"]}},
+        #{SetAttribute:#{edit_target:edit_target,path:presentation,name:"ui:displayName",
+            type_name:"string",value:name+" exhaust presentation"}},
+        #{SetAttribute:#{edit_target:edit_target,path:presentation,name:"collection:components:expansionRule",
+            type_name:"token",value:"\"explicitOnly\""}},
+        #{SetRelationship:#{edit_target:edit_target,path:presentation,name:"collection:components:includes",targets:members}}];
+    let routes=network_boundary::route_external_inputs_plan(doc,edit_target,presentation,members,
+        |prim,property| main_engine_presentation_input(prim,property));
+    if !routes.ok {return support::plan_error("griffin_propulsion_assembly", routes.error);}
+    for op in routes.ops {ops.push(op);}
+    #{ok:true,kind:"griffin_main_engine_presentation",engine:name,ops:ops,no_op:false}
+}
+
 fn apply_griffin_main_engine_component(doc, edit_target, root, name, parent_gen) {
     let plan=griffin_main_engine_component_plan(doc,edit_target,root,name);
     if !plan.ok {return plan;}
@@ -406,6 +479,13 @@ fn apply_griffin_main_engine_feed(doc, edit_target, root, parent_gen) {
     if !plan.ok {return plan;}
     let command=assembly_edit::batch(doc,"Feed Griffin main engines from shared tanks",plan.ops,parent_gen);
     #{ok:command.ok!=false,kind:plan.kind,command:command,engine_count:plan.engine_count}
+}
+
+fn apply_griffin_main_engine_presentation(doc, edit_target, root, name, parent_gen) {
+    let plan=griffin_main_engine_presentation_plan(doc,edit_target,root,name);
+    if !plan.ok {return plan;}
+    let command=assembly_edit::batch(doc,"Admit Griffin "+name+" exhaust presentation",plan.ops,parent_gen);
+    #{ok:command.ok!=false,kind:plan.kind,command:command,engine:name}
 }
 
 // Guidance converts acceleration demand with the nominal cluster rating. It is

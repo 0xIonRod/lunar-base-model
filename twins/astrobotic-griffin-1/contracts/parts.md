@@ -20,7 +20,8 @@ graph still needs canonical identity migration and generated realization links.
 | `RoverPayloadDeckCollider` | Hidden clipped-square convex collider matching the central FLIP payload adapter | Enabled, separate from the octagonal perimeter ring | Geometry is derived from adapter dimensions; supplier interface and load rating remain TBD |
 | `TankPX/NX/PZ/NZ` | `components/lander/griffin_tank_visual.usda` through four source references | Four render-only COPV study assemblies at the ordered SysML stations; MainPropulsion owns flight propellant mass | Tank count, type, dimensions, and stations are not established by a public Griffin-1 ICD |
 | `PayloadAdapter` | `AdapterPlate` | Adapter plate with enabled collider; the surface scene owns one fixed FLIP payload joint | The graph names the adapter and release-joint paths and requires both touchdown/settling and a ready egress path before release; mechanical interface dimensions and release-load ICD remain TBD |
-| `MainPropulsion` | Shared fuel and oxidizer tanks, seven USD engine assemblies with explicit valve/chamber members and one `PlumePhotometry` each, representative nozzle design | Each chamber owns delivered thrust; both valves consume `engineNN_enabled`, and USD owns the fluid topology | Nozzle contour, engine-out guidance response, and supplier propulsion data remain TBD |
+| `MainPropulsion` | Shared fuel and oxidizer tanks, seven USD engine assemblies with explicit valve/chamber members, representative nozzle design | Each chamber owns delivered thrust; both valves consume `engineNN_enabled`, and USD owns the fluid topology | Nozzle contour, engine-out guidance response, and supplier propulsion data remain TBD |
+| `MainEnginePresentation` | `Engine01..07`, each a network root with one `PlumePhotometry` (`Plume`) and one `NozzleWallThermal` (`Wall`) program | Reads its engine's delivered state from the `MainPropulsion` boundary and drives only the plume, light and bell glow; no output feeds propulsion physics, so the seven presentation solvers run in parallel beside `MainPropulsion` | Plume optical coefficients remain uncalibrated |
 | `Nozzle` | `MainEngineCluster/Engine01..07`, each with a bell, throat, outer plume, hot core, local plume light and force actuator | Seven non-colliding bells; each applies its own engine's thrust at its station and shows its own plume | Seven main engines are public; bell contour and spacing remain study geometry |
 | `SolarPanelForward`, `SolarPanelFrontStarboard`, `SolarPanelFrontPort` | Each root references `components/lander/griffin_solar_panel_visual.usda`, with `Cells`, `Frame`, dividers, hinge, brackets, and links | Three independently oriented panels use paired bus rails; each installed width derives from its rail span and shared edge clearance | The lower clearance cutout, as-built outline, installation datums, mechanism limits, and electrical behavior require the controlled panel and interface definitions |
 | `LegPX/NX/PZ/NZ` | `Strut` and matching `PadPX/NX/PZ/NZ` | Positive mass body, visible strut, enabled pad collider | Four functional legs; dimensions and damping TBD |
@@ -114,7 +115,7 @@ the nominal SysML cluster rating (`guidanceClusterThrustN`) and is not told
 about a failure.
 
 Each engine's plume presents its own delivered state.
-`MainPropulsion/EngineNNPlume` (`PlumePhotometry`, count 1) consumes that engine's
+`MainEnginePresentation/EngineNN/Plume` (`PlumePhotometry`, count 1) consumes that engine's
 thrust, flow and effective Isp velocity, plus nozzle radius, area, Mach, gamma
 and wall angle from `NozzleDesign`. A failed engine loses its own light and
 volume while the other six remain independent. Rhai authors connections;
